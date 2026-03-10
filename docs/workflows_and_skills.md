@@ -61,11 +61,15 @@ External shell scripts can be used to feed real-time context into the Gemini CLI
 
 - **Schema Context Hook:** 
     - **Status:** **Implemented** (`scripts/extract_schema.cjs`).
-    - **Function:** Parses `src/main/db.ts` to provide a live summary of database tables.
-    - **Activation:** Automatically configured in `.gemini/settings.json`. Run `/skills reload` or restart the CLI session to enable.
+    - **Function:** Parses the structured `src/common/schema.ts` to provide a live summary of database tables.
+    - **Activation:** Automatically configured in `.gemini/settings.json`.
 - **Build Status Hook:** 
     - **Status:** **Implemented** (`scripts/check_build.cjs`).
     - **Function:** Runs `tsc --noEmit` to provide context on type errors after each turn.
+    - **Activation:** Automatically configured in `.gemini/settings.json`.
+- **Lint Status Hook:** 
+    - **Status:** **Implemented** (`scripts/check_lint.cjs`).
+    - **Function:** Runs `eslint` to provide context on code style violations after each turn.
     - **Activation:** Automatically configured in `.gemini/settings.json`.
 
 ---

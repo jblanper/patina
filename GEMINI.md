@@ -30,7 +30,7 @@ This document defines the absolute standards for the Patina project. All develop
 - **Optimization:** Use `React.memo` and `useCallback` strategically in the Gallery grid to ensure smooth scrolling and interaction.
 
 ### Database & File System
-- **SQLite Integrity:** Use `better-sqlite3` with WAL mode. Ensure all writes are atomic and follow the approved schema in `docs/schema_proposal_2026-03-10.md`.
+- **SQLite Integrity:** Use `better-sqlite3` with WAL mode. Ensure all writes are atomic and follow the structured schema defined in `src/common/schema.ts`. This file is the single source of truth for all table and column definitions.
 - **Portable Paths:** Store image paths as relative to the `data/images/` directory. Never use absolute system paths in the database.
 - **Atomic File Operations:** When moving or saving images from the "Lens" bridge, use atomic move/write operations to prevent data loss.
 
@@ -45,7 +45,7 @@ This document defines the absolute standards for the Patina project. All develop
 
 ## 4. Development Workflow
 - **Research First:** Before implementing any new numismatic feature, research historical standards (Numista, PCGS, Museum cataloging).
-- **Validation Mandate:** Every feature must be verified with its corresponding automated test or a documented manual validation step. The workspace is equipped with **Automated Quality Hooks** that check for TypeScript errors and database schema consistency after every turn.
+- **Validation Mandate:** Every feature must be verified with its corresponding automated test or a documented manual validation step. The workspace is equipped with **Automated Quality Hooks** that check for TypeScript errors, linting violations, and database schema consistency after every turn.
 ---
 
 ## 5. Skill Synergy (Specialized Agents)
