@@ -24,7 +24,32 @@
 - **Frontend:** [React](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/)
 - **Build Tool:** [Vite](https://vitejs.dev/)
 - **Database:** [SQLite3](https://sqlite.org/) (via `better-sqlite3`)
-- **Styling:** Vanilla CSS (Oxford Blue & Verdigris theme)
+- **Styling:** Vanilla CSS (Gallery White & Ink Black theme)
+
+---
+
+## Design Standards
+
+Patina follows a strict **"White Cube" Gallery** aesthetic. The interface is a silent frame designed to let historical objects take center stage.
+
+- **Typography:** Inter (Sans-Serif)
+- **Palette:** Gallery White (`#FFFFFF`), Ink Black (`#121212`), Patina Accent (`#43AA8B`)
+- **Documentation:** See [Style Guide (Markdown)](docs/style_guide.md) and [Visual Reference (HTML)](docs/style_guide.html).
+
+---
+
+## Development with Gemini CLI
+
+This project uses specialized **Gemini CLI Skills** to ensure high standards for design, domain accuracy, and security.
+
+- **`curator-ui`**: Enforces the "White Cube" aesthetic.
+- **`numismatic-researcher`**: Ensures technical accuracy for coin records.
+- **`electron-security`**: Audits IPC handlers and process isolation.
+
+**Quick Start:**
+1.  Install skills: `gemini skills install .gemini/skills/* --scope workspace`
+2.  Reload: Run `/skills reload` in your interactive session.
+3.  Mandates: See [GEMINI.md](GEMINI.md) for core engineering rules.
 
 ---
 
