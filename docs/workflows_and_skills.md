@@ -14,10 +14,19 @@ To ensure consistency and quality, the following custom skills are proposed for 
 - **Scope:** Guidance on padding/margin ratios, serif/sans-serif usage, and color palette adherence as defined in `docs/style_guide.md`.
 - **Primary Use:** During the creation or refactoring of any React components.
 
-### B. [PROPOSED NEXT] `numismatic-researcher` (Domain Accuracy)
-- **Role:** Ensures technical accuracy for coin records.
-- **Scope:** Workflows for researching historical fields (e.g., Die Axis), handling non-Gregorian dates, and catalog reference standards.
-- **Primary Use:** When implementing database features or new data entry fields.
+### B. [DONE] `numismatic-researcher` (Domain Accuracy)
+- **Status:** **Implemented** (Professional Cataloging Standards).
+- **Role:** Ensures technical accuracy for coin records and historical context.
+- **Scope:**
+    - **Catalog Standards:** RIC (Roman Imperial), RPC (Roman Provincial), Crawford, etc.
+    - **Technical Metrics:** Die Axis (clock-face), Weight (grams), Diameter (mm).
+    - **Chronology:** Handling of non-Gregorian calendars and Era designations (BC/AD, BCE/CE).
+    - **Physical Description:** Standardized vocabulary for obverse/reverse legends and motifs.
+- **Primary Use:** When implementing database features, new data entry fields, or auditing catalog records.
+- **Workflow:**
+    1. **Research:** Identify specific cataloging standards for the coin's era.
+    2. **Validate:** Cross-reference user input against numismatic conventions.
+    3. **Enrich:** Propose standard descriptions for legends and physical characteristics.
 
 ### C. `electron-security` (System Integrity)
 - **Role:** Security audit for the Electron main process and IPC bridge.
