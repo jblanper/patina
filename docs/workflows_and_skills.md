@@ -12,7 +12,7 @@ Custom skills are stored in `.gemini/skills/` and must be installed in your loca
 If you have just cloned the repository or added a new skill:
 1.  **List Skills:** See what is currently active with `/skills list`.
 2.  **Install/Update:** Skills in `.gemini/skills/` are automatically available to the agent, but if you need to manually refresh the system, run `/skills reload`.
-3.  **Audit:** Use the `curator-ui` skill to audit any new UI code against the `docs/style_guide.md`.
+3.  **Audit:** Use the `curator-ui` skill for UI changes and `electron-security` for any IPC or Main-process modifications.
 
 ---
 
@@ -47,7 +47,7 @@ To ensure consistency and quality, the following custom skills are proposed for 
     - **WebPreferences:** Mandating `contextIsolation`, `nodeIntegration`, and `sandbox`.
     - **IPC Validation:** Defensive coding on the Main process side.
     - **Preload Bridge:** Narrow, secure contextBridge patterns.
-- **Primary Use:** When modifying `src/main/` or IPC handlers.
+- **Primary Use:** When modifying `src/main/`, `preload.ts`, or IPC handlers.
 
 ### D. [PROPOSED NEXT] `patina-release` (Packaging & Distribution)
 - **Role:** Manages the complexity of production builds.
