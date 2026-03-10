@@ -1,5 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
+import { dbService } from './db';
+import { NewCoin, NewCoinImage } from '../common/types';
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -21,6 +23,16 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Database IPC Handlers
+  ipcMain.handle('db:getCoins', () => dbService.getCoins());
+  ipcMain.handle('db:getCoinById', (_, id: number) => dbService.getCoinById(id));
+  ipcMain.handle('db:addCoin', (_, coin: NewCoin) => dbService.addCoin(coin));
+  ipcMain.handle('db:updateCoin', (_, id: number, coin: Partial<NewCoin>) => dbService.updateCoin(id, coin));
+  ipcMain.handle('db:deleteCoin', (_, id: number) => dbService.deleteCoin(id));
+  ipcMain.handle('db:addImage', (_, image: NewCoinImage) => dbService.addImage(image));
+  ipcMain.handle('db:getImagesByCoinId', (_, coinId: number) => dbService.getImagesByCoinId(coinId));
+  ipcMain.handle('db:deleteImage', (_, id: number) => dbService.deleteImage(id));
+
   ipcMain.handle('ping', () => 'pong');
   createWindow();
 

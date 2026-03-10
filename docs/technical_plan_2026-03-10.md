@@ -40,13 +40,15 @@ patina/
 
 ---
 
-## 3. The Ledger (Database Model) - [UNDER REVIEW]
+## 3. The Ledger (Database Model)
 
-> **IMPORTANT:** The database schema below is a preliminary draft. Do not implement until this model has been formally reviewed and approved.
+The database schema has been finalized and approved following a research phase into numismatic standards.
 
-**Proposed Schema:**
-- `coins`: (id, name, year, era, metal, mint, weight, diameter, grade, story, created_at)
-- `images`: (id, coin_id, path, is_primary, created_at)
+**Detailed Specification:** See [Schema Proposal (2026-03-10)](./schema_proposal_2026-03-10.md)
+
+**Core Tables:**
+- `coins`: Detailed historical and physical ledger.
+- `images`: Multi-image support for obverse, reverse, and edge views.
 
 ---
 
