@@ -40,12 +40,16 @@ To ensure consistency and quality, the following custom skills are proposed for 
     2. **Validate:** Cross-reference user input against numismatic conventions.
     3. **Enrich:** Propose standard descriptions for legends and physical characteristics.
 
-### C. `electron-security` (System Integrity)
+### C. [DONE] `electron-security` (System Integrity)
+- **Status:** **Implemented** (Secure IPC & Isolation Standards).
 - **Role:** Security audit for the Electron main process and IPC bridge.
-- **Scope:** Checklist for `preload.ts` changes, ensuring `contextIsolation` integrity, and input sanitization.
+- **Scope:** 
+    - **WebPreferences:** Mandating `contextIsolation`, `nodeIntegration`, and `sandbox`.
+    - **IPC Validation:** Defensive coding on the Main process side.
+    - **Preload Bridge:** Narrow, secure contextBridge patterns.
 - **Primary Use:** When modifying `src/main/` or IPC handlers.
 
-### D. `patina-release` (Packaging & Distribution)
+### D. [PROPOSED NEXT] `patina-release` (Packaging & Distribution)
 - **Role:** Manages the complexity of production builds.
 - **Scope:** Code signing procedures, "Export to USB" bundling, and SQLite dependency verification.
 
