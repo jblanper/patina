@@ -4,6 +4,8 @@ import fs from 'fs';
 import { app } from 'electron';
 import { Coin, CoinImage, NewCoin, NewCoinImage } from '../common/types';
 
+import { SCHEMA, generateSQL } from '../common/schema';
+
 const isDev = !app.isPackaged;
 const dbPath = isDev 
   ? path.join(process.cwd(), 'data', 'patina.db')
@@ -18,48 +20,7 @@ const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 
 // Initialize tables
-db.exec(`
-  CREATE TABLE IF NOT EXISTS coins (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    issuer TEXT,
-    denomination TEXT,
-    year_display TEXT,
-    year_numeric INTEGER,
-    era TEXT DEFAULT 'Modern',
-    mint TEXT,
-    metal TEXT,
-    fineness TEXT,
-    weight REAL,
-    diameter REAL,
-    die_axis TEXT,
-    obverse_legend TEXT,
-    obverse_desc TEXT,
-    reverse_legend TEXT,
-    reverse_desc TEXT,
-    edge_desc TEXT,
-    catalog_ref TEXT,
-    rarity TEXT,
-    grade TEXT,
-    provenance TEXT,
-    story TEXT,
-    purchase_price REAL,
-    purchase_date TEXT,
-    purchase_source TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-
-  CREATE TABLE IF NOT EXISTS images (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    coin_id INTEGER NOT NULL,
-    path TEXT NOT NULL,
-    label TEXT,
-    is_primary INTEGER DEFAULT 0,
-    sort_order INTEGER DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (coin_id) REFERENCES coins(id) ON DELETE CASCADE
-  );
-`);
+db.exec(generateSQL(SCHEMA));
 
 export const dbService = {
   getCoins: (): Coin[] => {

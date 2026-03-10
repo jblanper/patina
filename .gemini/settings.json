@@ -20,6 +20,11 @@
             "name": "patina-build-check",
             "type": "command",
             "command": "node $GEMINI_PROJECT_DIR/scripts/check_build.cjs"
+          },
+          {
+            "name": "patina-lint-check",
+            "type": "command",
+            "command": "node $GEMINI_PROJECT_DIR/scripts/check_lint.cjs"
           }
         ]
       }
