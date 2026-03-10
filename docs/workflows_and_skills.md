@@ -63,7 +63,10 @@ External shell scripts can be used to feed real-time context into the Gemini CLI
     - **Status:** **Implemented** (`scripts/extract_schema.cjs`).
     - **Function:** Parses `src/main/db.ts` to provide a live summary of database tables.
     - **Activation:** Automatically configured in `.gemini/settings.json`. Run `/skills reload` or restart the CLI session to enable.
-- **Build Status Hook:** Passes the results of `npm run build` or `tsc` directly into the agent's context to catch errors immediately.
+- **Build Status Hook:** 
+    - **Status:** **Implemented** (`scripts/check_build.cjs`).
+    - **Function:** Runs `tsc --noEmit` to provide context on type errors after each turn.
+    - **Activation:** Automatically configured in `.gemini/settings.json`.
 
 ---
 
