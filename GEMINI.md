@@ -46,4 +46,12 @@ This document defines the absolute standards for the Patina project. All develop
 ## 4. Development Workflow
 - **Research First:** Before implementing any new numismatic feature, research historical standards (Numista, PCGS, Museum cataloging).
 - **Validation Mandate:** Every feature must be verified with its corresponding automated test or a documented manual validation step.
-- **Documentation:** Update relevant `.md` files in `docs/` whenever the architecture or schema changes. The `docs/style_guide.md` and `docs/style_guide.html` are the authoritative sources for all UI/UX decisions and must be synchronized by the `curator-ui` skill.
+---
+
+## 5. Skill Synergy (Specialized Agents)
+To maintain the high standards of the Patina project, utilize these specialized skills for their respective domains:
+
+- **`curator-ui`:** Use for ALL UI/UX tasks. It enforces the "White Cube" aesthetic and maintains `docs/style_guide.md`. Invoke when creating or refactoring React components.
+- **`numismatic-researcher`:** Use for ALL cataloging and database tasks. It ensures technical accuracy for weights, measurements, and historical chronology. Invoke when modifying `src/main/db.ts` or implementing new data fields.
+
+Before starting a major feature, check `docs/workflows_and_skills.md` for the full list of active and proposed extensions.

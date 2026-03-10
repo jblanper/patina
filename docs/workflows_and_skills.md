@@ -4,6 +4,18 @@ This document outlines the specialized sub-agents, skills, and external hooks us
 
 ---
 
+## 0. Quick Start & Maintenance (Developer Guide)
+
+Custom skills are stored in `.gemini/skills/` and must be installed in your local Gemini CLI environment to be active.
+
+### Installation & Reloading
+If you have just cloned the repository or added a new skill:
+1.  **List Skills:** See what is currently active with `/skills list`.
+2.  **Install/Update:** Skills in `.gemini/skills/` are automatically available to the agent, but if you need to manually refresh the system, run `/skills reload`.
+3.  **Audit:** Use the `curator-ui` skill to audit any new UI code against the `docs/style_guide.md`.
+
+---
+
 ## 1. Custom Skills (Specialized Expertise)
 
 To ensure consistency and quality, the following custom skills are proposed for development:
