@@ -45,7 +45,7 @@ This document defines the absolute standards for the Patina project. All develop
 
 ## 4. Development Workflow
 - **Research First:** Before implementing any new numismatic feature, research historical standards (Numista, PCGS, Museum cataloging).
-- **Validation Mandate:** Every feature must be verified with its corresponding automated test or a documented manual validation step.
+- **Validation Mandate:** Every feature must be verified with its corresponding automated test or a documented manual validation step. The workspace is equipped with **Automated Quality Hooks** that check for TypeScript errors and database schema consistency after every turn.
 ---
 
 ## 5. Skill Synergy (Specialized Agents)
