@@ -1,0 +1,72 @@
+:root {
+  --oxford-blue: #0B132B;
+  --forest-green: #1B3022;
+  --aged-bronze: #8D5B4C;
+  --verdigris: #43AA8B;
+  --off-white: #F5F5F5;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--off-white);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  color: var(--oxford-blue);
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  background-color: var(--oxford-blue);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 4px solid var(--aged-bronze);
+}
+
+header h1 {
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.welcome-screen {
+  text-align: center;
+  padding: 3rem;
+  border: 1px solid #ddd;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.welcome-screen h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
