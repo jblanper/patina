@@ -2,27 +2,28 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Patina Database Schema Extractor
- * This script parses src/main/db.ts to provide a live summary of the 
- * current database structure for the Gemini CLI context.
+ * Patina Database Schema Extractor Hook
+ * This script parses src/main/db.ts and outputs a JSON object 
+ * for the Gemini CLI to inject as session context.
  */
 
 const DB_PATH = path.join(__dirname, '../src/main/db.ts');
 
 try {
+  if (!fs.existsSync(DB_PATH)) {
+    process.stderr.write(`Error: ${DB_PATH} does not exist\n`);
+    process.exit(1);
+  }
+
   const content = fs.readFileSync(DB_PATH, 'utf8');
-  
-  // Extract the content inside db.exec(`...`)
   const execMatch = content.match(/db\.exec\(`([\s\S]*?)`\)/);
   
   if (!execMatch) {
-    console.log('Error: Could not find db.exec call in src/main/db.ts');
+    process.stderr.write('Error: Could not find db.exec call in src/main/db.ts\n');
     process.exit(1);
   }
 
   const sql = execMatch[1];
-  
-  // Clean up and summarize the SQL for context efficiency
   const summary = sql
     .split(';')
     .map(statement => {
@@ -31,7 +32,7 @@ try {
         const tableName = tableMatch[1];
         const columns = tableMatch[2]
           .split(',')
-          .map(col => col.trim().split(/\s+/)[0]) // Just the column names
+          .map(col => col.trim().split(/\s+/)[0])
           .filter(name => name && !name.startsWith('FOREIGN') && !name.startsWith('PRIMARY'));
         
         return `Table: ${tableName} (${columns.join(', ')})`;
@@ -41,10 +42,19 @@ try {
     .filter(Boolean)
     .join('\n');
 
-  console.log('--- Current Database Schema Summary ---');
-  console.log(summary);
-  console.log('---------------------------------------');
+  const contextMessage = `--- Current Database Schema Summary ---\n${summary}\n---------------------------------------`;
+
+  // MUST output exactly one JSON object to stdout
+  const output = {
+    hookSpecificOutput: {
+      additionalContext: contextMessage
+    },
+    systemMessage: "Database schema context loaded."
+  };
+
+  process.stdout.write(JSON.stringify(output));
 
 } catch (err) {
-  console.log(`Error reading schema: ${err.message}`);
+  process.stderr.write(`Error reading schema: ${err.message}\n`);
+  process.exit(1);
 }

@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "name": "patina-schema-loader",
+            "type": "command",
+            "command": "node $GEMINI_PROJECT_DIR/scripts/extract_schema.cjs"
+          }
+        ]
+      }
+    ]
+  }
+}
