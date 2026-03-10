@@ -70,15 +70,19 @@ The database schema has been finalized and approved following a research phase i
 
 ## 5. Implementation Phases
 
-### Phase 1: Foundation (Current)
-- [ ] Scaffold Electron + React (TypeScript) base.
-- [ ] Configure `better-sqlite3` (pending schema approval).
-- [ ] Establish "Museum Label" design system (Typography, Colors).
+### Phase 1: Foundation (Completed)
+- [x] Scaffold Electron + React (TypeScript) base.
+- [x] Configure `better-sqlite3` with the approved curator schema.
+- [x] Establish "Museum Label" design system (Typography, Colors).
+- [x] Implement IPC bridge for secure Main/Renderer communication.
 
-### Phase 2: The Display Case (Gallery)
-- [ ] Implement the visual grid view for coin obverses.
-- [ ] Build the "Patina Filters" sidebar (Era, Metal).
-- [ ] Develop the prominent search bar for Year/Country.
+### Phase 2: The Display Case (Current)
+- [ ] **Data Management:** Develop `useCoins()` custom hook for centralized state, filtering, and DB interaction.
+- [ ] **Gallery Grid:** Build `GalleryGrid` and `CoinCard` components with "Museum Label" aesthetic.
+- [ ] **Sidebar Filters:** Create `PatinaSidebar` with multi-select filters for Era (Ancient, Medieval, Modern) and Metal (Gold, Silver, Bronze).
+- [ ] **Global Search:** Implement a prominent, stylized `SearchBar` for real-time filtering by Year, Country, or Title.
+- [ ] **Empty State:** Design a prestigious "Empty Case" view to encourage adding the first coin.
+- [ ] **Optimization:** Implement `React.memo` and image lazy-loading for large collections.
 
 ### Phase 3: The Ledger (Record View)
 - [ ] Build the detailed coin record display.
