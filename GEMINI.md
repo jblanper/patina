@@ -5,7 +5,7 @@ This document defines the absolute standards for the Patina project. All develop
 ---
 
 ## 1. Core Philosophy: The Curator's Tool
-- **Aesthetic Prestige:** Every UI element must feel like a museum label or a high-end ledger. Use serif headings (*Playfair Display*), clean borders, and generous margins. Avoid "techy" dashboards.
+- **Aesthetic Prestige:** Every UI element must feel like a museum label or a high-end archival ledger. Follow the "White Cube" Gallery aesthetic: a silent frame that recedes to let historical objects take center stage. Use **Inter (Sans-Serif)** for all typography as defined in `docs/style_guide.md`. Avoid "techy" dashboards.
 - **Privacy First:** Data never leaves the user's computer. No external telemetry, no cloud sync, and no third-party CDNs. All assets (fonts, icons) must be local.
 - **The Single-Click Rule:** Features must be accessible within two clicks. Keep the hierarchy flat and the navigation intuitive.
 
@@ -26,7 +26,7 @@ This document defines the absolute standards for the Patina project. All develop
 ### React & Frontend Architecture
 - **Component Focused:** One file per component. Keep components small, focused, and documented with TS interfaces for props.
 - **Custom Hooks:** All database interaction, filtering logic, or bridge state must be encapsulated in custom hooks (e.g., `useCoins()`, `useLens()`).
-- **Vanilla CSS:** Use CSS variables for the color palette (`--oxford-blue`, `--verdigris`, etc.). Follow a simple, consistent naming convention like BEM-lite.
+- **Vanilla CSS:** Use CSS variables for the color palette (`--bg-gallery`, `--text-ink`, `--accent-patina`, etc.) as defined in `docs/style_guide.md`. Follow a simple, consistent naming convention like BEM-lite.
 - **Optimization:** Use `React.memo` and `useCallback` strategically in the Gallery grid to ensure smooth scrolling and interaction.
 
 ### Database & File System
@@ -46,4 +46,4 @@ This document defines the absolute standards for the Patina project. All develop
 ## 4. Development Workflow
 - **Research First:** Before implementing any new numismatic feature, research historical standards (Numista, PCGS, Museum cataloging).
 - **Validation Mandate:** Every feature must be verified with its corresponding automated test or a documented manual validation step.
-- **Documentation:** Update relevant `.md` files in `docs/` whenever the architecture or schema changes.
+- **Documentation:** Update relevant `.md` files in `docs/` whenever the architecture or schema changes. The `docs/style_guide.md` and `docs/style_guide.html` are the authoritative sources for all UI/UX decisions and must be synchronized by the `curator-ui` skill.

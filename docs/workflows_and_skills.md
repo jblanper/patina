@@ -8,12 +8,13 @@ This document outlines the specialized sub-agents, skills, and external hooks us
 
 To ensure consistency and quality, the following custom skills are proposed for development:
 
-### A. `curator-ui` (Design & Aesthetics)
+### A. [DONE] `curator-ui` (Design & Aesthetics)
+- **Status:** **Implemented** (v2.0 Gallery Aesthetic).
 - **Role:** Enforces the "Museum Label" aesthetic.
-- **Scope:** Guidance on padding/margin ratios, serif/sans-serif usage, and color palette adherence as defined in `GEMINI.md`.
+- **Scope:** Guidance on padding/margin ratios, serif/sans-serif usage, and color palette adherence as defined in `docs/style_guide.md`.
 - **Primary Use:** During the creation or refactoring of any React components.
 
-### B. `numismatic-researcher` (Domain Accuracy)
+### B. [PROPOSED NEXT] `numismatic-researcher` (Domain Accuracy)
 - **Role:** Ensures technical accuracy for coin records.
 - **Scope:** Workflows for researching historical fields (e.g., Die Axis), handling non-Gregorian dates, and catalog reference standards.
 - **Primary Use:** When implementing database features or new data entry fields.

@@ -55,3 +55,12 @@ We use a **100% Sans-Serif** approach to achieve a prestigious, modern archival 
 - **Solid Actions:** Black background (`--text-ink`) with white text. High-contrast, no rounding.
 - **Minimal Actions:** Text-only with a bottom border (`1px solid var(--text-ink)`).
 - **Hover:** All actions transition to `--accent-patina`.
+- **Focus:** Accessibility is key; active focus states use `2px solid` outlines with offset.
+
+### Form Inputs
+- **Style:** Underlined only (`border-bottom`). No side or top borders.
+- **Focus:** Transition `border-bottom` to `var(--text-ink)`.
+- **Labels:** Use "Catalog Label" typography (Small, Uppercase, Spaced).
+
+### Empty States
+- **The "Silent Gallery" Rule:** Use dashed borders and centered, uppercase typography to indicate empty views. Avoid playful illustrations; maintain a somber, archival tone.
