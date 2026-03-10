@@ -59,7 +59,10 @@ To ensure consistency and quality, the following custom skills are proposed for 
 
 External shell scripts can be used to feed real-time context into the Gemini CLI environment:
 
-- **Schema Context Hook:** Triggers on changes to `src/main/db.ts` to provide an updated summary of the database tables.
+- **Schema Context Hook:** 
+    - **Status:** **Implemented** (`scripts/extract_schema.cjs`).
+    - **Function:** Parses `src/main/db.ts` to provide a live summary of database tables.
+    - **Activation:** Run `gemini config hooks set --scope workspace --on-session "node scripts/extract_schema.cjs"` to enable.
 - **Build Status Hook:** Passes the results of `npm run build` or `tsc` directly into the agent's context to catch errors immediately.
 
 ---
