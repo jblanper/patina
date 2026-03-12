@@ -26,6 +26,20 @@ This document defines the absolute standards for the Patina project. All develop
 - **Shared Types:** All domain models (Coins, Images) must be defined in `src/common/types.ts` and shared between Main and Renderer.
 - **Immutability:** Prefer `const` and `readonly` properties. Use functional patterns for data transformations.
 
+### Dependency Management
+
+- **Version Strategy:** Use caret (^) for semantic versioning to receive non-breaking updates automatically.
+- **Security:** Run `npm audit` in CI. Address HIGH/CVE vulnerabilities within 48 hours.
+- **Lockfile:** Always commit `package-lock.json`. Never use `--no-package-lock`.
+- **Upgrade Process:**
+  1. Create branch: `deps/upgrade-<package>-<version>`
+  2. Update version in `package.json`
+  3. Run full test suite, lint, and build
+  4. Ensure `npm audit` passes with no vulnerabilities
+  5. Document in changelog
+- **Critical Dependencies:** Electron, better-sqlite3, express require extended testing and manual review before upgrade.
+- **Obsolete Packages:** Replace within 30 days of deprecation; use `npm depcheck` monthly.
+
 ### React & Frontend Architecture
 - **Component Focused:** One file per component. Keep components small, focused, and documented with TS interfaces for props.
 - **Custom Hooks:** All database interaction, filtering logic, or bridge state must be encapsulated in custom hooks (e.g., `useCoins()`, `useLens()`).
