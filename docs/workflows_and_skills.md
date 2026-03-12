@@ -12,7 +12,7 @@ Custom skills are stored in `.gemini/skills/` and must be installed in your loca
 If you have just cloned the repository or added a new skill:
 1.  **List Skills:** See what is currently active with `/skills list`.
 2.  **Install/Update:** Skills in `.gemini/skills/` are automatically available to the agent, but if you need to manually refresh the system, run `/skills reload`.
-3.  **Audit:** Use the `curating-ui` skill for UI changes, `electron-security` for IPC modifications, and `numismatic-researcher` for any new data fields or cataloging records.
+3.  **Audit:** Use the `curating-ui` skill for UI changes, `securing-electron` for IPC modifications, and `numismatic-researcher` for any new data fields or cataloging records.
 
 ---
 
@@ -40,13 +40,14 @@ To ensure consistency and quality, the following custom skills are proposed for 
     2. **Validate:** Cross-reference user input against numismatic conventions.
     3. **Enrich:** Propose standard descriptions for legends and physical characteristics.
 
-### C. [DONE] `electron-security` (System Integrity)
-- **Status:** **Implemented** (Secure IPC & Isolation Standards).
+### C. [DONE] `securing-electron` (System Integrity)
+- **Status:** **Implemented** (Secure IPC, Isolation, & Navigation Standards).
 - **Role:** Security audit for the Electron main process and IPC bridge.
 - **Scope:** 
     - **WebPreferences:** Mandating `contextIsolation`, `nodeIntegration`, and `sandbox`.
     - **IPC Validation:** Defensive coding on the Main process side.
     - **Preload Bridge:** Narrow, secure contextBridge patterns.
+    - **Session & Navigation:** Strict `will-navigate` and `setWindowOpenHandler` controls.
 - **Primary Use:** When modifying `src/main/`, `preload.ts`, or IPC handlers.
 
 ### D. [PROPOSED NEXT] `patina-release` (Packaging & Distribution)
