@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, session } from 'electron';
 import path from 'path';
 import { dbService } from './db';
 import { NewCoin, NewCoinImage } from '../common/types';
@@ -11,6 +11,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
+      sandbox: true,
     },
     title: 'Patina - Historical Coin Archive',
   });
@@ -22,7 +23,36 @@ function createWindow() {
   }
 }
 
+app.on('web-contents-created', (_, contents) => {
+  // Navigation control: Prevent unauthorized top-level navigation
+  contents.on('will-navigate', (event, navigationUrl) => {
+    const parsedUrl = new URL(navigationUrl);
+    const devServerUrl = process.env.VITE_DEV_SERVER_URL;
+    
+    if (devServerUrl) {
+      const devOrigin = new URL(devServerUrl).origin;
+      if (parsedUrl.origin !== devOrigin && parsedUrl.protocol !== 'file:') {
+        console.warn(`Blocked unauthorized navigation to: ${navigationUrl}`);
+        event.preventDefault();
+      }
+    } else if (parsedUrl.protocol !== 'file:') {
+      console.warn(`Blocked unauthorized navigation to: ${navigationUrl}`);
+      event.preventDefault();
+    }
+  });
+
+  // Window opening control: Block all unauthorized window creation
+  contents.setWindowOpenHandler(({ url }) => {
+    console.warn(`Blocked unauthorized window opening to: ${url}`);
+    return { action: 'deny' };
+  });
+});
+
 app.whenReady().then(() => {
+  // Set permission request handler to deny all by default
+  session.defaultSession.setPermissionRequestHandler((_webContents, _permission, callback) => {
+    return callback(false);
+  });
   // Database IPC Handlers
   ipcMain.handle('db:getCoins', () => dbService.getCoins());
   ipcMain.handle('db:getCoinById', (_, id: number) => dbService.getCoinById(id));

@@ -4,7 +4,7 @@ Use these rules to rigorously evaluate the target skill against the open standar
 
 ## 1. Metadata & Naming Rules
 - **Name**: Max 64 characters, lowercase, numbers, and hyphens only. No XML tags. Cannot contain reserved words ("anthropic", "claude", "gemini", "google").
-- **Naming Convention**: Prefer the gerund form (e.g., `processing-pdfs`) or clear noun phrases. Avoid vague words like `helper`, `utils`, `tools`.
+- **Naming Convention**: MUST use the gerund form (e.g., `securing-electron`, NOT `electron-security`). Avoid vague words like `helper`, `utils`, `tools`.
 - **Description Tone**: Must be written in the **third person** (e.g., "Extracts text...", NOT "I extract..." or "You can use this to...").
 - **Description Triggers**: Must clearly state what the skill does AND provide specific triggers for when the CLI should autonomously activate it.
 
