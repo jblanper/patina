@@ -38,28 +38,6 @@ Patina follows a strict **"White Cube" Gallery** aesthetic. The interface is a s
 
 ---
 
-## Development with Gemini CLI
-
-This project uses specialized **Gemini CLI Skills** and **Automated Quality Hooks** to ensure high standards for design, domain accuracy, and security.
-
-### Specialized Skills:
-- **`curating-ui`**: Enforces the "White Cube" aesthetic.
-- **`numismatic-researcher`**: Ensures technical accuracy for coin records.
-- **`electron-security`**: Audits IPC handlers and process isolation.
-
-### Automated Quality Hooks:
-The workspace is equipped with real-time feedback hooks that trigger after every turn:
-- **Build Status**: Automated `tsc --noEmit` checks.
-- **Lint Status**: Automated `eslint` code style audits.
-- **Schema Sync**: Automatic extraction of the structured database schema.
-
-**Quick Start:**
-1.  Install skills: `gemini skills install .gemini/skills/* --scope workspace`
-2.  Reload: Run `/skills reload` in your interactive session.
-3.  Mandates: See [GEMINI.md](GEMINI.md) for core engineering rules.
-
----
-
 ## Getting Started
 
 ### Prerequisites
