@@ -1,7 +1,10 @@
 # AGENTS.md
 
+**Version:** 1.0  
+**Last Updated:** 2026-03-12
+
 ## 1. Build/lint/test commands
-- **Build**: `npm run build --silent` (uses Next.js optimization)
+- **Build**: `npm run build --silent` (uses Vite optimization)
 - **Lint**: `npm run lint -- --fix` (auto-fixes style violations)
 - **Test**: `npm test -- --testNamePattern=".*feature.*"` (runs specific tests)
 - **Single test**: `npm test -- --runTestsByPath "/Users/joseblancoperales/code/patina/src/features/dashboard/Widget.test.tsx"`

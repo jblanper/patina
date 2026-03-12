@@ -2,10 +2,13 @@
 
 This document defines the absolute standards for the Patina project. All development must rigorously adhere to these rules to maintain the "Curator-First" experience and ensure system integrity.
 
+**Version:** 1.0  
+**Last Updated:** 2026-03-12
+
 ---
 
 ## 1. Core Philosophy: The Curator's Tool
-- **Aesthetic Prestige:** Every UI element must feel like a museum label or a high-end archival ledger. Follow the "White Cube" Gallery aesthetic: a silent frame that recedes to let historical objects take center stage. Use **Inter (Sans-Serif)** for all typography as defined in `docs/style_guide.md`. Avoid "techy" dashboards.
+- **Aesthetic Prestige:** Every UI element must feel like a museum label or a high-end archival ledger. Follow the **Archival Ledger** aesthetic: a silent frame that recedes to let historical objects take center stage. All visual design, typography, and styling must comply with `docs/style_guide.md`. Avoid "techy" dashboards.
 - **Privacy First:** Data never leaves the user's computer. No external telemetry, no cloud sync, and no third-party CDNs. All assets (fonts, icons) must be local.
 - **The Single-Click Rule:** Features must be accessible within two clicks. Keep the hierarchy flat and the navigation intuitive.
 
@@ -26,7 +29,7 @@ This document defines the absolute standards for the Patina project. All develop
 ### React & Frontend Architecture
 - **Component Focused:** One file per component. Keep components small, focused, and documented with TS interfaces for props.
 - **Custom Hooks:** All database interaction, filtering logic, or bridge state must be encapsulated in custom hooks (e.g., `useCoins()`, `useLens()`).
-- **Vanilla CSS:** Use CSS variables for the color palette (`--bg-gallery`, `--text-ink`, `--accent-patina`, etc.) as defined in `docs/style_guide.md`. Follow a simple, consistent naming convention like BEM-lite.
+- **Styling:** All CSS, visual design, and component styling must follow the standards defined in `docs/style_guide.md`. This document is the authoritative source for the Archival Ledger aesthetic.
 - **Optimization:** Use `React.memo` and `useCallback` strategically in the Gallery grid to ensure smooth scrolling and interaction.
 
 ### Database & File System
@@ -38,16 +41,38 @@ This document defines the absolute standards for the Patina project. All develop
 
 ## 3. The "Lens" Bridge (Express.js)
 - **Local Network Only:** The server must bind only to local network interfaces.
-- **Input Sanitization:** Use `zod` or equivalent to validate all incoming multipart/form-data.
+- **Input Sanitization:** Use `zod` to validate all incoming multipart/form-data. Define strict schemas with clear error messages.
 - **Stateless Design:** The Express server is a passthrough. It should receive the image, hand it to the Main process for indexing, and return a simple status code.
+- **Security:** Apply `helmet` middleware and restrict CORS to localhost only.
+- **File Handling:** Validate MIME types (image/jpeg, image/png, image/webp) and enforce a 10MB size limit.
 
 ---
 
 ## 4. Development Workflow
 - **Research First:** Before implementing any new numismatic feature, research historical standards (Numista, PCGS, Museum cataloging).
 - **Validation Mandate:** Every feature must be verified with its corresponding automated test or a documented manual validation step. The workspace is equipped with **Automated Quality Hooks** that check for TypeScript errors, linting violations, and database schema consistency after every turn.
+  - **Coverage:** Maintain 80%+ overall coverage with 100% branch coverage for critical paths (database, IPC, file operations).
+  - **Framework:** Use Vitest with React Testing Library.
+  - **Test Structure:** Colocate tests with source files (e.g., `Component.test.tsx`) or use a centralized `src/__tests__/` directory.
 ---
 
-## 5. Skill Synergy (Specialized Agents)
+## 5. Error Handling
+
+All async operations must use try/catch with descriptive error messages:
+
+```typescript
+try {
+  const result = await someAsyncOperation();
+  return result;
+} catch (error) {
+  throw new Error(`Operation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+}
+```
+
+Never use empty catch blocks. Log errors with context for debugging, ensuring no sensitive data is exposed.
+
+---
+
+## 6. Skill Synergy (Specialized Agents)
 To maintain the high standards of the Patina project, utilize the specialized skills and sub-agents defined in [docs/workflows_and_skills.md](docs/workflows_and_skills.md). These extensions provide expert guidance and validation for specific domains of the project.
 
