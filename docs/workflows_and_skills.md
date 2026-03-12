@@ -1,81 +1,65 @@
-# Patina - Gemini CLI Workflows & Extensions
+# Patina: Gemini CLI Extensions & Workflows
 
-This document outlines the specialized sub-agents, skills, and external hooks used to maintain the high standards of the Patina project.
-
----
-
-## 0. Quick Start & Maintenance (Developer Guide)
-
-Custom skills are stored in `.gemini/skills/` and must be installed in your local Gemini CLI environment to be active.
-
-### Installation & Reloading
-If you have just cloned the repository or added a new skill:
-1.  **List Skills:** See what is currently active with `/skills list`.
-2.  **Install/Update:** Skills in `.gemini/skills/` are automatically available to the agent, but if you need to manually refresh the system, run `/skills reload`.
-3.  **Audit:** Use the `curating-ui` skill for UI changes, `securing-electron` for IPC modifications, and `numismatic-researcher` for any new data fields or cataloging records.
+This document provides a technical reference for the specialized skills, sub-agents, and automation hooks that extend the Gemini CLI for the Patina project. These extensions ensure that all development adheres to our core philosophy of museum-grade aesthetics and technical integrity.
 
 ---
 
-## 1. Custom Skills (Specialized Expertise)
+## 1. Management & Installation
 
-To ensure consistency and quality, the following custom skills are proposed for development:
+Custom skills are stored in the project's `.gemini/skills/` directory. They are automatically available to the agent, but may require a manual refresh if changes are made to the skill definitions.
 
-### A. [DONE] `curating-ui` (Design & Aesthetics)
-- **Status:** **Implemented** (v2.0 Gallery Aesthetic).
-- **Role:** Enforces the "Museum Label" aesthetic.
-- **Scope:** Guidance on padding/margin ratios, serif/sans-serif usage, and color palette adherence as defined in `docs/style_guide.md`.
-- **Primary Use:** During the creation or refactoring of any React components.
+### Commands
+- **List Skills:** Use `/skills list` to view all active skills in your environment.
+- **Reload Skills:** Use `/skills reload` to refresh the agent's knowledge of the skills in `.gemini/skills/`.
 
-### B. [DONE] `numismatic-researcher` (Domain Accuracy)
-- **Status:** **Implemented** (Professional Cataloging Standards).
-- **Role:** Ensures technical accuracy for coin records and historical context.
-- **Scope:**
-    - **Catalog Standards:** RIC (Roman Imperial), RPC (Roman Provincial), Crawford, etc.
-    - **Technical Metrics:** Die Axis (clock-face), Weight (grams), Diameter (mm).
-    - **Chronology:** Handling of non-Gregorian calendars and Era designations (BC/AD, BCE/CE).
-    - **Physical Description:** Standardized vocabulary for obverse/reverse legends and motifs.
-- **Primary Use:** When implementing database features, new data entry fields, or auditing catalog records.
-- **Workflow:**
-    1. **Research:** Identify specific cataloging standards for the coin's era.
-    2. **Validate:** Cross-reference user input against numismatic conventions.
-    3. **Enrich:** Propose standard descriptions for legends and physical characteristics.
+---
 
-### C. [DONE] `securing-electron` (System Integrity)
-- **Status:** **Implemented** (Secure IPC, Isolation, & Navigation Standards).
-- **Role:** Security audit for the Electron main process and IPC bridge.
+## 2. Core Skill Reference
+
+The following specialized skills provide expert guidance and validation for specific domains of the Patina project.
+
+### `curating-ui` (Aesthetics & Design)
+Ensures every interface element adheres to the "White Cube" Gallery aesthetic.
+- **Scope:** Enforces padding/margin ratios, typography standards (Inter), and the project's muted color palette.
+- **Primary Use:** Invoke when creating or refactoring React components in `src/renderer/`.
+- **References:** See `docs/style_guide.md` for the underlying design principles.
+
+### `numismatic-researcher` (Domain Accuracy)
+Maintains historical and technical integrity for all coin-related data.
+- **Scope:** Standardizes cataloging (RIC, RPC, Crawford), technical metrics (weight, diameter, die axis), and historical chronology (BC/AD).
+- **Primary Use:** Invoke when modifying `src/main/db.ts`, adding data entry fields, or auditing catalog records.
+
+### `securing-electron` (System Integrity)
+Performs automated and manual security audits of the Electron environment.
 - **Scope:** 
-    - **WebPreferences:** Mandating `contextIsolation`, `nodeIntegration`, and `sandbox`.
-    - **IPC Validation:** Defensive coding on the Main process side.
-    - **Preload Bridge:** Narrow, secure contextBridge patterns.
-    - **Session & Navigation:** Strict `will-navigate` and `setWindowOpenHandler` controls.
-- **Primary Use:** When modifying `src/main/`, `preload.ts`, or IPC handlers.
-
-### D. [PROPOSED NEXT] `patina-release` (Packaging & Distribution)
-- **Role:** Manages the complexity of production builds.
-- **Scope:** Code signing procedures, "Export to USB" bundling, and SQLite dependency verification.
+    - **Isolation:** Enforces `contextIsolation`, `nodeIntegration: false`, and `sandbox: true`.
+    - **IPC Safety:** Validates all data traversing the `contextBridge`.
+    - **Navigation:** Implements strict controls on `will-navigate` and window creation.
+- **Primary Use:** Invoke when modifying `src/main/index.ts`, `src/main/preload.ts`, or any IPC handlers.
 
 ---
 
-## 2. External Workflow Hooks
+## 3. Automated Quality Hooks
 
-External shell scripts can be used to feed real-time context into the Gemini CLI environment:
+Patina utilizes background scripts to provide the agent with real-time feedback and technical context after every turn. These are configured in `.gemini/settings.json`.
 
-- **Schema Context Hook:** 
-    - **Status:** **Implemented** (`scripts/extract_schema.cjs`).
-    - **Function:** Parses the structured `src/common/schema.ts` to provide a live summary of database tables.
-    - **Activation:** Automatically configured in `.gemini/settings.json`.
-- **Build Status Hook:** 
-    - **Status:** **Implemented** (`scripts/check_build.cjs`).
-    - **Function:** Runs `tsc --noEmit` to provide context on type errors after each turn.
-    - **Activation:** Automatically configured in `.gemini/settings.json`.
-- **Lint Status Hook:** 
-    - **Status:** **Implemented** (`scripts/check_lint.cjs`).
-    - **Function:** Runs `eslint` to provide context on code style violations after each turn.
-    - **Activation:** Automatically configured in `.gemini/settings.json`.
+- **Schema Context (`scripts/extract_schema.cjs`):** Parses `src/common/schema.ts` to provide the current database table definitions as live context.
+- **Build Verification (`scripts/check_build.cjs`):** Executes `tsc --noEmit` to identify TypeScript errors across the workspace.
+- **Style Audit (`scripts/check_lint.cjs`):** Runs ESLint to ensure code adheres to the project's linting rules.
 
 ---
 
-## 3. Sub-Agent Strategy
+## 4. Sub-Agent Orchestration
 
-- **`codebase_investigator`:** Used for mapping architectural dependencies, especially when refactoring the "Ledger" or "Lens" bridge.
-- **`generalist`:** Utilized for high-volume tasks like generating localized strings, batch-processing SVG assets, or cleaning up boilerplate.
+For complex tasks, use specialized sub-agents to maintain context efficiency:
+
+- **`codebase_investigator`:** Recommended for architectural mapping, dependency tracing, or large-scale refactors of the Ledger or Lens systems.
+- **`generalist`:** Efficient for high-volume, low-complexity tasks such as localized string generation or batch asset processing.
+
+---
+
+## 5. Development Pipeline (Future Extensions)
+
+New extensions are prioritized based on their impact on the curator experience. Currently proposed extensions include:
+
+- **`patina-release`:** A specialized skill for managing production builds, code signing, and SQLite distribution verification.
