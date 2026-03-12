@@ -16,8 +16,9 @@ When you have completed your evaluation of the target skill, you must format you
 - **Conciseness**: [Pass/Fail] - [Reason]
 - **Progressive Disclosure**: [Pass/Fail] - [Reason]
 
-## Workflows & Interoperability
+## Workflows, Patterns & Interoperability
 - **Checklists/Loops**: [Pass/Fail] - [Reason]
+- **Formatting/Tone**: [Pass/Fail] - [Reason]
 - **Cross-Platform Compatibility**: [Pass/Fail] - [Reason]
 
 ## Bundled Scripts (if applicable)

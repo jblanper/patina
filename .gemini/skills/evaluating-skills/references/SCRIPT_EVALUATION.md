@@ -14,6 +14,10 @@ When a skill includes bundled scripts, those scripts must be designed to work se
 - **Cross-Platform**: Scripts should ideally use standard cross-platform paths (forward slashes `/`) or handle OS-specific pathing gracefully.
 - **Execution Context**: Scripts must not assume they are running interactively. They should not use `read` prompts or require user keystrokes (unless specifically testing an interactive flow).
 
-## 4. Dependencies
+## 4. Idempotency & Safety
+- **Safe Retries**: Because Claude operates in a loop (Run -> Fail -> Fix -> Run), scripts should ideally be idempotent (safe to run multiple times without corrupting state) or have a clear rollback mechanism.
+- **Dry Runs**: For destructive or permanent operations, the script should ideally support a `--dry-run` or `--verify` flag.
+
+## 5. Dependencies
 - **Simplicity**: Scripts should rely on standard libraries where possible.
 - **Documentation**: External dependencies must be clearly documented in the skill so the agent knows to install them.

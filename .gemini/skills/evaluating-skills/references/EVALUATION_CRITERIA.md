@@ -5,6 +5,7 @@ Use these rules to rigorously evaluate the target skill against the open standar
 ## 1. Metadata & Naming Rules
 - **Name**: Max 64 characters, lowercase, numbers, and hyphens only. No XML tags. Cannot contain reserved words ("anthropic", "claude", "gemini", "google").
 - **Naming Convention**: MUST use the gerund form (e.g., `securing-electron`, NOT `electron-security`). Avoid vague words like `helper`, `utils`, `tools`.
+- **Description**: Max 1024 characters. Must be non-empty and have no XML tags.
 - **Description Tone**: Must be written in the **third person** (e.g., "Extracts text...", NOT "I extract..." or "You can use this to...").
 - **Description Triggers**: Must clearly state what the skill does AND provide specific triggers for when the CLI should autonomously activate it.
 
@@ -21,3 +22,7 @@ Use these rules to rigorously evaluate the target skill against the open standar
 ## 4. Workflows & Feedback Loops
 - **Checklists**: Multi-step workflows should provide a copyable markdown checklist that the agent can use to track progress.
 - **Validation**: Operations should implement clear feedback loops (e.g., Edit -> Validate -> Fix -> Repack).
+
+## 5. Content Formatting
+- **Time-Sensitivity**: The skill should not include time-sensitive information that will expire. Legacy information should be placed in toggles or specific "Old patterns" sections.
+- **Terminology**: The skill must use consistent terminology throughout (e.g., picking either "field" or "element" and sticking to it).
