@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patina - The Gallery Design System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gallery: #FFFFFF;
+            --text-ink: #121212;
+            --text-muted: #757575;
+            --border-hairline: #EEEEEE;
+            --accent-patina: #43AA8B;
+            --stone-gray: #F5F5F5;
+            --font-main: 'Inter', sans-serif;
+            --spacing-large: 4rem;
+            --spacing-med: 2rem;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-gallery);
+            color: var(--text-ink);
+            line-height: 1.4;
+            padding: var(--spacing-large);
+        }
+
+        header {
+            max-width: 1200px;
+            margin: 0 auto var(--spacing-large);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--text-ink);
+            padding-bottom: 1.5rem;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .version {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        section {
+            max-width: 1200px;
+            margin: 0 auto var(--spacing-large);
+        }
+
+        h2 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        /* Color Palette */
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background-color: var(--border-hairline);
+            border: 1px solid var(--border-hairline);
+            margin-bottom: 2rem;
+        }
+
+        .color-block {
+            background: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .swatch {
+            height: 80px;
+            width: 80px;
+            margin: 0 auto 1rem;
+            border: 1px solid var(--border-hairline);
+        }
+
+        .color-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: block;
+        }
+
+        /* Typography */
+        .type-spec {
+            border-left: 1px solid var(--text-ink);
+            padding-left: 2rem;
+        }
+
+        .type-h1 { font-size: 4rem; font-weight: 700; letter-spacing: -2px; margin-bottom: 1rem; }
+        .type-h2 { font-size: 2rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 0.5rem; }
+        .type-body { font-size: 1rem; font-weight: 400; margin-bottom: 1rem; color: var(--text-ink); }
+        .type-small { font-size: 0.8rem; font-weight: 400; color: var(--text-muted); }
+        .type-meta { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
+
+        /* Component: The Pedestal (Coin Card) */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-med);
+        }
+
+        .pedestal {
+            aspect-ratio: 1/1.2;
+            border: 1px solid transparent;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .pedestal:hover {
+            border-color: var(--text-ink);
+        }
+
+        .coin-frame {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--stone-gray);
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coin-frame::after {
+            content: "";
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff 0%, #eee 100%);
+            box-shadow: 10px 10px 30px #d9d9d9, -10px -10px 30px #ffffff;
+        }
+
+        .pedestal-info {
+            border-top: 1px solid var(--border-hairline);
+            padding-top: 1rem;
+        }
+
+        .pedestal-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .pedestal-data {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+        }
+
+        .label-meta {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-minimal {
+            width: 100%;
+            padding: 0.75rem 0;
+            border: none;
+            border-bottom: 1px solid var(--border-hairline);
+            font-family: var(--font-main);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-minimal:focus {
+            border-color: var(--text-ink);
+        }
+
+        /* Buttons & States */
+        .btn-container {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-minimal {
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--text-ink);
+            padding-bottom: 4px;
+            font-family: var(--font-main);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .btn-minimal:hover {
+            color: var(--accent-patina);
+            border-color: var(--accent-patina);
+        }
+
+        .btn-minimal:focus {
+            outline: 2px solid var(--accent-patina);
+            outline-offset: 4px;
+        }
+
+        .btn-minimal:disabled {
+            color: var(--border-hairline);
+            border-color: var(--border-hairline);
+            cursor: not-allowed;
+        }
+
+        .btn-solid {
+            background: var(--text-ink);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-solid:hover {
+            background: var(--accent-patina);
+        }
+
+        .btn-solid:focus {
+            outline: 2px solid var(--text-ink);
+            outline-offset: 4px;
+        }
+
+        .btn-solid:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* Empty State */
+        .empty-curator {
+            border: 1px dashed var(--border-hairline);
+            padding: var(--spacing-large);
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .empty-curator p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Patina</div>
+        <div class="version">Design System v2.0 // The Gallery</div>
+    </header>
+
+    <section id="philosophy">
+        <h2>01 Philosophy</h2>
+        <div class="type-spec">
+            <div class="type-h1">The Digital Pedestal</div>
+            <p style="max-width: 600px;">A minimal "White Cube" aesthetic designed to let the history and craftsmanship of each coin take center stage. The interface is a silent frame; the content is the masterpiece.</p>
+        </div>
+    </section>
+
+    <section id="colors">
+        <h2>02 Palette</h2>
+        <div class="palette">
+            <div class="color-block">
+                <div class="swatch" style="background: #FFFFFF;"></div>
+                <span class="color-label">Gallery White</span>
+                <span class="type-meta">#FFFFFF</span>
+            </div>
+            <div class="color-block">
+                <div class="swatch" style="background: #121212;"></div>
+                <span class="color-label">Ink Black</span>
+                <span class="type-meta">#121212</span>
+            </div>
+            <div class="color-block">
+                <div class="swatch" style="background: #F5F5F5;"></div>
+                <span class="color-label">Stone Gray</span>
+                <span class="type-meta">#F5F5F5</span>
+            </div>
+            <div class="color-block">
+                <div class="swatch" style="background: #43AA8B;"></div>
+                <span class="color-label">Patina Accent</span>
+                <span class="type-meta">#43AA8B</span>
+            </div>
+            <div class="color-block">
+                <div class="swatch" style="background: #757575;"></div>
+                <span class="color-label">Text Muted</span>
+                <span class="type-meta">#757575</span>
+            </div>
+            <div class="color-block">
+                <div class="swatch" style="background: #EEEEEE;"></div>
+                <span class="color-label">Hairline Border</span>
+                <span class="type-meta">#EEEEEE</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="typography">
+        <h2>03 Typography</h2>
+        <div class="type-spec">
+            <div class="type-h1">Heading 01 / Bold / -2px</div>
+            <div class="type-h2">Heading 02 / Bold / -1px</div>
+            <div class="type-body">Body text. Inter Regular (400) at 16px. Clean, legible, and balanced.</div>
+            <div class="type-small">Small metadata text. Inter Regular at 13px. Used for minor details.</div>
+            <div class="type-meta">Catalog Label / Uppercase / +2px Tracking</div>
+        </div>
+    </section>
+
+    <section id="components">
+        <h2>04 The Pedestal</h2>
+        <div class="gallery-grid">
+            <div class="pedestal">
+                <div class="coin-frame"></div>
+                <div class="pedestal-info">
+                    <div class="pedestal-title">Athens Owl Tetradrachm</div>
+                    <div class="pedestal-data">440 BC // Silver // 17.2g</div>
+                </div>
+            </div>
+            <div class="pedestal">
+                <div class="coin-frame"></div>
+                <div class="pedestal-info">
+                    <div class="pedestal-title">Julius Caesar Denarius</div>
+                    <div class="pedestal-data">44 BC // Silver // 3.8g</div>
+                </div>
+            </div>
+            <div class="pedestal">
+                <div class="coin-frame"></div>
+                <div class="pedestal-info">
+                    <div class="pedestal-title">Byzantine Solidus</div>
+                    <div class="pedestal-data">610 AD // Gold // 4.5g</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="forms">
+        <h2>05 Form Inputs</h2>
+        <div class="form-group">
+            <label class="label-meta">Object Designation</label>
+            <input type="text" class="input-minimal" placeholder="e.g. Roman Aureus">
+        </div>
+        <div class="form-group">
+            <label class="label-meta">Search the Archive</label>
+            <input type="search" class="input-minimal" placeholder="Keywords...">
+        </div>
+    </section>
+
+    <section id="actions">
+        <h2>06 Interaction & States</h2>
+        <div class="btn-container">
+            <button class="btn-solid">Active Action</button>
+            <button class="btn-solid" disabled>Disabled Action</button>
+            <button class="btn-minimal">Minimal Toggle</button>
+            <button class="btn-minimal" disabled>Unavailable</button>
+        </div>
+    </section>
+
+    <section id="empty">
+        <h2>07 Empty Collection</h2>
+        <div class="empty-curator">
+            <p>The gallery is silent.</p>
+            <p style="margin-top: 1rem; font-size: 0.7rem; color: var(--border-hairline);">Awaiting new acquisitions for the permanent collection.</p>
+        </div>
+    </section>
+
+</body>
+</html>

@@ -43,7 +43,7 @@ Patina follows a strict **"White Cube" Gallery** aesthetic. The interface is a s
 This project uses specialized **Gemini CLI Skills** and **Automated Quality Hooks** to ensure high standards for design, domain accuracy, and security.
 
 ### Specialized Skills:
-- **`curator-ui`**: Enforces the "White Cube" aesthetic.
+- **`curating-ui`**: Enforces the "White Cube" aesthetic.
 - **`numismatic-researcher`**: Ensures technical accuracy for coin records.
 - **`electron-security`**: Audits IPC handlers and process isolation.
 

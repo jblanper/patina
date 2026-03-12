@@ -12,7 +12,7 @@ Custom skills are stored in `.gemini/skills/` and must be installed in your loca
 If you have just cloned the repository or added a new skill:
 1.  **List Skills:** See what is currently active with `/skills list`.
 2.  **Install/Update:** Skills in `.gemini/skills/` are automatically available to the agent, but if you need to manually refresh the system, run `/skills reload`.
-3.  **Audit:** Use the `curator-ui` skill for UI changes, `electron-security` for IPC modifications, and `numismatic-researcher` for any new data fields or cataloging records.
+3.  **Audit:** Use the `curating-ui` skill for UI changes, `electron-security` for IPC modifications, and `numismatic-researcher` for any new data fields or cataloging records.
 
 ---
 
@@ -20,7 +20,7 @@ If you have just cloned the repository or added a new skill:
 
 To ensure consistency and quality, the following custom skills are proposed for development:
 
-### A. [DONE] `curator-ui` (Design & Aesthetics)
+### A. [DONE] `curating-ui` (Design & Aesthetics)
 - **Status:** **Implemented** (v2.0 Gallery Aesthetic).
 - **Role:** Enforces the "Museum Label" aesthetic.
 - **Scope:** Guidance on padding/margin ratios, serif/sans-serif usage, and color palette adherence as defined in `docs/style_guide.md`.

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curatorial Proposal: [Component Name] - Patina</title>
+    <!-- 
+        IMPORTANT: These variables and fonts MUST be synchronized with the latest version of 
+        docs/style_guide.md and docs/style_guide.html.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: The Archival Warmth */
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #7A7875;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            
+            /* Typography: The Archival Hybrid */
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            /* Responsive Spacing */
+            --spacing-large: clamp(3rem, 8vw, 4rem);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-manuscript);
+            color: var(--text-ink);
+            line-height: 1.6;
+            padding: var(--spacing-large);
+        }
+
+        header {
+            border-bottom: 2px solid var(--text-ink);
+            margin-bottom: var(--spacing-large);
+            padding-bottom: 1.5rem;
+        }
+
+        h1 { 
+            font-family: var(--font-serif);
+            font-size: 2.4rem;
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: -0.5px;
+        }
+        
+        .meta-info {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-manuscript);
+            margin-top: 0.5rem;
+        }
+
+        .proposal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+        }
+
+        .path-card {
+            background: #FFF;
+            padding: 2.5rem;
+            border: 1px solid var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .path-title {
+            font-family: var(--font-serif);
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .rationale {
+            font-size: 0.95rem;
+            color: var(--text-ink);
+            margin-bottom: 2rem;
+            min-height: 80px;
+            font-family: var(--font-serif);
+            font-style: italic;
+        }
+
+        .preview-area {
+            background: var(--stone-pedestal);
+            border: 1px dashed var(--border-hairline);
+            flex-grow: 1;
+            min-height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+        }
+
+        .audit-results {
+            font-size: 0.8rem;
+            background: var(--bg-manuscript);
+            padding: 1.5rem;
+            border-left: 3px solid var(--accent-manuscript);
+            font-family: var(--font-mono);
+        }
+
+        .audit-results ul {
+            list-style: none;
+            margin-top: 0.5rem;
+        }
+
+        .audit-results li {
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Curatorial Proposal: [Component Name]</h1>
+        <div class="meta-info">Project: Patina // Date: [YYYY-MM-DD] // Ref: [PROPOSAL_ID]</div>
+    </header>
+
+    <main class="proposal-grid">
+        <!-- Path A: The Minimalist -->
+        <section class="path-card">
+            <span class="tag">Archetype A</span>
+            <h2 class="path-title">The Minimalist</h2>
+            <p class="rationale">[Rationale: Focus on whitespace and sensory sanctuary. Minimum interference with the object.]</p>
+            <div class="preview-area">
+                <!-- Mockup HTML here -->
+                [Interactive Preview A]
+            </div>
+            <div class="audit-results">
+                <strong>CURATORIAL AUDIT:</strong>
+                <ul>
+                    <li>Contrast: [Pass/Ratio]</li>
+                    <li>Focus: [Description]</li>
+                    <li>Breathability: [Expansive]</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Path B: The Ledger -->
+        <section class="path-card">
+            <span class="tag">Archetype B</span>
+            <h2 class="path-title">The Ledger</h2>
+            <p class="rationale">[Rationale: High information density, archival clarity. Prioritizes scholarly metrics.]</p>
+            <div class="preview-area">
+                <!-- Mockup HTML here -->
+                [Interactive Preview B]
+            </div>
+            <div class="audit-results">
+                <strong>CURATORIAL AUDIT:</strong>
+                <ul>
+                    <li>Contrast: [Pass/Ratio]</li>
+                    <li>Focus: [Description]</li>
+                    <li>Breathability: [Archival]</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Path C: The Hybrid -->
+        <section class="path-card">
+            <span class="tag">Archetype C</span>
+            <h2 class="path-title">The Hybrid</h2>
+            <p class="rationale">[Rationale: Progressive disclosure for balanced utility. The modern archival standard.]</p>
+            <div class="preview-area">
+                <!-- Mockup HTML here -->
+                [Interactive Preview C]
+            </div>
+            <div class="audit-results">
+                <strong>CURATORIAL AUDIT:</strong>
+                <ul>
+                    <li>Contrast: [Pass/Ratio]</li>
+                    <li>Focus: [Description]</li>
+                    <li>Breathability: [Balanced]</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

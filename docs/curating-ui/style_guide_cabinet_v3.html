@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patina - The Cabinet Design System (v3.0)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Spectral:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: The Archival Warmth */
+            --bg-gallery: #FFFFFF;
+            --text-ink: #121212;
+            --text-muted: #7A7875;
+            --border-hairline: #EEEEEE;
+            --accent-bronze: #B49269;
+            --stone-gray: #F5F5F5;
+            
+            /* Typography: The Scholarly Hybrid */
+            --font-main: 'Inter', sans-serif;
+            --font-serif: 'Spectral', serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --spacing-large: 4rem;
+            --spacing-med: 2rem;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-gallery);
+            color: var(--text-ink);
+            line-height: 1.5;
+            padding: var(--spacing-large);
+        }
+
+        header {
+            max-width: 1200px;
+            margin: 0 auto var(--spacing-large);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid var(--text-ink);
+            padding-bottom: 1.5rem;
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 2.2rem;
+            letter-spacing: -0.5px;
+            font-style: italic;
+        }
+
+        .version {
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            color: var(--accent-bronze);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        section {
+            max-width: 1200px;
+            margin: 0 auto var(--spacing-large);
+        }
+
+        h2 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        /* Color Palette */
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background-color: var(--border-hairline);
+            border: 1px solid var(--border-hairline);
+            margin-bottom: 2rem;
+        }
+
+        .color-block {
+            background: white;
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .swatch {
+            height: 80px;
+            width: 80px;
+            margin: 0 auto 1.5rem;
+            border: 1px solid var(--border-hairline);
+        }
+
+        .color-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Typography */
+        .type-spec {
+            border-left: 1px solid var(--accent-bronze);
+            padding-left: 2rem;
+        }
+
+        .type-h1 { font-family: var(--font-serif); font-size: 3.5rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 1rem; }
+        .type-h2 { font-family: var(--font-serif); font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .type-body { font-size: 1rem; font-weight: 400; margin-bottom: 1rem; color: var(--text-ink); }
+        .type-mono { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-bronze); text-transform: uppercase; }
+        .type-meta { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
+
+        /* Component: The Cabinet Tray (Coin Card) */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-med);
+        }
+
+        .pedestal {
+            background: white;
+            border: 1px solid var(--border-hairline);
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .pedestal:hover {
+            border-color: var(--accent-bronze);
+            transform: translateY(-4px);
+        }
+
+        .coin-frame {
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--stone-gray);
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .coin-placeholder {
+            width: 70%;
+            height: 70%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff 0%, #dcdcdc 100%);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .pedestal-info {
+            padding-top: 0.5rem;
+        }
+
+        .pedestal-title {
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .pedestal-data {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent-bronze);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+        }
+
+        .label-meta {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .input-minimal {
+            width: 100%;
+            padding: 0.75rem 0;
+            border: none;
+            border-bottom: 1px solid var(--border-hairline);
+            font-family: var(--font-main);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            background: transparent;
+        }
+
+        .input-minimal:focus {
+            border-color: var(--accent-bronze);
+        }
+
+        /* Buttons & States */
+        .btn-container {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-minimal {
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--text-ink);
+            padding-bottom: 4px;
+            font-family: var(--font-mono);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+            color: var(--text-ink);
+        }
+
+        .btn-minimal:hover {
+            color: var(--accent-bronze);
+            border-color: var(--accent-bronze);
+        }
+
+        .btn-solid {
+            background: var(--text-ink);
+            color: white;
+            padding: 1rem 2rem;
+            border: 1px solid var(--text-ink);
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-solid:hover {
+            background: var(--accent-bronze);
+            border-color: var(--accent-bronze);
+        }
+
+        /* Empty State */
+        .empty-curator {
+            border: 1px solid var(--border-hairline);
+            padding: var(--spacing-large);
+            text-align: center;
+            max-width: 600px;
+            background: var(--stone-gray);
+        }
+
+        .empty-curator p {
+            color: var(--text-muted);
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Patina</div>
+        <div class="version">Design System v3.0 // The Cabinet</div>
+    </header>
+
+    <section id="philosophy">
+        <h2>01 Philosophy</h2>
+        <div class="type-spec">
+            <div class="type-h1">The Scholarly Archive</div>
+            <p style="max-width: 600px; margin-bottom: 1.5rem;">A tactile, prestigious aesthetic that bridges the "White Cube" gallery with the atmosphere of a physical numismatic cabinet. It prioritizes the historical weight of the object and the technical precision of the curator.</p>
+            <div class="type-mono">Status: Verified // Permanent Collection</div>
+        </div>
+    </section>
+
+    <section id="colors">
+        <h2>02 Palette</h2>
+        <div class="palette">
+            <div class="color-block">
+                <div class="swatch" style="background: #FFFFFF;"></div>
+                <span class="color-label">Gallery White</span>
+                <span class="type-meta">#FFFFFF</span>
+            </div>
+            <div class="color-block">
+                <div class="swatch" style="background: #121212;"></div>
+                <span class="color-label">Ink Black</span>
+                <span class="type-meta">#121212</span>
+            </div>
+            <div class="color-block">
+                <div class="swatch" style="background: #B49269;"></div>
+                <span class="color-label">Archival Bronze</span>
+                <span class="type-meta">#B49269</span>
+            </div>
+            <div class="color-block">
+                <div class="swatch" style="background: #F5F5F5;"></div>
+                <span class="color-label">Stone Gray</span>
+                <span class="type-meta">#F5F5F5</span>
+            </div>
+            <div class="color-block">
+                <div class="swatch" style="background: #7A7875;"></div>
+                <span class="color-label">Metadata Muted</span>
+                <span class="type-meta">#7A7875</span>
+            </div>
+            <div class="color-block">
+                <div class="swatch" style="background: #EEEEEE;"></div>
+                <span class="color-label">Hairline Border</span>
+                <span class="type-meta">#EEEEEE</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="typography">
+        <h2>03 Typography</h2>
+        <div class="type-spec">
+            <div class="type-h1">Spectral / Bold / Title</div>
+            <div class="type-h2">Spectral / Italic / Logo</div>
+            <div class="type-body">Inter / Regular / UI. Clean and balanced for readability.</div>
+            <div class="type-mono">JetBrains Mono / Technical Metrics / Precision</div>
+        </div>
+    </section>
+
+    <section id="components">
+        <h2>04 The Cabinet Tray</h2>
+        <div class="gallery-grid">
+            <div class="pedestal">
+                <div class="coin-frame">
+                    <div class="coin-placeholder"></div>
+                </div>
+                <div class="pedestal-info">
+                    <div class="pedestal-title">Athens Owl Tetradrachm</div>
+                    <div class="pedestal-data">REF. RIC-204 // AG 17.20g</div>
+                </div>
+            </div>
+            <div class="pedestal">
+                <div class="coin-frame">
+                    <div class="coin-placeholder"></div>
+                </div>
+                <div class="pedestal-info">
+                    <div class="pedestal-title">Julius Caesar Denarius</div>
+                    <div class="pedestal-data">REF. RRC-480 // AG 3.85g</div>
+                </div>
+            </div>
+            <div class="pedestal">
+                <div class="coin-frame">
+                    <div class="coin-placeholder"></div>
+                </div>
+                <div class="pedestal-info">
+                    <div class="pedestal-title">Byzantine Solidus</div>
+                    <div class="pedestal-data">REF. DOC-12 // AU 4.50g</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="forms">
+        <h2>05 Form Inputs</h2>
+        <div class="form-group">
+            <label class="label-meta">Archival Designation</label>
+            <input type="text" class="input-minimal" placeholder="e.g. Roman Aureus">
+        </div>
+        <div class="form-group">
+            <label class="label-meta">Technical Search</label>
+            <input type="search" class="input-minimal" placeholder="Metrics, metals, eras...">
+        </div>
+    </section>
+
+    <section id="actions">
+        <h2>06 Interaction & States</h2>
+        <div class="btn-container">
+            <button class="btn-solid">Record Acquisition</button>
+            <button class="btn-minimal">Modify Index</button>
+            <button class="btn-minimal" style="color: var(--text-muted); border-color: var(--border-hairline);" disabled>Archived</button>
+        </div>
+    </section>
+
+    <section id="empty">
+        <h2>07 Empty Cabinet</h2>
+        <div class="empty-curator">
+            <p>The cabinet awaits its first acquisition.</p>
+            <div class="type-mono" style="margin-top: 1rem; font-size: 0.6rem;">Status: Initialized // Volume Empty</div>
+        </div>
+    </section>
+
+</body>
+</html>

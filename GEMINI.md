@@ -51,7 +51,7 @@ This document defines the absolute standards for the Patina project. All develop
 ## 5. Skill Synergy (Specialized Agents)
 To maintain the high standards of the Patina project, utilize these specialized skills for their respective domains:
 
-- **`curator-ui`:** Use for ALL UI/UX tasks. It enforces the "White Cube" aesthetic and maintains `docs/style_guide.md`. Invoke when creating or refactoring React components.
+- **`curating-ui`:** Use for ALL UI/UX tasks. It enforces the "White Cube" aesthetic and maintains `docs/style_guide.md`. Invoke when creating or refactoring React components.
 - **`numismatic-researcher`:** Use for ALL cataloging and database tasks. It ensures technical accuracy for weights, measurements, and historical chronology. Invoke when modifying `src/main/db.ts` or implementing new data fields.
 - **`electron-security`:** Use for ALL IPC and Main-process tasks. It enforces secure bridge patterns and Main-side validation. Invoke when modifying `src/main/` or `preload.ts`.
 
