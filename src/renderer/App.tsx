@@ -1,60 +1,109 @@
-import React, { useEffect, useState } from 'react';
-import { Coin } from '../common/types';
+import React from 'react';
+import { useCoins } from './hooks/useCoins';
 
 const App: React.FC = () => {
-  const [ipcStatus, setIpcStatus] = useState<string>('Pinging...');
-  const [coins, setCoins] = useState<Coin[]>([]);
+  const { 
+    filteredCoins, 
+    loading, 
+    error, 
+    filters, 
+    updateFilters,
+    availableMetals 
+  } = useCoins();
 
-  useEffect(() => {
-    window.electronAPI.ping().then((res) => {
-      setIpcStatus(`Main process responded with: ${res}`);
-    });
-
-    // Test DB: Add a sample coin if none exist
-    window.electronAPI.getCoins().then(async (existingCoins) => {
-      if (existingCoins.length === 0) {
-        console.log('No coins found, adding a sample...');
-        await window.electronAPI.addCoin({
-          title: 'Athens Owl Tetradrachm',
-          issuer: 'Athens',
-          denomination: 'Tetradrachm',
-          year_display: 'c. 440-404 BC',
-          year_numeric: -440,
-          era: 'Ancient',
-          metal: 'Silver',
-          story: 'The most iconic coin of the ancient world.'
-        });
-        const updatedCoins = await window.electronAPI.getCoins();
-        setCoins(updatedCoins);
-      } else {
-        setCoins(existingCoins);
-      }
-    });
-  }, []);
+  if (error) {
+    // This will be caught by the ErrorBoundary, but we can also handle it locally
+    throw error;
+  }
 
   return (
     <div className="app-container">
       <header>
         <h1>Patina</h1>
-        <p>Historical Coin Archive</p>
+        <div className="version-tag">Archive v1.0 // The Cabinet</div>
       </header>
+
       <main>
-        <div className="welcome-screen">
-          <h2>Welcome, Curator</h2>
-          <p>Your collection has {coins.length} item(s).</p>
-          
-          <div style={{ marginTop: '20px', textAlign: 'left' }}>
-            {coins.map(coin => (
-              <div key={coin.id} style={{ borderBottom: '1px solid #eee', padding: '10px 0' }}>
-                <strong>{coin.title}</strong> ({coin.year_display})
+        <section className="welcome-screen">
+          <h2 style={{ fontSize: '3rem', marginBottom: '1rem', letterSpacing: '-2px' }}>
+            The Cabinet
+          </h2>
+          <p className="type-body" style={{ marginBottom: '2.5rem' }}>
+            {loading 
+              ? 'Synchronizing with the local archive...' 
+              : `The collection contains ${filteredCoins.length} verified historical objects.`}
+          </p>
+
+          <div style={{ marginBottom: '2rem' }}>
+            <label className="type-meta" style={{ display: 'block', marginBottom: '0.5rem' }}>
+              Search the Ledger
+            </label>
+            <input 
+              type="text" 
+              className="input-minimal"
+              placeholder="Title, issuer, or catalog reference..."
+              value={filters.searchTerm}
+              onChange={(e) => updateFilters({ searchTerm: e.target.value })}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '2rem', marginBottom: '3rem' }}>
+             <div>
+                <label className="type-meta" style={{ display: 'block', marginBottom: '0.5rem' }}>Era</label>
+                <select 
+                  className="input-minimal" 
+                  multiple 
+                  style={{ height: '80px' }}
+                  value={filters.era}
+                  onChange={(e) => {
+                    const values = Array.from(e.target.selectedOptions, option => option.value as any);
+                    updateFilters({ era: values });
+                  }}
+                >
+                  <option value="Ancient">Ancient</option>
+                  <option value="Medieval">Medieval</option>
+                  <option value="Modern">Modern</option>
+                </select>
+             </div>
+
+             <div>
+                <label className="type-meta" style={{ display: 'block', marginBottom: '0.5rem' }}>Metal</label>
+                <select 
+                  className="input-minimal" 
+                  multiple 
+                  style={{ height: '80px' }}
+                  value={filters.metal}
+                  onChange={(e) => {
+                    const values = Array.from(e.target.selectedOptions, option => option.value);
+                    updateFilters({ metal: values });
+                  }}
+                >
+                  {availableMetals.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+             </div>
+          </div>
+
+          <div className="ledger-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+            {filteredCoins.map(coin => (
+              <div key={coin.id} style={{ borderBottom: '1px solid var(--border-hairline)', paddingBottom: '1rem' }}>
+                <h3 style={{ fontSize: '1.4rem', marginBottom: '0.25rem' }}>{coin.title}</h3>
+                <div className="type-mono">
+                  {coin.era} // {coin.metal} // {coin.year_display}
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="status-badge" style={{ marginTop: '40px', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-            System Status: {ipcStatus}
-          </div>
-        </div>
+          {!loading && filteredCoins.length === 0 && (
+            <div style={{ padding: '4rem', border: '1px solid var(--border-hairline)', textAlign: 'center', backgroundColor: 'var(--stone-pedestal)' }}>
+              <p style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '1.2rem', color: 'var(--text-muted)' }}>
+                The ledger is silent. No records match the current criteria.
+              </p>
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );

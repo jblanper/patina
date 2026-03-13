@@ -14,34 +14,43 @@
     "build": "npm run build:renderer && npm run build:main",
     "build:renderer": "vite build",
     "build:main": "tsc -p tsconfig.main.json",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/better-sqlite3": "^7.6.13",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.57.0",
     "@typescript-eslint/parser": "^8.57.0",
     "@vitejs/plugin-react": "^5.1.4",
+    "@vitest/ui": "^4.1.0",
     "concurrently": "^9.2.1",
     "electron": "^40.8.0",
     "electron-builder": "^26.8.1",
     "eslint": "^9.39.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
+    "jsdom": "^28.1.0",
     "tsc-watch": "^7.2.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
+    "vitest": "^4.1.0",
     "wait-on": "^9.0.4"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",
     "express": "^5.2.1",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "react-error-boundary": "^6.1.1",
+    "zod": "^4.3.6"
   }
 }

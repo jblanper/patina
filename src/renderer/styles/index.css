@@ -1,14 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap');
+
 :root {
-  --bg-gallery: #FFFFFF;
-  --text-ink: #121212;
-  --text-muted: #757575;
-  --border-hairline: #EEEEEE;
-  --accent-patina: #43AA8B;
-  --stone-gray: #F5F5F5;
-  
-  --font-main: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --spacing-large: 4rem;
+  /* Palette: The Archival Warmth */
+  --bg-manuscript: #FCF9F2; /* Primary background (Parchment) */
+  --text-ink: #2D2926;      /* High-contrast typography (Iron Gall Ink) */
+  --text-muted: #7A7875;    /* Secondary metadata and labels */
+  --border-hairline: #E0DCCD; /* Subtle structural dividers (Vellum tone) */
+  --accent-manuscript: #914E32; /* Action states and primary accents (Burnt Sienna) */
+  --stone-pedestal: #F0EDE6;    /* Soft background for coin frames and containers */
+  --error-red: #B22222;        /* Error states, validation messages, and critical alerts */
+
+  /* Typography */
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-sans: 'Montserrat', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Spacing */
+  --spacing-large: clamp(3rem, 8vw, 4rem);
   --spacing-med: 2rem;
+  --spacing-small: 1rem;
 }
 
 * {
@@ -19,17 +29,17 @@
 }
 
 body {
-  font-family: var(--font-main);
-  background-color: var(--bg-gallery);
+  font-family: var(--font-sans);
+  background-color: var(--bg-manuscript);
   color: var(--text-ink);
-  line-height: 1.4;
+  line-height: 1.6;
   font-size: 16px;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-main);
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
   font-weight: 700;
-  letter-spacing: -1px;
+  color: var(--text-ink);
 }
 
 .app-container {
@@ -40,7 +50,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 header {
-  border-bottom: 1px solid var(--text-ink);
+  border-bottom: 2px solid var(--text-ink);
   padding-bottom: 1.5rem;
   margin-bottom: var(--spacing-large);
   display: flex;
@@ -49,14 +59,16 @@ header {
 }
 
 header h1 {
-  font-size: 1.8rem;
-  text-transform: uppercase;
+  font-size: clamp(2rem, 5vw, 2.4rem);
+  font-style: italic;
+  letter-spacing: -0.5px;
 }
 
 .version-tag {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  letter-spacing: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-manuscript);
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
 
@@ -64,35 +76,62 @@ main {
   flex: 1;
 }
 
-.welcome-screen {
-  text-align: left;
-  max-width: 600px;
-}
-
-.welcome-screen h2 {
-  font-size: 3rem;
-  margin-bottom: 1.5rem;
-  letter-spacing: -2px;
-}
-
-.welcome-screen p {
-  color: var(--text-muted);
-  margin-bottom: 2rem;
-}
+/* Base Utility Classes */
+.type-body { font-size: 1rem; font-weight: 400; color: var(--text-ink); max-width: 65ch; }
+.type-mono { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-manuscript); text-transform: uppercase; }
+.type-meta { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; }
 
 .btn-solid {
   background: var(--text-ink);
   color: white;
-  padding: 1rem 2rem;
+  padding: 1rem 2.5rem;
   border: none;
   text-transform: uppercase;
-  font-size: 0.8rem;
-  letter-spacing: 2px;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .btn-solid:hover {
-  background: var(--accent-patina);
+  background: var(--accent-manuscript);
+}
+
+.btn-minimal {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--text-ink);
+  padding-bottom: 4px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  color: var(--text-ink);
+}
+
+.btn-minimal:hover {
+  color: var(--accent-manuscript);
+  border-color: var(--accent-manuscript);
+}
+
+/* Forms */
+.input-minimal {
+  width: 100%;
+  padding: 0.75rem 0;
+  border: none;
+  border-bottom: 1px solid var(--border-hairline);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  background: transparent;
+}
+
+.input-minimal:focus {
+  border-color: var(--text-ink);
 }

@@ -19,11 +19,12 @@ This document defines the absolute standards for the Patina project. All develop
 ### Electron Security
 - **Strict Isolation:** `contextIsolation: true` and `sandbox: true` are non-negotiable for the Renderer process.
 - **Secure Bridge:** Only expose specific, validated functions through the `contextBridge` in `preload.ts`. Never expose raw IPC or Node.js modules.
-- **IPC Validation:** The Main process MUST validate all data received from the Renderer. Verify IDs against the database and restrict file paths to the application's `data/` directory.
+- **IPC Validation:** The Main process MUST rigorously validate all data received from the Renderer using strict Zod schemas (`.strict()`). Verify IDs (positive integers) against the database and restrict file paths to the application's `data/` directory.
 
 ### TypeScript & Type Safety
 - **Strict Typing:** `strict: true` is mandatory. Avoid the `any` type at all costs; use `unknown` with type guards if necessary.
-- **Shared Types:** All domain models (Coins, Images) must be defined in `src/common/types.ts` and shared between Main and Renderer.
+- **Shared Types:** All domain models (Coins, Images) must be defined in `src/common/types.ts`.
+- **Centralized Validation:** Use Zod for cross-process data integrity. All schemas must be centralized in `src/common/validation.ts` and shared between Main and Renderer.
 - **Immutability:** Prefer `const` and `readonly` properties. Use functional patterns for data transformations.
 
 ### Dependency Management
@@ -37,8 +38,9 @@ This document defines the absolute standards for the Patina project. All develop
   3. Run full test suite, lint, and build
   4. Ensure `npm audit` passes with no vulnerabilities
   5. Document in changelog
-- **Critical Dependencies:** Electron, better-sqlite3, express require extended testing and manual review before upgrade.
+- **Critical Dependencies:** Electron, better-sqlite3, express, zod, and react-error-boundary require extended testing and manual review before upgrade.
 - **Obsolete Packages:** Replace within 30 days of deprecation; use `npm depcheck` monthly.
+
 
 ### React & Frontend Architecture
 - **Component Focused:** One file per component. Keep components small, focused, and documented with TS interfaces for props.
@@ -72,7 +74,9 @@ This document defines the absolute standards for the Patina project. All develop
 
 ## 5. Error Handling
 
-All async operations must use try/catch with descriptive error messages:
+All async operations must use try/catch with descriptive error messages.
+
+**UI Resilience:** Wrap critical component trees in an `ErrorBoundary` to ensure that unexpected errors are handled gracefully with a somber, technical fallback UI, preventing total application crashes.
 
 ```typescript
 try {
@@ -84,6 +88,7 @@ try {
 ```
 
 Never use empty catch blocks. Log errors with context for debugging, ensuring no sensitive data is exposed.
+
 
 ---
 

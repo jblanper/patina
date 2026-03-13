@@ -23,7 +23,7 @@ Task Progress:
 Review the recent conversation history. Use your built-in tools (like git diff, git status, or reading recently modified files) to identify exactly what has been built, changed, or discussed during this session.
 
 ## Step 2: Read the document template
-Read the format requirements from assets/doc-template.md.
+Read the format requirements from [assets/doc-template.md](assets/doc-template.md).
 
 ## Step 3: Generate the changelog content
 Synthesize the context you gathered in Step 1 and format it strictly according to the structure provided in the template.
