@@ -181,27 +181,27 @@ interface UseCoinsReturn {
   - SearchBar (Phase 2, Point 4)
 
 ## Compliance Checks
-- [ ] Follows GEMINI.md custom hooks requirement (Point 28)
-- [ ] Uses TypeScript strict typing (Point 22)
-- [ ] Implements immutability patterns (Point 24)
-- [ ] Follows component-focused architecture (Point 27)
-- [ ] Includes optimization strategies (Point 30)
-- [ ] Exports reusable `FilterState` interface
-- [ ] Includes `getCoinImages` for image management
-- [ ] Implements case-insensitive search matching
-- [ ] Handles null/undefined values in sort comparator
-- [ ] Includes unit tests for filter/sort logic
+- [x] Follows GEMINI.md custom hooks requirement (Point 28)
+- [x] Uses TypeScript strict typing (Point 22)
+- [x] Implements immutability patterns (Point 24)
+- [x] Follows component-focused architecture (Point 27)
+- [x] Includes optimization strategies (Point 30)
+- [x] Exports reusable `FilterState` interface
+- [/] Includes `getCoinImages` for image management (Images included in `getCoins` LEFT JOIN; separate method pending)
+- [x] Implements case-insensitive search matching
+- [x] Handles null/undefined values in sort comparator
+- [x] Includes unit tests for filter/sort logic
 - [ ] Includes `mint` filter (derived from DB)
 - [ ] Includes `rarity` filter
 - [ ] Includes `grade` filter (adjective scale)
-- [ ] Expands search to include `provenance` and `catalog_ref`
-- [ ] Default sort by `year_numeric` ascending
-- [ ] IPC handlers validate numeric IDs (type guard for `id > 0`)
-- [ ] `addCoin` validates required field `title` is present and non-empty
-- [ ] Uses Zod or type guards for `NewCoin` validation
-- [ ] Includes error boundaries for graceful error handling
-- [ ] Implements debounced search (300ms delay)
-- [ ] Includes loading states for async operations
+- [x] Expands search to include `provenance` and `catalog_ref`
+- [x] Default sort by `year_numeric` ascending
+- [x] IPC handlers validate numeric IDs (type guard for `id > 0`)
+- [x] `addCoin` validates required field `title` is present and non-empty
+- [x] Uses Zod or type guards for `NewCoin` validation
+- [x] Includes error boundaries for graceful error handling
+- [x] Implements debounced search (300ms delay)
+- [x] Includes loading states for async operations
 
 ## Security Audit Status
 - ✅ Configuration Review: N/A (plan only)
