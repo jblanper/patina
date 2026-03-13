@@ -6,13 +6,19 @@ interface GalleryGridProps {
   coins: CoinWithPrimaryImage[];
   onCoinClick?: (id: number) => void;
   loading?: boolean;
+  isDatabaseEmpty?: boolean;
 }
 
 /**
  * GalleryGrid Component
  * A responsive CSS Grid for displaying coin pedestals.
  */
-export const GalleryGrid: React.FC<GalleryGridProps> = React.memo(({ coins, onCoinClick, loading }) => {
+export const GalleryGrid: React.FC<GalleryGridProps> = React.memo(({ 
+  coins, 
+  onCoinClick, 
+  loading, 
+  isDatabaseEmpty 
+}) => {
   if (loading) {
     return (
       <div className="gallery-status">
@@ -21,11 +27,22 @@ export const GalleryGrid: React.FC<GalleryGridProps> = React.memo(({ coins, onCo
     );
   }
 
+  if (isDatabaseEmpty) {
+    return (
+      <div className="empty-cabinet">
+        <p className="empty-title">The Ledger Awaits</p>
+        <p className="empty-desc">Your private archive is currently empty. Begin by recording your first historical object.</p>
+        <div className="cabinet-status">Status: Index Ready // Ledger Empty</div>
+      </div>
+    );
+  }
+
   if (coins.length === 0) {
     return (
       <div className="empty-cabinet">
-        <p>The ledger awaits its first historical entry.</p>
-        <div className="cabinet-status">Status: Index Ready // Ledger Empty</div>
+        <p className="empty-title">The Silent Archive</p>
+        <p className="empty-desc">No historical entries match your current search or filter parameters.</p>
+        <div className="cabinet-status">Status: Ledger Ready // Filtered Empty</div>
       </div>
     );
   }
@@ -49,18 +66,33 @@ export const GalleryGrid: React.FC<GalleryGridProps> = React.memo(({ coins, onCo
         }
 
         .gallery-status, .empty-cabinet {
-          padding: var(--spacing-large);
+          padding: 3rem;
           border: 1px solid var(--border-hairline);
           background: var(--stone-pedestal);
-          max-width: 600px;
+          max-width: 800px;
+          margin-top: 2rem;
         }
 
-        .gallery-status p, .empty-cabinet p {
+        .gallery-status p {
           font-family: var(--font-serif);
           font-style: italic;
           font-size: 1.4rem;
           color: var(--text-muted);
-          margin-bottom: 1rem;
+        }
+
+        .empty-title {
+          font-family: var(--font-serif);
+          font-style: italic;
+          font-size: 1.8rem;
+          color: var(--text-ink);
+          margin-bottom: 0.5rem;
+        }
+
+        .empty-desc {
+          font-family: var(--font-sans);
+          font-size: 1rem;
+          color: var(--text-muted);
+          margin-bottom: 2rem;
         }
 
         .cabinet-status {

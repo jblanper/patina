@@ -44,7 +44,12 @@ export const CoinCard: React.FC<CoinCardProps> = React.memo(({ coin, onClick }) 
     >
       <div className="coin-image-container">
         {imageSrc ? (
-          <img src={imageSrc} alt={coin.title} className="coin-image" />
+          <img 
+            src={imageSrc} 
+            alt={coin.title} 
+            className="coin-image" 
+            loading="lazy" 
+          />
         ) : (
           <div className="coin-placeholder">
             <div className="coin-silhouette" />

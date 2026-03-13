@@ -53,6 +53,7 @@ const App: React.FC = () => {
             <GalleryGrid 
               coins={filteredCoins} 
               loading={loading} 
+              isDatabaseEmpty={coins.length === 0}
               onCoinClick={(id) => console.log('Coin clicked:', id)} 
             />
           </section>
