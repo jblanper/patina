@@ -18,16 +18,31 @@ Custom skills are stored in the project's `.gemini/skills/` directory. They are 
 
 The following specialized skills provide expert guidance and validation for specific domains of the Patina project.
 
+### `curating-blueprints` (Lifecycle Management)
+Standardizes the creation and review lifecycle of Implementation Blueprints.
+- **Scope:** Manages the initiation, multi-disciplinary audit (Security, Numismatic, UI), and retrospective phases of all major technical changes.
+- **Primary Use:** Invoke when starting new features, performing audits, or documenting post-implementation lessons.
+
+### `curating-coins` (Domain Accuracy)
+Maintains historical and technical integrity for all coin-related data.
+- **Scope:** Standardizes cataloging (RIC, RPC, Crawford), technical metrics (weight, diameter, die axis), and historical chronology (BC/AD).
+- **Primary Use:** Invoke when modifying `src/main/db.ts`, adding data entry fields, or auditing catalog records.
+
 ### `curating-ui` (Aesthetics & Design)
 Ensures every interface element adheres to the "White Cube" Gallery aesthetic.
 - **Scope:** Enforces padding/margin ratios, typography standards (Inter), and the project's muted color palette.
 - **Primary Use:** Invoke when creating or refactoring React components in `src/renderer/`.
 - **References:** See `docs/style_guide.md` for the underlying design principles.
 
-### `curating-coins` (Domain Accuracy)
-Maintains historical and technical integrity for all coin-related data.
-- **Scope:** Standardizes cataloging (RIC, RPC, Crawford), technical metrics (weight, diameter, die axis), and historical chronology (BC/AD).
-- **Primary Use:** Invoke when modifying `src/main/db.ts`, adding data entry fields, or auditing catalog records.
+### `evaluating-skills` (Skill Standards)
+Audits AI Agent Skills against the AgentSkills.io Open Standard.
+- **Scope:** Enforces metadata rules, gerund-based naming, progressive disclosure, and workflow checklists.
+- **Primary Use:** Invoke when creating, refactoring, or reviewing any skill in `.gemini/skills/`.
+
+### `saving-context` (Session Integrity)
+Generates structured context snapshots to preserve workspace state.
+- **Scope:** Analyzes changes, identifies current progress, and saves structured changelogs to `docs/changelog/`.
+- **Primary Use:** Invoke when "saving context" or before clearing the CLI session.
 
 ### `securing-electron` (System Integrity)
 Performs automated and manual security audits of the Electron environment.
@@ -37,20 +52,15 @@ Performs automated and manual security audits of the Electron environment.
     - **Navigation:** Implements strict controls on `will-navigate` and window creation.
 - **Primary Use:** Invoke when modifying `src/main/index.ts`, `src/main/preload.ts`, or any IPC handlers.
 
-### `evaluating-skills` (Skill Standards)
-Audits AI Agent Skills against the AgentSkills.io Open Standard.
-- **Scope:** Enforces metadata rules, gerund-based naming, progressive disclosure, and workflow checklists.
-- **Primary Use:** Invoke when creating, refactoring, or reviewing any skill in `.gemini/skills/`.
+### `tracking-progress` (Implementation Audit)
+Synchronizes project documentation with the actual state of the codebase.
+- **Scope:** Scans blueprints and changelogs for pending tasks, verifies their implementation in the code, and updates task lists (`- [x]`).
+- **Primary Use:** Invoke when auditing project progress or updating documentation after completing technical tasks.
 
 ### `writing-tech-docs` (Documentation Framework)
 Creates, refactors, and reviews technical documentation following the Diátaxis framework.
 - **Scope:** Enforces structured quadrants (Tutorials, How-to, Reference, Explanation) and the project's writing style.
 - **Primary Use:** Invoke when drafting new guides in `docs/` or updating existing markdown documentation.
-
-### `saving-context` (Session Integrity)
-Generates structured context snapshots to preserve workspace state.
-- **Scope:** Analyzes changes, identifies current progress, and saves structured changelogs to `docs/changelog/`.
-- **Primary Use:** Invoke when "saving context" or before clearing the CLI session.
 
 ---
 
