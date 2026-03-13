@@ -30,11 +30,12 @@
 
 ## Design Standards
 
-Patina follows a strict **"White Cube" Gallery** aesthetic. The interface is a silent frame designed to let historical objects take center stage.
+Patina follows a strict **Manuscript Hybrid (v3.3)** aesthetic. The interface is a silent frame (the "Archival Ledger") designed to let historical objects take center stage.
 
-- **Typography:** Inter (Sans-Serif)
-- **Palette:** Gallery White (`#FFFFFF`), Ink Black (`#121212`), Patina Accent (`#43AA8B`)
-- **Documentation:** See [Style Guide (Markdown)](docs/style_guide.md) and [Visual Reference (HTML)](docs/style_guide.html).
+- **Typography:** Cormorant (Serif), Montserrat (Sans), JetBrains Mono (Technical)
+- **Palette:** Parchment (`#FCF9F2`), Iron Gall Ink (`#2D2926`), Burnt Sienna (`#914E32`)
+- **CLI Extensions:** For specialized workflows (e.g., `curating-coins`, `securing-electron`), see [The Curator's Automation](docs/workflows_and_skills.md).
+- **Style Guides:** See [Technical Style Guide](docs/style_guide.md) and [Visual Reference](docs/style_guide.html).
 
 ---
 

@@ -8,7 +8,7 @@ interface CoinCardProps {
 
 /**
  * Path 1: The Archival Pedestal
- * Merges the borderless "White Cube" look with persistent data.
+ * Merges the borderless archival look with persistent data.
  * Adheres to 2-decimal (weight) and 1-decimal (diameter) rules.
  */
 export const CoinCard: React.FC<CoinCardProps> = React.memo(({ coin, onClick }) => {

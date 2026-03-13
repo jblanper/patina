@@ -1,90 +1,24 @@
-# Patina: Gemini CLI Extensions & Workflows
+# Explanation: The Curator's Automation
 
-This document provides a technical reference for the specialized skills, sub-agents, and automation hooks that extend the Gemini CLI for the Patina project. These extensions ensure that all development adheres to our core philosophy of museum-grade aesthetics and technical integrity.
+The Patina project utilizes a specialized set of Gemini CLI extensions to ensure that every technical decision adheres to our core philosophy of museum-grade aesthetics and numismatic integrity.
 
----
+## Why Automation?
 
-## 1. Management & Installation
+At its core, Patina is a sanctuary for historical objects. Standard software development tools often prioritize speed and "tech-first" dashboards, which can clash with the somber, tactile experience of a numismatic gallery. Our automation layer acts as a **Digital Curator**, enforcing specific standards that would otherwise require constant manual auditing.
 
-Custom skills are stored in the project's `.gemini/skills/` directory. They are automatically available to the agent, but may require a manual refresh if changes are made to the skill definitions.
+## How the System Works
 
-### Commands
-- **List Skills:** Use `/skills list` to view all active skills in your environment.
-- **Reload Skills:** Use `/skills reload` to refresh the agent's knowledge of the skills in `.gemini/skills/`.
+The extension layer is built on three pillars:
 
----
+1.  **Specialized Skills:** These are domain-specific agents that "look over our shoulder" during the development process. For example, `curating-coins` ensures that we use the correct numismatic symbols (e.g., `AR` for silver) and record weights to exactly two decimal places.
+2.  **Automated Quality Hooks:** These background scripts provide real-time feedback. After every tool call, the agent receives a "Context Update" containing the latest database schema, build status, and design system compliance reports.
+3.  **The Design Lifecycle:** Through the `curating-blueprints` and `curating-ui` skills, we follow a rigorous process of 3-path interactive proposals and post-implementation audits. This ensures that no component is implemented until its aesthetic impact has been curated.
 
-## 2. Core Skill Reference
+## Maintaining Standards
 
-The following specialized skills provide expert guidance and validation for specific domains of the Patina project.
+All extensions are audited against the **AgentSkills.io Open Standard** using the `evaluating-skills` tool. This ensures that our automation remains maintainable, secure, and aligned with the "Curator-First" experience.
 
-### `curating-blueprints` (Lifecycle Management)
-Standardizes the creation and review lifecycle of Implementation Blueprints.
-- **Scope:** Manages the initiation, multi-disciplinary audit (Security, Numismatic, UI), and retrospective phases of all major technical changes.
-- **Primary Use:** Invoke when starting new features, performing audits, or documenting post-implementation lessons.
-
-### `curating-coins` (Domain Accuracy)
-Maintains historical and technical integrity for all coin-related data.
-- **Scope:** Standardizes cataloging (RIC, RPC, Crawford), technical metrics (weight, diameter, die axis), and historical chronology (BC/AD).
-- **Primary Use:** Invoke when modifying `src/main/db.ts`, adding data entry fields, or auditing catalog records.
-
-### `curating-ui` (Aesthetics & Design)
-Ensures every interface element adheres to the "White Cube" Gallery aesthetic.
-- **Scope:** Enforces padding/margin ratios, typography standards (Inter), and the project's muted color palette.
-- **Primary Use:** Invoke when creating or refactoring React components in `src/renderer/`.
-- **References:** See `docs/style_guide.md` for the underlying design principles.
-
-### `evaluating-skills` (Skill Standards)
-Audits AI Agent Skills against the AgentSkills.io Open Standard.
-- **Scope:** Enforces metadata rules, gerund-based naming, progressive disclosure, and workflow checklists.
-- **Primary Use:** Invoke when creating, refactoring, or reviewing any skill in `.gemini/skills/`.
-
-### `saving-context` (Session Integrity)
-Generates structured context snapshots to preserve workspace state.
-- **Scope:** Analyzes changes, identifies current progress, and saves structured changelogs to `docs/changelog/`.
-- **Primary Use:** Invoke when "saving context" or before clearing the CLI session.
-
-### `securing-electron` (System Integrity)
-Performs automated and manual security audits of the Electron environment.
-- **Scope:** 
-    - **Isolation:** Enforces `contextIsolation`, `nodeIntegration: false`, and `sandbox: true`.
-    - **IPC Safety:** Validates all data traversing the `contextBridge`.
-    - **Navigation:** Implements strict controls on `will-navigate` and window creation.
-- **Primary Use:** Invoke when modifying `src/main/index.ts`, `src/main/preload.ts`, or any IPC handlers.
-
-### `tracking-progress` (Implementation Audit)
-Synchronizes project documentation with the actual state of the codebase.
-- **Scope:** Scans blueprints and changelogs for pending tasks, verifies their implementation in the code, and updates task lists (`- [x]`).
-- **Primary Use:** Invoke when auditing project progress or updating documentation after completing technical tasks.
-
-### `writing-tech-docs` (Documentation Framework)
-Creates, refactors, and reviews technical documentation following the Diátaxis framework.
-- **Scope:** Enforces structured quadrants (Tutorials, How-to, Reference, Explanation) and the project's writing style.
-- **Primary Use:** Invoke when drafting new guides in `docs/` or updating existing markdown documentation.
-
----
-
-## 3. Automated Quality Hooks
-
-Patina utilizes background scripts to provide the agent with real-time feedback and technical context after every turn. These are configured in `.gemini/settings.json`.
-
-- **Schema Context (`scripts/extract_schema.cjs`):** Parses `src/common/schema.ts` to provide the current database table definitions as live context.
-- **Build Verification (`scripts/check_build.cjs`):** Executes `tsc --noEmit` to identify TypeScript errors across the workspace.
-- **Style Audit (`scripts/check_lint.cjs`):** Runs ESLint to ensure code adheres to the project's linting rules.
-
----
-
-## 4. Sub-Agent Orchestration
-
-For complex tasks, use specialized sub-agents to maintain context efficiency:
-
-- **`codebase_investigator`:** Recommended for architectural mapping, dependency tracing, or large-scale refactors of the Ledger or Lens systems.
-- **`generalist`:** Efficient for high-volume, low-complexity tasks such as localized string generation or batch asset processing.
-
----
-
-## 5. Development Pipeline (Future Extensions)
-
-New extensions are prioritized based on their impact on the curator experience. Currently proposed extensions include:
-
-- **`patina-release`:** A specialized skill for managing production builds, code signing, and SQLite distribution verification.
+## Related resources
+- [How-to: Manage CLI Extensions](./how-to/manage_cli_extensions.md)
+- [Reference: CLI Extensions](./reference/cli_extensions.md)
+- [The Patina Style Guide](./style_guide.md)
