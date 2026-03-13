@@ -1,6 +1,8 @@
 import React from 'react';
 import { useCoins } from './hooks/useCoins';
 import { GalleryGrid } from './components/GalleryGrid';
+import { PatinaSidebar } from './components/PatinaSidebar';
+import { SearchBar } from './components/SearchBar';
 
 const App: React.FC = () => {
   const { 
@@ -9,6 +11,7 @@ const App: React.FC = () => {
     error, 
     filters, 
     updateFilters,
+    clearFilters,
     availableMetals 
   } = useCoins();
 
@@ -18,80 +21,76 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
-      <header>
+      <header className="app-header">
         <h1>Patina</h1>
         <div className="version-tag">Archive v1.0 // THE DISPLAY CASE</div>
       </header>
 
-      <main>
-        <section className="welcome-screen">
-          <h2 style={{ fontSize: '3rem', marginBottom: '1rem', letterSpacing: '-2px' }}>
-            The Cabinet
-          </h2>
-          <p className="type-body" style={{ marginBottom: '2.5rem' }}>
-            {loading 
-              ? 'Synchronizing with the local archive...' 
-              : `The collection contains ${filteredCoins.length} verified historical objects.`}
-          </p>
+      <div className="app-layout">
+        <PatinaSidebar 
+          filters={filters}
+          updateFilters={updateFilters}
+          clearFilters={clearFilters}
+          availableMetals={availableMetals}
+        />
 
-          <div style={{ marginBottom: '2rem' }}>
-            <label className="type-meta" style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Search the Ledger
-            </label>
-            <input 
-              type="text" 
-              className="input-minimal"
-              placeholder="Title, issuer, or catalog reference..."
+        <main className="app-main">
+          <section className="cabinet-section">
+            <header className="cabinet-header">
+              <h2 className="cabinet-title">The Cabinet</h2>
+              <p className="type-body cabinet-subtitle">
+                {loading 
+                  ? 'Synchronizing with the local archive...' 
+                  : `The collection contains ${filteredCoins.length} verified historical objects.`}
+              </p>
+            </header>
+
+            <SearchBar 
               value={filters.searchTerm}
-              onChange={(e) => updateFilters({ searchTerm: e.target.value })}
+              onChange={(val) => updateFilters({ searchTerm: val })}
             />
-          </div>
 
-          <div style={{ display: 'flex', gap: '2rem', marginBottom: '3rem' }}>
-             <div>
-                <label className="type-meta" style={{ display: 'block', marginBottom: '0.5rem' }}>Era</label>
-                <select 
-                  className="input-minimal" 
-                  multiple 
-                  style={{ height: '80px', minWidth: '150px' }}
-                  value={filters.era}
-                  onChange={(e) => {
-                    const values = Array.from(e.target.selectedOptions, option => option.value as any);
-                    updateFilters({ era: values });
-                  }}
-                >
-                  <option value="Ancient">Ancient</option>
-                  <option value="Medieval">Medieval</option>
-                  <option value="Modern">Modern</option>
-                </select>
-             </div>
+            <GalleryGrid 
+              coins={filteredCoins} 
+              loading={loading} 
+              onCoinClick={(id) => console.log('Coin clicked:', id)} 
+            />
+          </section>
+        </main>
+      </div>
 
-             <div>
-                <label className="type-meta" style={{ display: 'block', marginBottom: '0.5rem' }}>Metal</label>
-                <select 
-                  className="input-minimal" 
-                  multiple 
-                  style={{ height: '80px', minWidth: '150px' }}
-                  value={filters.metal}
-                  onChange={(e) => {
-                    const values = Array.from(e.target.selectedOptions, option => option.value);
-                    updateFilters({ metal: values });
-                  }}
-                >
-                  {availableMetals.map(m => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
-                </select>
-             </div>
-          </div>
+      <style jsx>{`
+        .app-layout {
+          display: flex;
+          gap: var(--spacing-large);
+          flex: 1;
+        }
 
-          <GalleryGrid 
-            coins={filteredCoins} 
-            loading={loading} 
-            onCoinClick={(id) => console.log('Coin clicked:', id)} 
-          />
-        </section>
-      </main>
+        .app-main {
+          flex: 1;
+          min-width: 0; /* Prevent flex children from overflowing */
+        }
+
+        .cabinet-section {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .cabinet-header {
+          margin-bottom: 2.5rem;
+        }
+
+        .cabinet-title {
+          font-size: clamp(2.5rem, 6vw, 3.5rem);
+          margin-bottom: 0.5rem;
+          letter-spacing: -2px;
+          line-height: 1;
+        }
+
+        .cabinet-subtitle {
+          color: var(--text-muted);
+        }
+      `}</style>
     </div>
   );
 };
