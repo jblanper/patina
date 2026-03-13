@@ -15,7 +15,8 @@
     "build:renderer": "vite build",
     "build:main": "tsc -p tsconfig.main.json",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "db:seed": "tsc scripts/seed_data.ts --module commonjs --target es2020 --esModuleInterop && electron scripts/seed_data.js && rm scripts/seed_data.js"
   },
   "keywords": [],
   "author": "",
@@ -41,6 +42,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "jsdom": "^28.1.0",
     "tsc-watch": "^7.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vitest": "^4.1.0",

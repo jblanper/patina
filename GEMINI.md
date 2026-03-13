@@ -32,6 +32,7 @@ This document defines the absolute standards for the Patina project. All develop
 - **Version Strategy:** Use caret (^) for semantic versioning to receive non-breaking updates automatically.
 - **Security:** Run `npm audit` in CI. Address HIGH/CVE vulnerabilities within 48 hours.
 - **Lockfile:** Always commit `package-lock.json`. Never use `--no-package-lock`.
+- **Native Modules:** Native modules like `better-sqlite3` MUST be rebuilt for the Electron version's ABI using `@electron/rebuild`.
 - **Upgrade Process:**
   1. Create branch: `deps/upgrade-<package>-<version>`
   2. Update version in `package.json`
@@ -51,7 +52,9 @@ This document defines the absolute standards for the Patina project. All develop
 ### Database & File System
 - **SQLite Integrity:** Use `better-sqlite3` with WAL mode. Ensure all writes are atomic and follow the structured schema defined in `src/common/schema.ts`. This file is the single source of truth for all table and column definitions.
 - **Portable Paths:** Store image paths as relative to the `data/images/` directory. Never use absolute system paths in the database.
-- **Atomic File Operations:** When moving or saving images from the "Lens" bridge, use atomic move/write operations to prevent data loss.
+- **Secure Image Loading:** Use a custom protocol (e.g., `patina-img://`) in the Main process to serve local images to the Renderer. This preserves the sandbox and CSP integrity by avoiding `file://` protocols or direct filesystem access.
+- **Atomic File Operations:**
+ When moving or saving images from the "Lens" bridge, use atomic move/write operations to prevent data loss.
 
 ---
 

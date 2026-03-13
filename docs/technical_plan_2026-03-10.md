@@ -73,6 +73,7 @@ The database schema has been finalized and approved following a research phase i
 ### Phase 1: Foundation (Completed)
 - [x] Scaffold Electron + React (TypeScript) base.
 - [x] Configure `better-sqlite3` with the approved curator schema.
+- [x] Implement `npm run db:seed` for numismatically accurate test data.
 - [x] Establish "Museum Label" design system (Typography, Colors).
 - [x] Implement IPC bridge for secure Main/Renderer communication.
 
