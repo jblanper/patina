@@ -361,6 +361,50 @@
             top: 0;
         }
 
+        /* Filtering & Sidebar */
+        .sidebar-mock {
+            width: 280px;
+            background: var(--stone-pedestal);
+            border: 1px solid var(--border-hairline);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .filter-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: var(--text-ink);
+        }
+
+        .filter-checkbox input {
+            accent-color: var(--accent-manuscript);
+        }
+
     </style>
 </head>
 <body>
@@ -430,11 +474,37 @@
                 <div class="type-h2">Cormorant / Italic / Logo</div>
                 <p class="type-body">Montserrat / Regular / UI. Modern yet archival. This sans-serif provides the functional structure needed for complex data entry and navigation.</p>
                 <div class="type-mono">JetBrains Mono / Technical Metrics / Precision</div>
+                <p class="type-body" style="font-family: var(--font-mono); font-size: 0.8rem; margin-top: 1rem;">
+                    [METRIC_PRECISION] Weight: 2-Decimal Rule (e.g. 17.20g) <br>
+                    [METRIC_PRECISION] Diameter: 1-Decimal Rule (e.g. 19.5mm)
+                </p>
+            </div>
+        </section>
+
+        <section id="filtering">
+            <h2>04 Filtering & Navigation</h2>
+            <div class="sidebar-mock">
+                <div class="filter-group">
+                    <span class="filter-title">Historical Era</span>
+                    <div class="filter-options">
+                        <label class="filter-checkbox"><input type="checkbox" checked> Ancient</label>
+                        <label class="filter-checkbox"><input type="checkbox"> Medieval</label>
+                        <label class="filter-checkbox"><input type="checkbox"> Modern</label>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <span class="filter-title">Primary Metal</span>
+                    <div class="filter-options">
+                        <label class="filter-checkbox"><input type="checkbox" checked> AU (Gold)</label>
+                        <label class="filter-checkbox"><input type="checkbox" checked> AR (Silver)</label>
+                        <label class="filter-checkbox"><input type="checkbox"> AE (Bronze)</label>
+                    </div>
+                </div>
             </div>
         </section>
 
         <section id="error-handling">
-            <h2>04 Error Handling</h2>
+            <h2>05 Error Handling</h2>
             <div class="alert alert-error" role="alert">
                 <span class="alert-icon">[!]</span>
                 <div class="alert-content">
@@ -450,7 +520,7 @@
         </section>
 
         <section id="components">
-            <h2>05 The Pedestal</h2>
+            <h2>06 The Pedestal</h2>
             <div class="gallery-grid">
                 <a href="#" class="pedestal">
                     <div class="coin-frame">
@@ -483,7 +553,7 @@
         </section>
 
         <section id="forms">
-            <h2>06 Form Inputs</h2>
+            <h2>07 Form Inputs</h2>
             <div class="form-group">
                 <label class="label-meta" for="designation">Archival Designation</label>
                 <input type="text" id="designation" class="input-minimal" placeholder="e.g. Roman Aureus">
@@ -495,7 +565,7 @@
         </section>
 
         <section id="actions">
-            <h2>07 Interaction & States</h2>
+            <h2>08 Interaction & States</h2>
             <div class="btn-container">
                 <button class="btn-solid">Index Acquisition</button>
                 <button class="btn-minimal">Modify Ledger</button>
@@ -504,7 +574,7 @@
         </section>
 
         <section id="empty">
-            <h2>08 Empty Ledger</h2>
+            <h2>09 Empty Ledger</h2>
             <div class="empty-curator">
                 <p>The ledger awaits its first historical entry.</p>
                 <div class="type-mono" style="margin-top: 1rem; font-size: 0.6rem;">Status: Index Ready // Ledger Empty</div>

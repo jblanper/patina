@@ -34,6 +34,8 @@ We use a **Scholarly Hybrid** approach to balance historical authority with tech
 
 ### Technical Mono: **JetBrains Mono**
 - **Metrics:** Used for all weights, measurements, and catalog references to ensure scientific precision and alignment.
+- **The "2-Decimal Rule":** Weight (grams) MUST be recorded to exactly two decimal places (e.g., `17.20g`).
+- **The "1-Decimal Rule":** Diameter (mm) MUST be recorded to exactly one decimal place (e.g., `19.5mm`).
 
 ---
 
@@ -48,6 +50,11 @@ We use a **Scholarly Hybrid** approach to balance historical authority with tech
 ### Borders & Depth
 - **Borders:** Use `1px solid var(--border-hairline)` for structural division.
 - **Elevation:** No drop shadows. Use slight background shifts (e.g., `--stone-pedestal`) to define areas.
+
+### The Sidebar (The "Archive Explorer")
+- **Width:** Fixed `280px` to maintain a stable ledger structure.
+- **Position:** Persistent on the left for the Gallery view.
+- **Filtering:** Use "Archival Labels" (Small, Sans-serif, Spaced) for multi-select categories (Era, Metal).
 
 ---
 
@@ -67,6 +74,7 @@ We use a **Scholarly Hybrid** approach to balance historical authority with tech
 - **Style:** Underlined only (`border-bottom`). No side or top borders.
 - **Labels:** Use "Catalog Label" typography (Small, Sans-serif, Spaced).
 - **Validation:** Use `var(--error-red)` for `border-color` and helper text.
+- **Schema Guard:** All inputs are guarded by **Zod validation** to ensure technical precision (e.g., `ERR_INVALID_METRIC`).
 
 ### Error Handling
 - **Alerts:** Use high-contrast banners with `4px` left borders in `var(--error-red)`.
@@ -74,3 +82,16 @@ We use a **Scholarly Hybrid** approach to balance historical authority with tech
 
 ### Empty States
 - **The "Silent Archive" Rule:** Use soft background containers and italicized serif typography. Left-aligned to mirror the start of a new ledger entry.
+
+---
+
+## 5. Filtering & Search (The Data Engine)
+
+### Global Search
+- **Behavior:** Debounced (300ms) to maintain a calm interface.
+- **Scope:** Search across Title, Issuer, Denomination, Provenance, and Catalog Reference.
+
+### Archival Filters (Multi-Select)
+- **Eras:** Ancient, Medieval, Modern.
+- **Metals:** Dynamically generated from the collection (AU, AR, AE, EL, BI).
+- **Sort:** Default to `year_numeric` to preserve the chronological integrity of the archive.
