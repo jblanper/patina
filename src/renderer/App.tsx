@@ -1,5 +1,6 @@
 import React from 'react';
 import { useCoins } from './hooks/useCoins';
+import { GalleryGrid } from './components/GalleryGrid';
 
 const App: React.FC = () => {
   const { 
@@ -12,7 +13,6 @@ const App: React.FC = () => {
   } = useCoins();
 
   if (error) {
-    // This will be caught by the ErrorBoundary, but we can also handle it locally
     throw error;
   }
 
@@ -20,7 +20,7 @@ const App: React.FC = () => {
     <div className="app-container">
       <header>
         <h1>Patina</h1>
-        <div className="version-tag">Archive v1.0 // The Cabinet</div>
+        <div className="version-tag">Archive v1.0 // THE DISPLAY CASE</div>
       </header>
 
       <main>
@@ -53,7 +53,7 @@ const App: React.FC = () => {
                 <select 
                   className="input-minimal" 
                   multiple 
-                  style={{ height: '80px' }}
+                  style={{ height: '80px', minWidth: '150px' }}
                   value={filters.era}
                   onChange={(e) => {
                     const values = Array.from(e.target.selectedOptions, option => option.value as any);
@@ -71,7 +71,7 @@ const App: React.FC = () => {
                 <select 
                   className="input-minimal" 
                   multiple 
-                  style={{ height: '80px' }}
+                  style={{ height: '80px', minWidth: '150px' }}
                   value={filters.metal}
                   onChange={(e) => {
                     const values = Array.from(e.target.selectedOptions, option => option.value);
@@ -85,24 +85,11 @@ const App: React.FC = () => {
              </div>
           </div>
 
-          <div className="ledger-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-            {filteredCoins.map(coin => (
-              <div key={coin.id} style={{ borderBottom: '1px solid var(--border-hairline)', paddingBottom: '1rem' }}>
-                <h3 style={{ fontSize: '1.4rem', marginBottom: '0.25rem' }}>{coin.title}</h3>
-                <div className="type-mono">
-                  {coin.era} // {coin.metal} // {coin.year_display}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {!loading && filteredCoins.length === 0 && (
-            <div style={{ padding: '4rem', border: '1px solid var(--border-hairline)', textAlign: 'center', backgroundColor: 'var(--stone-pedestal)' }}>
-              <p style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '1.2rem', color: 'var(--text-muted)' }}>
-                The ledger is silent. No records match the current criteria.
-              </p>
-            </div>
-          )}
+          <GalleryGrid 
+            coins={filteredCoins} 
+            loading={loading} 
+            onCoinClick={(id) => console.log('Coin clicked:', id)} 
+          />
         </section>
       </main>
     </div>

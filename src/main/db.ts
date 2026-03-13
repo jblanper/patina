@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { app } from 'electron';
 import { z } from 'zod';
-import { Coin, CoinImage, NewCoin, NewCoinImage } from '../common/types';
+import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage } from '../common/types';
 import { NewCoinSchema } from '../common/validation';
 
 import { SCHEMA, generateSQL } from '../common/schema';
@@ -39,8 +39,13 @@ function validate<T>(schema: z.ZodSchema<T>, data: unknown): T {
 }
 
 export const dbService = {
-  getCoins: (): Coin[] => {
-    return db.prepare('SELECT * FROM coins ORDER BY created_at DESC').all() as Coin[];
+  getCoins: (): CoinWithPrimaryImage[] => {
+    return db.prepare(`
+      SELECT c.*, i.path as primary_image_path 
+      FROM coins c 
+      LEFT JOIN images i ON c.id = i.coin_id AND i.is_primary = 1
+      ORDER BY c.created_at DESC
+    `).all() as CoinWithPrimaryImage[];
   },
 
   getCoinById: (id: number): { coin: Coin; images: CoinImage[] } | null => {

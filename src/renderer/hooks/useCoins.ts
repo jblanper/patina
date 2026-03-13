@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Coin, NewCoin } from '../../common/types';
+import { Coin, NewCoin, CoinWithPrimaryImage } from '../../common/types';
 import { FilterState } from '../../common/validation';
 import { useDebounce } from './useDebounce';
 
@@ -15,7 +15,7 @@ const DEFAULT_FILTERS: FilterState = {
 };
 
 export function useCoins() {
-  const [coins, setCoins] = useState<Coin[]>([]);
+  const [coins, setCoins] = useState<CoinWithPrimaryImage[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);

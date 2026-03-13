@@ -1,10 +1,10 @@
-import { Coin, CoinImage, NewCoin, NewCoinImage } from '../common/types';
+import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage } from '../common/types';
 
 export interface IElectronAPI {
   ping: () => Promise<string>;
   
   // Database API
-  getCoins: () => Promise<Coin[]>;
+  getCoins: () => Promise<CoinWithPrimaryImage[]>;
   getCoinById: (id: number) => Promise<{ coin: Coin; images: CoinImage[] } | null>;
   addCoin: (coin: NewCoin) => Promise<number>;
   updateCoin: (id: number, coin: Partial<NewCoin>) => Promise<boolean>;

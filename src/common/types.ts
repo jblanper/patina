@@ -28,6 +28,10 @@ export interface Coin {
   created_at: string;
 }
 
+export interface CoinWithPrimaryImage extends Coin {
+  primary_image_path?: string;
+}
+
 export interface CoinImage {
   id: number;
   coin_id: number;

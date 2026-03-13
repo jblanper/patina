@@ -9,7 +9,7 @@ Establish the core browsing experience for the Patina archive, ensuring the data
 
 ## 2. Technical Tasks
 
-### T1: Data Management Layer (`useCoins`)
+### T1: Data Management Layer (`useCoins`) [DONE]
 - **Location:** `src/renderer/hooks/useCoins.ts`
 - **Logic:**
     - Initialize state for `coins` (full list) and `filteredCoins`.
@@ -17,7 +17,7 @@ Establish the core browsing experience for the Patina archive, ensuring the data
     - Provide filtering methods for `era`, `metal`, and a text-based `searchQuery`.
     - Sync state with the IPC bridge (loading, error, success).
 
-### T2: Foundational Components (Gallery & Card)
+### T2: Foundational Components (Gallery & Card) [DONE]
 - **`CoinCard` (`src/renderer/components/CoinCard.tsx`):**
     - Implement the "Pedestal" design: `--stone-pedestal` background.
     - Typography: **Cormorant Bold** for Title, **JetBrains Mono** for metrics (Weight, Metal).

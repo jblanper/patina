@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refined Curatorial Proposal: Gallery Card v2 - Patina</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #7A7875;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --spacing-large: clamp(3rem, 8vw, 4rem);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-manuscript);
+            color: var(--text-ink);
+            line-height: 1.6;
+            padding: var(--spacing-large);
+        }
+
+        header {
+            border-bottom: 2px solid var(--text-ink);
+            margin-bottom: var(--spacing-large);
+            padding-bottom: 1.5rem;
+        }
+
+        h1 { 
+            font-family: var(--font-serif);
+            font-size: 2.4rem;
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: -0.5px;
+        }
+        
+        .meta-info {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-manuscript);
+            margin-top: 0.5rem;
+        }
+
+        .proposal-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 4rem;
+        }
+
+        .path-card {
+            background: #FFF;
+            padding: 3rem;
+            border: 1px solid var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .path-title {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .rationale {
+            font-size: 1.1rem;
+            color: var(--text-ink);
+            margin-bottom: 2.5rem;
+            font-family: var(--font-serif);
+            font-style: italic;
+            max-width: 800px;
+        }
+
+        .preview-area {
+            background: var(--bg-manuscript);
+            border: 1px solid var(--border-hairline);
+            padding: 3rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        /* Common Component Styles */
+        .gallery-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .coin-image-placeholder {
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: var(--stone-pedestal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .coin-circle {
+            width: 70%;
+            height: 70%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #E8E4D8 0%, #D1CDC0 100%);
+            box-shadow: 4px 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .coin-title {
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-ink);
+        }
+
+        .metadata-line {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent-manuscript);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .secondary-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Path 1: The Archival Pedestal */
+        .card-1 {
+            padding: 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            position: relative;
+        }
+
+        .card-1::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 1px solid transparent;
+            pointer-events: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .card-1:hover {
+            background: #F4F1E9;
+        }
+
+        .card-1:hover::after {
+            border-color: var(--accent-manuscript);
+        }
+
+        /* Path 2: The Floating Vellum */
+        .card-2 {
+            padding: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .card-2:hover {
+            background: var(--stone-pedestal);
+        }
+
+        .card-2 .coin-title {
+            position: relative;
+            display: inline-block;
+        }
+
+        .card-2 .coin-title::after {
+            content: '';
+            position: absolute;
+            left: 0; bottom: -2px;
+            width: 0; height: 1px;
+            background: var(--text-ink);
+            transition: width 0.3s ease;
+        }
+
+        .card-2:hover .coin-title::after {
+            width: 100%;
+        }
+
+        /* Path 3: The Structured Frame */
+        .card-3 {
+            padding: 1rem;
+            cursor: pointer;
+            border: 1px solid var(--border-hairline);
+            transition: border-color 0.3s ease;
+        }
+
+        .card-3:hover {
+            border-color: var(--accent-manuscript);
+        }
+
+        .card-3 .coin-image-placeholder {
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        .audit-results {
+            font-size: 0.85rem;
+            background: var(--bg-manuscript);
+            padding: 2rem;
+            border-left: 4px solid var(--accent-manuscript);
+            font-family: var(--font-mono);
+        }
+
+        .audit-results ul { list-style: none; margin-top: 0.75rem; }
+        .audit-results li { margin-bottom: 0.5rem; }
+        .audit-results li strong { color: var(--accent-manuscript); }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Refined Proposal: Gallery Card & Grid (v2)</h1>
+        <div class="meta-info">Project: Patina // Date: 2026-03-13 // Ref: PROP-GAL-002-V2</div>
+    </header>
+
+    <main class="proposal-grid">
+        <!-- Path 1: The Archival Pedestal -->
+        <section class="path-card">
+            <span class="tag">Archetype A/B Hybrid // The Archival Pedestal</span>
+            <h2 class="path-title">Internal Accent</h2>
+            <p class="rationale">Merges the borderless "White Cube" look with persistent data. On hover, a subtle internal border of Burnt Sienna defines the card without shifting the grid. Background shifts slightly to provide tactile feedback.</p>
+            
+            <div class="preview-area">
+                <div class="gallery-preview">
+                    <div class="card-1">
+                        <div class="coin-image-placeholder">
+                            <div class="coin-circle"></div>
+                        </div>
+                        <div class="coin-title">Athens Owl Tetradrachm</div>
+                        <div class="metadata-line">
+                            <span>AR</span>
+                            <span>17.20g</span>
+                            <span>24mm</span>
+                        </div>
+                        <div class="secondary-meta">Ref: RIC-204 // Attica, Athens</div>
+                    </div>
+                    <div class="card-1">
+                        <div class="coin-image-placeholder">
+                            <div class="coin-circle" style="background: radial-gradient(circle at 30% 30%, #EBD49D 0%, #C4A552 100%);"></div>
+                        </div>
+                        <div class="coin-title">Byzantine Solidus</div>
+                        <div class="metadata-line">
+                            <span>AU</span>
+                            <span>4.50g</span>
+                            <span>20mm</span>
+                        </div>
+                        <div class="secondary-meta">Ref: DOC-12 // Justinian I</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="audit-results">
+                <strong>CURATORIAL AUDIT:</strong>
+                <ul>
+                    <li><strong>Visibility:</strong> 100% (No data hidden).</li>
+                    <li><strong>Hover Action:</strong> Internal border + BG shift. (No layout shift).</li>
+                    <li><strong>Typography:</strong> Cormorant Garamond 700 / JetBrains Mono 400.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Path 2: The Floating Vellum -->
+        <section class="path-card">
+            <span class="tag">Archetype A/B Hybrid // The Floating Vellum</span>
+            <h2 class="path-title">Minimalist Underline</h2>
+            <p class="rationale">An even cleaner approach that relies on the "Iron Gall Ink" theme. Hovering triggers a subtle underline expansion on the title and a soft background shift to Archival Stone. Maintains an expansive, borderless feel.</p>
+            
+            <div class="preview-area">
+                <div class="gallery-preview">
+                    <div class="card-2">
+                        <div class="coin-image-placeholder">
+                            <div class="coin-circle"></div>
+                        </div>
+                        <div class="coin-title">Athens Owl Tetradrachm</div>
+                        <div class="metadata-line">
+                            <span>AR</span>
+                            <span>17.20g</span>
+                            <span>24mm</span>
+                        </div>
+                        <div class="secondary-meta">Ref: RIC-204 // Attica, Athens</div>
+                    </div>
+                    <div class="card-2">
+                        <div class="coin-image-placeholder">
+                            <div class="coin-circle" style="background: radial-gradient(circle at 30% 30%, #EBD49D 0%, #C4A552 100%);"></div>
+                        </div>
+                        <div class="coin-title">Byzantine Solidus</div>
+                        <div class="metadata-line">
+                            <span>AU</span>
+                            <span>4.50g</span>
+                            <span>20mm</span>
+                        </div>
+                        <div class="secondary-meta">Ref: DOC-12 // Justinian I</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="audit-results">
+                <strong>CURATORIAL AUDIT:</strong>
+                <ul>
+                    <li><strong>Visibility:</strong> 100% (Persistent metrics).</li>
+                    <li><strong>Hover Action:</strong> Animated underline + BG shift. (No layout shift).</li>
+                    <li><strong>Contrast:</strong> Exceeds WCAG AAA for primary text.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Path 3: The Structured Frame -->
+        <section class="path-card">
+            <span class="tag">Archetype B Refined // The Structured Frame</span>
+            <h2 class="path-title">Archival Stability</h2>
+            <p class="rationale">A refined version of the ledger approach. The card is always framed by a Vellum border, which changes color on hover. This provides the highest sense of archival order and stability.</p>
+            
+            <div class="preview-area">
+                <div class="gallery-preview">
+                    <div class="card-3">
+                        <div class="coin-image-placeholder">
+                            <div class="coin-circle"></div>
+                        </div>
+                        <div class="coin-title">Athens Owl Tetradrachm</div>
+                        <div class="metadata-line">
+                            <span>AR</span>
+                            <span>17.20g</span>
+                            <span>24mm</span>
+                        </div>
+                        <div class="secondary-meta">Ref: RIC-204 // Attica, Athens</div>
+                    </div>
+                    <div class="card-3">
+                        <div class="coin-image-placeholder">
+                            <div class="coin-circle" style="background: radial-gradient(circle at 30% 30%, #EBD49D 0%, #C4A552 100%);"></div>
+                        </div>
+                        <div class="coin-title">Byzantine Solidus</div>
+                        <div class="metadata-line">
+                            <span>AU</span>
+                            <span>4.50g</span>
+                            <span>20mm</span>
+                        </div>
+                        <div class="secondary-meta">Ref: DOC-12 // Justinian I</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="audit-results">
+                <strong>CURATORIAL AUDIT:</strong>
+                <ul>
+                    <li><strong>Visibility:</strong> 100% (High density, archival clarity).</li>
+                    <li><strong>Hover Action:</strong> Border color transition. (No layout shift).</li>
+                    <li><strong>Stability:</strong> Highest structural integrity for the grid.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
