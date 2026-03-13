@@ -21,7 +21,7 @@ This session focused on implementing and hardening the `useCoins` hook, which se
 * **Testing Strategy:** Introduced Vitest and jsdom to verify hook logic in isolation, ensuring 100% pass rate for filtering and sorting.
 
 ## Next Steps / Unresolved Issues
-* [ ] **T2: Foundational Components:** Implement `CoinCard` and `GalleryGrid` using the new hook.
-* [ ] **T3: The Sidebar:** Build `PatinaSidebar` for multi-select filtering of Era and Metal.
-* [ ] **T4: Global Search:** Implement the dedicated `SearchBar` component.
+* [x] **T2: Foundational Components:** Implement `CoinCard` and `GalleryGrid` using the new hook.
+* [x] **T3: The Sidebar:** Build `PatinaSidebar` for multi-select filtering of Era and Metal.
+* [x] **T4: Global Search:** Implement the dedicated `SearchBar` component.
 * [ ] **Optimization:** Monitor performance for collections > 100 items; consider moving `SELECT DISTINCT` filters to the Main process if needed.

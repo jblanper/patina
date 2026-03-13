@@ -19,6 +19,6 @@ Refactored the project's technical documentation into a structured Diátaxis fra
 * **Font Strategy:** Switched to scholarly serifs (Cormorant) and functional sans (Montserrat) to support the "Scholarly Hybrid" typography goal.
 
 ## Next Steps / Unresolved Issues
-* [ ] **T3: The Sidebar:** Implement the `PatinaSidebar` with the correct v3.3 typography and parchment colors.
+* [x] **T3: The Sidebar:** Implement the `PatinaSidebar` with the correct v3.3 typography and parchment colors.
 * [ ] **Custom Protocol:** Implement the `patina-img://` protocol to enable secure local image loading.
 * [ ] **Cleanup:** Perform a final scan of legacy HTML style guides for any remaining "White Cube" mentions.

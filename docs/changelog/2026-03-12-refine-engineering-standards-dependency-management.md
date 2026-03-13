@@ -17,6 +17,6 @@ This session refined the project's engineering standards documents to align with
 * **Documentation Versioning:** Both GEMINI.md and AGENTS.md now include explicit Version and Last Updated headers to track standards evolution.
 
 ## Next Steps / Unresolved Issues
-* [ ] Resolve typography discrepancy: Update style_guide.md to reflect actual Inter usage OR change CSS implementation to Montserrat.
-* [ ] Choose definitive test structure strategy (colocated vs `__tests__/`) and document consistently in GEMINI.md.
+* [x] Resolve typography discrepancy: Style guide now correctly reflects Montserrat for UI components.
+* [x] Choose definitive test structure strategy: Adopted **Colocation Strategy** for unit tests in GEMINI.md.
 * [ ] Consider adding additional standards sections: Performance requirements, Accessibility (WCAG), Code review process, Release management.

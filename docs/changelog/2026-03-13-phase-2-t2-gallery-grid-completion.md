@@ -20,7 +20,7 @@ Successfully implemented the foundational Gallery and Coin Card components for P
 * **Native Module Management:** Integrated `@electron/rebuild` to handle `better-sqlite3` ABI version mismatches between Node.js and Electron.
 
 ## Next Steps / Unresolved Issues
-* [ ] **T3: The Sidebar & Filtering:** Implement the `PatinaSidebar` with multi-select filters for Era and Metal.
+* [x] **T3: The Sidebar & Filtering:** Implement the `PatinaSidebar` with multi-select filters for Era and Metal.
 * [ ] **Custom Protocol:** Implement the `patina-img://` protocol handler in `src/main/index.ts` to enable local image rendering in the gallery.
-* [ ] **T4: Global Search:** Implement the `SearchBar` for real-time filtering.
+* [x] **T4: Global Search:** Implement the `SearchBar` for real-time filtering.
 * [ ] **Privacy Audit:** Ensure all fonts and assets are served locally (found some external Google Font links in `index.html` and `style_guide.html`).
