@@ -17,6 +17,7 @@ This document defines the absolute standards for the Patina project. All develop
 ## 2. Technical Standards
 
 ### Electron Security
+- **Security Architecture:** Refer to `docs/architecture/security_data_flow.md` for the authoritative guide on "The Filter" principle, secure IPC patterns, and Zod validation.
 - **Strict Isolation:** `contextIsolation: true` and `sandbox: true` are non-negotiable for the Renderer process.
 - **Secure Bridge:** Only expose specific, validated functions through the `contextBridge` in `preload.ts`. Never expose raw IPC or Node.js modules.
 - **IPC Validation:** The Main process MUST rigorously validate all data received from the Renderer using strict Zod schemas (`.strict()`). Verify IDs (positive integers) against the database and restrict file paths to the application's `data/` directory.
@@ -67,12 +68,13 @@ This document defines the absolute standards for the Patina project. All develop
 
 ---
 
-## 4. Development Workflow
+### Development Workflow
 - **Research First:** Before implementing any new numismatic feature, research historical standards (Numista, PCGS, Museum cataloging).
 - **Validation Mandate:** Every feature must be verified with its corresponding automated test or a documented manual validation step. The workspace is equipped with **Automated Quality Hooks** that check for TypeScript errors, linting violations, and database schema consistency after every turn.
+  - **Testing Standards:** Refer to `docs/guides/testing_standards.md` for comprehensive guidelines on directory structure, mocking, and coverage.
   - **Coverage:** Maintain 80%+ overall coverage with 100% branch coverage for critical paths (database, IPC, file operations).
   - **Framework:** Use Vitest with React Testing Library.
-  - **Test Structure:** Colocate tests with source files (e.g., `Component.test.tsx`) or use a centralized `src/__tests__/` directory.
+  - **Structure:** Colocate unit tests with source files (e.g., `Component.test.tsx`); use `src/__tests__/` for integration tests only.
 ---
 
 ## 5. Error Handling
