@@ -6,20 +6,30 @@ This reference provides technical details for the specialized skills, sub-agents
 
 | Skill | Primary Goal | Triggers / Usage |
 | :--- | :--- | :--- |
-| **`curating-blueprints`** | Lifecycle Management | When starting new features or performing audits. |
+| **`assuring-quality`** | Testing Standards | When creating components, hooks, or core logic. |
+| **`curating-blueprints`** | Senior Architect | When initiating features or architectural reviews. |
 | **`curating-coins`** | Numismatic Integrity | When modifying `src/main/db.ts` or cataloging coins. |
 | **`curating-ui`** | Archival Ledger Design | When creating or refactoring React components. |
 | **`evaluating-skills`** | Agent Standards | When creating or reviewing skills in `.gemini/skills/`. |
 | **`saving-context`** | Session Integrity | Before clearing a session or documenting a milestone. |
-| **`securing-electron`** | System Integrity | When modifying IPC, preload, or Main process logic. |
+| **`securing-electron`** | "The Filter" Principle | When modifying IPC, preload, or Main process logic. |
 | **`tracking-progress`** | Project Audit | To sync code state with blueprints and changelogs. |
 | **`writing-tech-docs`** | Diátaxis Compliance | When drafting or refactoring guides in `docs/`. |
 
-### `curating-ui`
-Enforces the **Manuscript Hybrid (v3.3)** aesthetic defined in `docs/style_guide.md`.
-- **Aesthetic:** Archival Ledger (Sanctuary approach).
-- **Typography:** Cormorant (Serif), Montserrat (Sans), JetBrains Mono (Technical).
-- **Colors:** Parchment (`#FCF9F2`), Iron Gall Ink (`#2D2926`), Burnt Sienna (`#914E32`).
+### `assuring-quality`
+Enforces the **Colocation Rule** and **Coverage Mandates** (100% validation, 90% hooks).
+- **Strategy:** Mandatory review of testing plans in blueprints.
+- **Verification:** Automated execution of specific tests and coverage analysis.
+
+### `curating-blueprints`
+Provides **Senior Architect** oversight for system-wide consistency.
+- **Philosophy:** Enforces "Curator-First", "Privacy First", and the "Single-Click Rule".
+- **Integrity:** Prevents architectural drift and ensures cross-process consistency.
+
+### `securing-electron`
+Protects user data through **"The Filter"** (strict Zod validation).
+- **Boundary:** Mandates `.strict()` schemas for all IPC handlers.
+- **Protocols:** Audits the `patina-img://` custom protocol for path traversal.
 
 ---
 

@@ -17,10 +17,11 @@ This document defines the absolute standards for the Patina project. All develop
 ## 2. Technical Standards
 
 ### Electron Security
-- **Security Architecture:** Refer to `docs/architecture/security_data_flow.md` for the authoritative guide on "The Filter" principle, secure IPC patterns, and Zod validation.
+- **Security Architecture:** Refer to `docs/architecture/security_data_flow.md` for the authoritative guide on **"The Filter"** principle.
 - **Strict Isolation:** `contextIsolation: true` and `sandbox: true` are non-negotiable for the Renderer process.
-- **Secure Bridge:** Only expose specific, validated functions through the `contextBridge` in `preload.ts`. Never expose raw IPC or Node.js modules.
-- **IPC Validation:** The Main process MUST rigorously validate all data received from the Renderer using strict Zod schemas (`.strict()`). Verify IDs (positive integers) against the database and restrict file paths to the application's `data/` directory.
+- **The Filter:** The Main process MUST rigorously validate all data from the Renderer using strict Zod schemas (`.strict()`).
+- **Secure Bridge:** Only expose specific, validated functions through the `contextBridge`. Never expose raw IPC or Node.js modules.
+- **Protocol Security:** Use the `patina-img://` custom protocol for image loading. All protocol handlers must implement strict path sanitization (blocking `..` traversal).
 
 ### TypeScript & Type Safety
 - **Strict Typing:** `strict: true` is mandatory. Avoid the `any` type at all costs; use `unknown` with type guards if necessary.
@@ -70,11 +71,12 @@ This document defines the absolute standards for the Patina project. All develop
 
 ### Development Workflow
 - **Research First:** Before implementing any new numismatic feature, research historical standards (Numista, PCGS, Museum cataloging).
-- **Validation Mandate:** Every feature must be verified with its corresponding automated test or a documented manual validation step. The workspace is equipped with **Automated Quality Hooks** that check for TypeScript errors, linting violations, and database schema consistency after every turn.
-  - **Testing Standards:** Refer to `docs/guides/testing_standards.md` for comprehensive guidelines on directory structure, mocking, and coverage.
-  - **Coverage:** Maintain 80%+ overall coverage with 100% branch coverage for critical paths (database, IPC, file operations).
+- **Architectural Oversight:** Utilize `curating-blueprints` to ensure every change aligns with the "Curator-First" philosophy and the "Single-Click Rule".
+- **Validation Mandate:** Every feature must be verified with its corresponding automated test.
+  - **Testing Standards:** Refer to `docs/guides/testing_standards.md` for guidelines on the **Colocation Rule** and mocking patterns.
+  - **Coverage:** Maintain 100% branch coverage for `src/common/validation.ts`, 90% for hooks, and 80% for components.
   - **Framework:** Use Vitest with React Testing Library.
-  - **Structure:** Colocate unit tests with source files (e.g., `Component.test.tsx`); use `src/__tests__/` for integration tests only.
+  - **QA Oversight:** Utilize the `assuring-quality` skill to audit testing plans and verify coverage metrics.
 ---
 
 ## 5. Error Handling

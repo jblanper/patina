@@ -7,22 +7,65 @@
 ## 1. Objective
 [Clear, concise description of the goal.]
 
-## 2. Technical Tasks
-### [T1: Task Name]
-- **Location:** [File path]
-- **Logic:** [Brief description of the logic or implementation.]
+### Philosophical Alignment
+- [ ] **Curator-First:** Does this feel like a museum tool? (Archival Ledger aesthetic)
+- [ ] **Privacy First:** No external CDNs or telemetry introduced?
+- [ ] **Single-Click Rule:** Is the UI hierarchy flat and intuitive?
 
-### [T2: Task Name]
 ...
 
-## 3. Verification Strategy
-- **Testing:** [Unit tests, integration tests, etc.]
-- **Visual Audit:** [Manual or automated checks against style guides.]
-- **Performance:** [Scale testing, if applicable.]
+## 3. Verification Strategy (Quality Oversight)
+- **Testing Plan:** [Specific test cases for hooks/components.]
+- **Colocation Check:** [Confirm test files live next to source.]
+- **Mocking Strategy:** [Details on mocking Electron API.]
 
 ---
 
-## 4. Security Assessment (`securing-electron`)
+## 4. Architectural Oversight (`curating-blueprints`)
+**Status:** [Pending/Verified]
+### Audit Findings:
+- **System Integrity:** [Cross-process consistency, type safety.]
+- **Abstraction:** [Does logic leak into the Electron bridge?]
+
+### Recommendations:
+- [Recommendation 1]
+
+---
+
+## 5. Security Assessment (`securing-electron`)
+**Status:** [Pending/Verified]
+### Audit Findings:
+- **The Filter:** [Zod validation, .strict() schemas.]
+- **Protocols:** [patina-img:// path sanitization.]
+
+### Recommendations:
+- [Recommendation 1]
+
+---
+
+## 6. Quality Assessment (`assuring-quality`)
+**Status:** [Pending/Verified]
+### Audit Findings:
+- **Coverage Check:** [Targets: 100% validation, 90% hooks, 80% components.]
+- **Async Safety:** [waitFor, findBy* usage.]
+
+### Recommendations:
+- [Recommendation 1]
+
+---
+
+## 7. UI Assessment (`curating-ui`)
+**Status:** [Pending/Verified]
+### Audit Findings:
+- **Aesthetic Compliance:** [Manuscript Hybrid v3.3 standards.]
+- **Accessibility:** [Semantic HTML, contrast, keyboard nav.]
+
+### Recommendations:
+- [Recommendation 1]
+
+---
+
+## 8. Numismatic Assessment (`curating-coins`)
 **Status:** [Pending/Verified]
 ### Audit Findings:
 - [Finding 1]
@@ -32,27 +75,7 @@
 
 ---
 
-## 5. Numismatic Assessment (`curating-coins`)
-**Status:** [Pending/Verified]
-### Audit Findings:
-- [Finding 1]
-
-### Recommendations:
-- [Recommendation 1]
-
----
-
-## 6. UI Assessment (`curating-ui`)
-**Status:** [Pending/Verified]
-### Audit Findings:
-- [Finding 1]
-
-### Recommendations:
-- [Recommendation 1]
-
----
-
-## 7. Post-Implementation Retrospective
+## 9. Post-Implementation Retrospective
 **Date:** [YYYY-MM-DD]  
 **Outcome:** [Summary of success or failure]
 
