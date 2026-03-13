@@ -23,10 +23,19 @@ This document resolves the ambiguity in `GEMINI.md` regarding test structure and
 | **React Testing Library** | Component Rendering | Use `@testing-library/react` (v16+). |
 | **JSDOM** | Browser Environment | Simulates DOM API for React components. |
 | **Vi** | Mocking | Built-in Vitest mocking utility (`vi.fn`, `vi.spyOn`). |
+| **TSC** | Type-Check | Static analysis via `npx tsc --noEmit`. |
 
 ---
 
-## 3. Directory Structure (The "Colocation" Rule)
+## 3. Build Verification
+
+Static analysis is the first line of defense against runtime failures.
+- **The Zero-Error Rule:** No code may be committed or finalized if `npx tsc --noEmit` returns errors.
+- **Execution Mandate:** You MUST execute a full project type-check before declaring any "Execution" phase complete. Runtime success in a HMR (Hot Module Replacement) environment is not a valid substitute for a clean build.
+
+---
+
+## 4. Directory Structure (The "Colocation" Rule)
 
 We have formally adopted the **Colocation Strategy** for unit tests to support our modular architecture.
 

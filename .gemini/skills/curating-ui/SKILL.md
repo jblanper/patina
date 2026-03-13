@@ -26,8 +26,9 @@ For any UI task, you MUST propose **3 distinct alternatives** following the guid
 ### Implementation Review
 After code is written, you MUST perform a "Curator's Audit":
 1. Does the implementation match the chosen proposal's metrics?
-2. Is the "breathability" (whitespace) preserved as per the "Expansive Rule"?
-3. Are the CSS variables from `style_guide.md` used correctly?
+2. **Vanilla CSS Mandate:** Are styles strictly in `src/renderer/styles/index.css`? Reject `styled-jsx`, `Tailwind`, or `styled-components` unless requested.
+3. Is the "breathability" (whitespace) preserved as per the "Expansive Rule"?
+4. Are the CSS variables from `style_guide.md` used correctly?
 
 ### Style Guide Synchronization
 Any time a new pattern, component, or variable is approved, you MUST update both `docs/style_guide.md` (Technical documentation) and `docs/style_guide.html` (Visual reference).

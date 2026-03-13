@@ -25,6 +25,7 @@ Coordinate specialized audits to ensure deep domain compliance:
 
 ### Phase III: Execution Oversight
 Monitor the implementation to prevent architectural drift:
+- [ ] **Build Integrity:** Mandate a clean `npx tsc --noEmit` run before finalization.
 - [ ] **Cross-Process Consistency:** Ensure types in `src/common/` are used by both Main and Renderer.
 - [ ] **Abstraction Integrity:** Prevent business logic from leaking into the raw Electron bridge.
 

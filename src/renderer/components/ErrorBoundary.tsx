@@ -52,7 +52,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           color: '#B22222',
           border: '1px solid #E0DCCD'
         }}>
-          ERR_CRITICAL_EXCEPTION: {error.message}
+          ERR_CRITICAL_EXCEPTION: {error instanceof Error ? error.message : 'An unspecified archival error occurred.'}
         </div>
 
         <button

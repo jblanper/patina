@@ -77,7 +77,7 @@ The database schema has been finalized and approved following a research phase i
 - [x] Establish "Museum Label" design system (Typography, Colors).
 - [x] Implement IPC bridge for secure Main/Renderer communication.
 
-### Phase 2: The Display Case (Current)
+### Phase 2: The Display Case (Completed)
 - [x] **Data Management:** Develop `useCoins()` custom hook for centralized state, filtering, and DB interaction.
 - [x] **Gallery Grid:** Build `GalleryGrid` and `CoinCard` components with "Museum Label" aesthetic.
 - [x] **Sidebar Filters:** Create `PatinaSidebar` with multi-select filters for Era (Ancient, Medieval, Modern) and Metal (Gold, Silver, Bronze).
@@ -85,7 +85,7 @@ The database schema has been finalized and approved following a research phase i
 - [x] **Empty State:** Design a prestigious "Empty Case" view to encourage adding the first coin.
 - [x] **Optimization:** Implement `React.memo` and image lazy-loading for large collections.
 
-### Phase 3: The Ledger (Record View)
+### Phase 3: The Ledger (Record View) (Current)
 - [ ] Build the detailed coin record display.
 - [ ] Implement the "Story" box (rich text or clean markdown).
 - [ ] Add the image zoom/inspection functionality.

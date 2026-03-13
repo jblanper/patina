@@ -56,53 +56,6 @@ export const GalleryGrid: React.FC<GalleryGridProps> = React.memo(({
           onClick={onCoinClick} 
         />
       ))}
-
-      <style jsx>{`
-        .gallery-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 2rem;
-          padding-bottom: 4rem;
-        }
-
-        .gallery-status, .empty-cabinet {
-          padding: 3rem;
-          border: 1px solid var(--border-hairline);
-          background: var(--stone-pedestal);
-          max-width: 800px;
-          margin-top: 2rem;
-        }
-
-        .gallery-status p {
-          font-family: var(--font-serif);
-          font-style: italic;
-          font-size: 1.4rem;
-          color: var(--text-muted);
-        }
-
-        .empty-title {
-          font-family: var(--font-serif);
-          font-style: italic;
-          font-size: 1.8rem;
-          color: var(--text-ink);
-          margin-bottom: 0.5rem;
-        }
-
-        .empty-desc {
-          font-family: var(--font-sans);
-          font-size: 1rem;
-          color: var(--text-muted);
-          margin-bottom: 2rem;
-        }
-
-        .cabinet-status {
-          font-family: var(--font-mono);
-          font-size: 0.6rem;
-          color: var(--accent-manuscript);
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-      `}</style>
     </section>
   );
 });

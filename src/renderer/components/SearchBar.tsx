@@ -24,42 +24,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, placehold
         maxLength={100}
         aria-label="Search the coin archive"
       />
-
-      <style jsx>{`
-        .search-bar-container {
-          width: 100%;
-          margin-bottom: 2.5rem;
-        }
-
-        .search-label {
-          display: block;
-          margin-bottom: 0.5rem;
-        }
-
-        .search-input {
-          width: 100%;
-          padding: 0.75rem 0;
-          border: none;
-          border-bottom: 1px solid var(--border-hairline);
-          font-family: var(--font-sans);
-          font-size: 1.1rem;
-          outline: none;
-          background: transparent;
-          color: var(--text-ink);
-          transition: border-color 0.3s ease, border-width 0.1s ease;
-        }
-
-        .search-input:focus {
-          border-bottom: 2px solid var(--text-ink);
-          padding-bottom: calc(0.75rem - 1px); /* Prevent layout shift from 2px border */
-        }
-
-        .search-input::placeholder {
-          color: var(--text-muted);
-          font-style: italic;
-          opacity: 0.6;
-        }
-      `}</style>
     </div>
   );
 };

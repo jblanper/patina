@@ -23,6 +23,7 @@ As code is being written, ensure the following patterns are followed:
 
 ### Phase III: Validation & Coverage Audit
 After implementation, you must verify the results:
+- [ ] **Static Analysis:** Execute a full project type-check (`npx tsc --noEmit`). No task is complete if `tsc` reports errors.
 - [ ] **Execution:** Run the specific tests related to the change.
 - [ ] **Regression:** Run existing tests in the same module to ensure no regressions.
 - [ ] **Coverage:** Verify that coverage mandates are met:

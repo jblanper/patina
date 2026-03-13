@@ -6,6 +6,7 @@ import { SearchBar } from './components/SearchBar';
 
 const App: React.FC = () => {
   const { 
+    coins,
     filteredCoins, 
     loading, 
     error, 
@@ -59,39 +60,6 @@ const App: React.FC = () => {
           </section>
         </main>
       </div>
-
-      <style jsx>{`
-        .app-layout {
-          display: flex;
-          gap: var(--spacing-large);
-          flex: 1;
-        }
-
-        .app-main {
-          flex: 1;
-          min-width: 0; /* Prevent flex children from overflowing */
-        }
-
-        .cabinet-section {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .cabinet-header {
-          margin-bottom: 2.5rem;
-        }
-
-        .cabinet-title {
-          font-size: clamp(2.5rem, 6vw, 3.5rem);
-          margin-bottom: 0.5rem;
-          letter-spacing: -2px;
-          line-height: 1;
-        }
-
-        .cabinet-subtitle {
-          color: var(--text-muted);
-        }
-      `}</style>
     </div>
   );
 };

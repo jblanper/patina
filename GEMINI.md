@@ -48,7 +48,7 @@ This document defines the absolute standards for the Patina project. All develop
 ### React & Frontend Architecture
 - **Component Focused:** One file per component. Keep components small, focused, and documented with TS interfaces for props.
 - **Custom Hooks:** All database interaction, filtering logic, or bridge state must be encapsulated in custom hooks (e.g., `useCoins()`, `useLens()`).
-- **Styling:** All CSS, visual design, and component styling must follow the standards defined in `docs/style_guide.md`. This document is the authoritative source for the Archival Ledger aesthetic.
+- **Styling:** All CSS must be implemented using **Vanilla CSS** in the global `src/renderer/styles/index.css` file. Follow the standards in `docs/style_guide.md`. Do NOT use `styled-jsx`, `styled-components`, or utility-first frameworks like Tailwind unless specifically requested. This ensures a stable, type-safe, and archival-focused build.
 - **Optimization:** Use `React.memo` and `useCallback` strategically in the Gallery grid to ensure smooth scrolling and interaction.
 
 ### Database & File System
@@ -73,6 +73,7 @@ This document defines the absolute standards for the Patina project. All develop
 - **Research First:** Before implementing any new numismatic feature, research historical standards (Numista, PCGS, Museum cataloging).
 - **Architectural Oversight:** Utilize `curating-blueprints` to ensure every change aligns with the "Curator-First" philosophy and the "Single-Click Rule".
 - **Validation Mandate:** Every feature must be verified with its corresponding automated test.
+  - **Type-Check Policy:** You MUST execute a full project type-check (`npx tsc --noEmit`) and verify the build status before finalizing any "Execution" phase. Runtime success is not a substitute for static analysis.
   - **Testing Standards:** Refer to `docs/guides/testing_standards.md` for guidelines on the **Colocation Rule** and mocking patterns.
   - **Coverage:** Maintain 100% branch coverage for `src/common/validation.ts`, 90% for hooks, and 80% for components.
   - **Framework:** Use Vitest with React Testing Library.

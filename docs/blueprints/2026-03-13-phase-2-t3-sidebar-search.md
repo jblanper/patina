@@ -104,3 +104,28 @@ Finalize the browsing interface of the Patina archive by implementing the `Patin
 - **Mobile UI:** The 280px sidebar is currently fixed; mobile implementation will require a bottom-sheet or drawer pattern.
 - **Performance:** For archives exceeding ~500 entries, filtering should be migrated to `ipcMain` and SQL `WHERE` clauses to maintain UI responsiveness.
 - **Core Doc Revision:** Confirmed adherence to `GEMINI.md` and `docs/style_guide.md`. No revisions to core standards required.
+
+---
+
+## 8. Post-Mortem: ERR_CRITICAL_EXCEPTION (2026-03-13)
+
+### Incident Summary
+Immediately following the implementation of Phase 2 (T2-T5), the application failed to boot with a `ReferenceError: coins is not defined` (wrapped as `ERR_CRITICAL_EXCEPTION` by the UI).
+
+### Root Cause Analysis
+- **Missing Destructuring:** In `src/renderer/App.tsx`, the `coins` variable was passed to the `GalleryGrid` component (`isDatabaseEmpty={coins.length === 0}`), but it had not been extracted from the `useCoins()` hook destructuring block.
+- **Validation Gap:** The "Execution" phase was finalized without a comprehensive TypeScript type-check (`tsc`), allowing both the `ReferenceError` and latent styling type errors to persist.
+- **Shadow Styling Pattern:** The project utilized `<style jsx>` tags without the `styled-jsx` library being installed or configured, leading to 5+ persistent `tsc` errors across all new components.
+- **Error Boundary Limitation:** The `ErrorBoundary` was unable to display specific error messages because the `error` prop was typed as `unknown` without a proper type guard.
+
+### Resolution
+- **Code Fix:** Added `coins` to the `useCoins()` destructuring in `App.tsx`.
+- **Architectural Refactor:** Removed all `<style jsx>` blocks and migrated styles to the global `src/renderer/styles/index.css`, adhering to the "Vanilla CSS" mandate in `technical_plan_2026-03-10.md`.
+- **UI Resilience:** Refactored `ErrorBoundary.tsx` to use an `instanceof Error` type guard for safe message extraction.
+- **Verification:** Executed a full project type-check (`npx tsc --noEmit`) and verified a clean, zero-error build.
+
+### Lessons Learnt
+1.  **Mandatory Type-Check:** Runtime success in a development watcher is a "false positive." A task is only complete when `tsc` confirms structural integrity.
+2.  **Stick to the Stack:** Introducing unmanaged patterns (like `styled-jsx`) creates technical debt. Always verify the project's CSS strategy (`Vanilla CSS` in this case) before implementation.
+3.  **Defensive UI:** Error boundaries must use type guards to safely handle `unknown` error types.
+4.  **Destructuring Hygiene:** Always verify that every variable used in a component's JSX is explicitly defined in its scope.
