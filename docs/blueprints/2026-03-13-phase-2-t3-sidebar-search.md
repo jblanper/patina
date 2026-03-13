@@ -1,7 +1,7 @@
 # Implementation Blueprint: Phase 2 - T3 & T4: Sidebar & SearchBar
 
 **Date:** 2026-03-13  
-**Status:** Draft  
+**Status:** Completed  
 **Reference:** `docs/technical_plan_2026-03-10.md` (T3, T4)
 
 ## 1. Objective
@@ -9,7 +9,7 @@ Finalize the browsing interface of the Patina archive by implementing the `Patin
 
 ## 2. Technical Tasks
 
-### T3: PatinaSidebar (`src/renderer/components/PatinaSidebar.tsx`)
+### T3: PatinaSidebar (`src/renderer/components/PatinaSidebar.tsx`) [DONE]
 - **Location:** `src/renderer/components/PatinaSidebar.tsx`
 - **Logic:**
     - Fixed `280px` width.
@@ -21,7 +21,7 @@ Finalize the browsing interface of the Patina archive by implementing the `Patin
         - Spacing: `2.5rem` between filter categories.
     - **Reset Action:** A "Clear All" button (`btn-minimal`) to reset filters.
 
-### T4: SearchBar (`src/renderer/components/SearchBar.tsx`)
+### T4: SearchBar (`src/renderer/components/SearchBar.tsx`) [DONE]
 - **Location:** `src/renderer/components/SearchBar.tsx`
 - **Logic:**
     - A full-width input field with a bottom-only border (`--border-hairline`).
@@ -29,7 +29,7 @@ Finalize the browsing interface of the Patina archive by implementing the `Patin
     - **Typography:** Montserrat (Sans-serif) for high legibility during active entry.
     - **Aesthetic:** Minimalist, no icon (or a very subtle one), focusing on the "Archival Ledger" feel.
 
-### T5: Layout Integration
+### T5: Layout Integration [DONE]
 - **Location:** `src/renderer/App.tsx` and `src/renderer/styles/index.css`
 - **Logic:**
     - Update `App.tsx` to wrap the `PatinaSidebar` and the main gallery content in a flex container.
@@ -38,10 +38,10 @@ Finalize the browsing interface of the Patina archive by implementing the `Patin
     - Update the `SearchBar` to sit at the top of the content area.
 
 ## 3. Verification Strategy
-- **Functionality:** Verify that selecting filters correctly updates the `filteredCoins` in the `GalleryGrid`.
-- **Debounce Check:** Confirm the 300ms delay in `useCoins` is properly respected by the `SearchBar` without causing input lag.
-- **Visual Audit:** Adheres to **Manuscript Hybrid v3.3** (Persistent 280px sidebar, Underlined inputs).
-- **Responsive Check:** Ensure the layout degrades gracefully (e.g., sidebar moves to top or becomes toggleable) on narrower windows.
+- [x] **Functionality:** Verify that selecting filters correctly updates the `filteredCoins` in the `GalleryGrid`.
+- [x] **Debounce Check:** Confirm the 300ms delay in `useCoins` is properly respected by the `SearchBar` without causing input lag.
+- [x] **Visual Audit:** Adheres to **Manuscript Hybrid v3.3** (Persistent 280px sidebar, Underlined inputs).
+- [x] **Responsive Check:** Ensure the layout degrades gracefully (e.g., sidebar moves to top or becomes toggleable) on narrower windows.
 
 ---
 
@@ -86,15 +86,21 @@ Finalize the browsing interface of the Patina archive by implementing the `Patin
 ---
 
 ## 7. Post-Implementation Retrospective
-**Date:** [YYYY-MM-DD]  
-**Outcome:** [Summary of success or failure]
+**Date:** 2026-03-13  
+**Outcome:** Success. The gallery now features a stable, two-column layout with robust filtering and search.
 
 ### Summary of Work
-- [Key achievement 1]
+- Implemented `PatinaSidebar` with multi-select for Era and Metal.
+- Implemented `SearchBar` with debounced input and archival styling.
+- Integrated components into a flexbox layout in `App.tsx`.
+- Added "The Silent Archive" and "The Ledger Awaits" empty states to `GalleryGrid`.
+- Optimized image performance with `loading="lazy"` in `CoinCard`.
 
 ### Pain Points
-- [Challenge 1]
+- **Layout Stability:** Handling increasing border widths on focus required precise padding adjustments (`calc(0.75rem - 1px)`) to prevent grid shifting.
+- **State Logic:** Distinguishing between an empty database and filtered results required the addition of an `isDatabaseEmpty` prop to the `GalleryGrid`.
 
 ### Things to Consider
-- [Future improvement 1]
-- **Core Doc Revision:** [Confirm if GEMINI.md, style_guide.md, or style_guide.html were updated.]
+- **Mobile UI:** The 280px sidebar is currently fixed; mobile implementation will require a bottom-sheet or drawer pattern.
+- **Performance:** For archives exceeding ~500 entries, filtering should be migrated to `ipcMain` and SQL `WHERE` clauses to maintain UI responsiveness.
+- **Core Doc Revision:** Confirmed adherence to `GEMINI.md` and `docs/style_guide.md`. No revisions to core standards required.

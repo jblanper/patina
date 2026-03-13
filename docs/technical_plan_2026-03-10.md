@@ -80,10 +80,10 @@ The database schema has been finalized and approved following a research phase i
 ### Phase 2: The Display Case (Current)
 - [x] **Data Management:** Develop `useCoins()` custom hook for centralized state, filtering, and DB interaction.
 - [x] **Gallery Grid:** Build `GalleryGrid` and `CoinCard` components with "Museum Label" aesthetic.
-- [ ] **Sidebar Filters:** Create `PatinaSidebar` with multi-select filters for Era (Ancient, Medieval, Modern) and Metal (Gold, Silver, Bronze).
-- [ ] **Global Search:** Implement a prominent, stylized `SearchBar` for real-time filtering by Year, Country, or Title.
-- [ ] **Empty State:** Design a prestigious "Empty Case" view to encourage adding the first coin.
-- [/] **Optimization:** Implement `React.memo` and image lazy-loading for large collections. (Memoization complete; lazy-loading pending).
+- [x] **Sidebar Filters:** Create `PatinaSidebar` with multi-select filters for Era (Ancient, Medieval, Modern) and Metal (Gold, Silver, Bronze).
+- [x] **Global Search:** Implement a prominent, stylized `SearchBar` for real-time filtering by Year, Country, or Title.
+- [x] **Empty State:** Design a prestigious "Empty Case" view to encourage adding the first coin.
+- [x] **Optimization:** Implement `React.memo` and image lazy-loading for large collections.
 
 ### Phase 3: The Ledger (Record View)
 - [ ] Build the detailed coin record display.
