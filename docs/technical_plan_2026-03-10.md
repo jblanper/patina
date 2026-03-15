@@ -73,22 +73,24 @@ The database schema has been finalized and approved following a research phase i
 ### Phase 1: Foundation (Completed)
 - [x] Scaffold Electron + React (TypeScript) base.
 - [x] Configure `better-sqlite3` with the approved curator schema.
-- [x] Implement `npm run db:seed` for numismatically accurate test data.
+- [x] Implement `npm run db:seed` for numismatically accurate test data. [Blueprint](./blueprints/2026-03-13-seed-data-script.md)
 - [x] Establish "Museum Label" design system (Typography, Colors).
 - [x] Implement IPC bridge for secure Main/Renderer communication.
 
 ### Phase 2: The Display Case (Completed)
-- [x] **Data Management:** Develop `useCoins()` custom hook for centralized state, filtering, and DB interaction.
-- [x] **Gallery Grid:** Build `GalleryGrid` and `CoinCard` components with "Museum Label" aesthetic.
-- [x] **Sidebar Filters:** Create `PatinaSidebar` with multi-select filters for Era (Ancient, Medieval, Modern) and Metal (Gold, Silver, Bronze).
-- [x] **Global Search:** Implement a prominent, stylized `SearchBar` for real-time filtering by Year, Country, or Title.
+**Phase Blueprint:** [2026-03-12-phase-2-display-case.md](./blueprints/2026-03-12-phase-2-display-case.md)
+- [x] **Data Management:** Develop `useCoins()` custom hook for centralized state, filtering, and DB interaction. [Blueprint](./blueprints/2026-03-12-t1-usecoins-hook.md)
+- [x] **Gallery Grid:** Build `GalleryGrid` and `CoinCard` components with "Museum Label" aesthetic. [Blueprint](./blueprints/2026-03-13-phase-2-t2-gallery-grid.md)
+- [x] **Sidebar Filters:** Create `PatinaSidebar` with multi-select filters for Era (Ancient, Medieval, Modern) and Metal (Gold, Silver, Bronze). [Blueprint](./blueprints/2026-03-13-phase-2-t3-sidebar-search.md)
+- [x] **Global Search:** Implement a prominent, stylized `SearchBar` for real-time filtering by Year, Country, or Title. [Blueprint](./blueprints/2026-03-13-phase-2-t3-sidebar-search.md)
 - [x] **Empty State:** Design a prestigious "Empty Case" view to encourage adding the first coin.
 - [x] **Optimization:** Implement `React.memo` and image lazy-loading for large collections.
 
-### Phase 3: The Ledger (Record View) (Current)
-- [ ] Build the detailed coin record display.
-- [ ] Implement the "Story" box (rich text or clean markdown).
-- [ ] Add the image zoom/inspection functionality.
+### Phase 3: The Ledger (Record View) (Completed)
+**Detailed Blueprint:** [2026-03-14-phase-3-ledger.md](./blueprints/2026-03-14-phase-3-ledger.md)
+- [x] Build the detailed coin record display.
+- [x] Implement the "Story" box (rich text or clean markdown).
+- [x] Add the image zoom/inspection functionality.
 
 ### Phase 4: The Lens (Wireless Bridge)
 - [ ] Implement the local Node.js/Express server.
@@ -101,7 +103,13 @@ The database schema has been finalized and approved following a research phase i
 
 ---
 
-## 6. Design Guidelines
-- **Primary:** "Oxford Blue" (#0B132B) & "Forest Green" (#1B3022).
-- **Accents:** "Aged Bronze" (#8D5B4C) & "Verdigris" (#43AA8B).
-- **Fonts:** *Playfair Display* (Serif) for headings, *Inter* (Sans-Serif) for data.
+## 6. Design Guidelines (Updated to v3.3)
+> **Note:** See [style_guide.md](./style_guide.md) for the definitive design system.
+
+- **Theme:** "Manuscript Hybrid" (Parchment & Iron Gall Ink).
+- **Primary:** "Parchment" (#FCF9F2) & "Iron Gall Ink" (#2D2926).
+- **Accents:** "Burnt Sienna" (#914E32) & "Vellum" (#E0DCCD).
+- **Fonts:**
+  - *Cormorant Garamond* (Serif) for headings.
+  - *Montserrat* (Sans-Serif) for body text.
+  - *JetBrains Mono* (Monospace) for technical metrics.

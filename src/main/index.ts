@@ -1,7 +1,12 @@
-import { app, BrowserWindow, ipcMain, session } from 'electron';
+import { app, BrowserWindow, ipcMain, session, protocol, net } from 'electron';
 import path from 'path';
 import { dbService } from './db';
 import { NewCoin, NewCoinImage } from '../common/types';
+
+// Register custom protocol as privileged
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'patina-img', privileges: { secure: true, supportFetchAPI: true, standard: true, bypassCSP: true } }
+]);
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -49,6 +54,30 @@ app.on('web-contents-created', (_, contents) => {
 });
 
 app.whenReady().then(() => {
+  // Define image root path
+  const isDev = !app.isPackaged;
+  const imageRoot = isDev 
+    ? path.join(process.cwd(), 'data', 'images')
+    : path.join(app.getPath('userData'), 'images');
+
+  // Handle patina-img:// protocol
+  protocol.handle('patina-img', (request) => {
+    const url = request.url.replace('patina-img://', '');
+    // Decode URI component to handle spaces and special chars
+    const decodedUrl = decodeURIComponent(url);
+    
+    // Path sanitization: Prevent directory traversal
+    const normalizedPath = path.normalize(decodedUrl).replace(/^(\.\.[\/\\])+/, '');
+    const fullPath = path.join(imageRoot, normalizedPath);
+
+    // Ensure the resolved path is still within the image root (extra safety)
+    if (!fullPath.startsWith(imageRoot)) {
+      return new Response('Access Denied', { status: 403 });
+    }
+
+    return net.fetch(`file://${fullPath}`);
+  });
+
   // Set permission request handler to deny all by default
   session.defaultSession.setPermissionRequestHandler((_webContents, _permission, callback) => {
     return callback(false);
