@@ -204,16 +204,34 @@ We will keep the button (better accessibility) but style it like `.nav-back`. We
 
 ## Success Criteria
 
-- [ ] All mockup class names implemented correctly
-- [ ] Zoom modal functional with backdrop blur
-- [ ] Thumbnail strip shows active state
-- [ ] Single-column layout on ≤ 899px
-- [ ] Metrics grid: 3 columns (desktop), 2 (tablet), 1 (mobile)
-- [ ] Footer stacks on mobile
-- [ ] Back button matches `.nav-back` styling
-- [ ] Container centered with max-width 1400px
-- [ ] No lint or type errors
-- [ ] Existing tests still pass
+- [x] All mockup class names implemented correctly
+- [x] Zoom modal functional with backdrop blur
+- [x] Thumbnail strip shows active state
+- [x] Single-column layout on ≤ 899px
+- [x] Metrics grid: 3 columns (desktop), 2 (tablet), 1 (mobile)
+- [x] Footer stacks on mobile
+- [x] Back button matches `.nav-back` styling
+- [x] Container centered with max-width 1400px
+- [x] No lint or type errors
+- [x] Existing tests still pass
+- [x] **Overflow issues resolved** - content adjusts smoothly to any viewport width without horizontal/vertical overflow
+
+---
+
+## Post-Implementation Fixes (2026-03-16)
+
+After initial implementation, testing revealed content overflow on certain viewport sizes. Applied the following CSS enhancements:
+
+- Added `overflow-x: hidden` to `.coin-detail-container`
+- Set `min-width: 0` on grid items (`.left-folio`, `.right-folio`, `.metric-item`, `.footer-item`) to allow proper shrinking
+- Applied `overflow-wrap: anywhere` and `word-break: break-word` to all text containers (`.folio-title`, `.meta-line`, `.subtitle`, `.desc-text`, `.metric-value`, `.plate-caption`)
+- Updated image handling:
+  - `.main-image`: `height: 100%` + `object-fit: contain` (prevents vertical overflow in plate frame)
+  - `.thumbnail-img`: replaced fixed height with `aspect-ratio: 1` (responsive squares)
+- Enhanced `.thumbnail-strip` with `flex-wrap: wrap` and `justify-content: center` to handle many images
+- Added safety rules: `.nav-back { max-width: 100%; overflow-wrap: anywhere; }`
+
+All changes are backward-compatible and maintain the archival aesthetic while ensuring robust responsiveness.
 
 ---
 
@@ -235,4 +253,4 @@ All changes are in CSS and one component. Rollback is straightforward:
 
 ---
 
-**Status:** Ready for execution upon approval.
+**Status:** Implementation complete. All fixes applied and committed.
