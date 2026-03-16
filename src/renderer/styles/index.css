@@ -552,14 +552,15 @@ main {
 
 .thumbnail-img {
   width: 60px;
-  height: 60px;
+  aspect-ratio: 1;
   object-fit: contain;
 }
 
 /* Main Image */
 .main-image {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
   display: block;
 }
 
@@ -746,6 +747,53 @@ main {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
+/* ==========================================
+   OVERFLOW PREVENTION & TEXT BREAKING
+   ========================================== */
+.coin-detail-container {
+  overflow-x: hidden;
+}
+
+/* Allow grid items to shrink below content min-width */
+.left-folio,
+.right-folio,
+.metric-item,
+.footer-item {
+  min-width: 0;
+}
+
+/* Prevent long text from causing overflow */
+.folio-title,
+.meta-line,
+.subtitle,
+.desc-text,
+.metric-value,
+.plate-caption {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Ensure images never exceed container */
+.main-image,
+.thumbnail-img,
+.zoom-image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Thumbnail strip: wrap on overflow */
+.thumbnail-strip {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Back button safety */
+.nav-back {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
 /* Mobile-responsive adjustments */
 @media (max-width: 1199px) {
   .left-folio,
@@ -820,7 +868,7 @@ main {
 
   .thumbnail-img {
     width: 50px;
-    height: 50px;
+    aspect-ratio: 1;
   }
 }
 
