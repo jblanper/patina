@@ -439,6 +439,40 @@ main {
 
 /* --- Path B v2: Ledger Folio Styles --- */
 
+.coin-detail-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: var(--bg-manuscript);
+  min-height: 100vh;
+}
+
+/* Back Navigation */
+.nav-back {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.nav-back:hover {
+  color: var(--accent-manuscript);
+  border-color: var(--accent-manuscript);
+}
+
 .coin-detail-loading, .coin-detail-error {
   display: flex;
   flex-direction: column;
@@ -497,6 +531,45 @@ main {
   text-align: center;
 }
 
+/* Thumbnail Strip */
+.thumbnail-strip {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.thumbnail-btn {
+  border: 1px solid var(--border-hairline);
+  background: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.thumbnail-btn.active {
+  border-color: var(--accent-manuscript);
+}
+
+.thumbnail-img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+/* Main Image */
+.main-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.no-image-placeholder {
+  color: var(--text-muted);
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
 /* Right Folio */
 .right-folio {
   padding-left: 4rem;
@@ -511,7 +584,7 @@ main {
   margin-bottom: 3rem;
 }
 
-.folio-meta {
+.meta-line {
   font-family: var(--font-mono);
   color: var(--accent-manuscript);
   font-size: 0.75rem;
@@ -529,7 +602,7 @@ main {
   color: var(--text-ink);
 }
 
-.folio-subtitle {
+.subtitle {
   font-family: var(--font-serif);
   font-size: 1.4rem;
   color: var(--text-muted);
@@ -623,6 +696,132 @@ main {
   text-transform: uppercase;
   color: var(--text-ink);
   margin-right: 0.5rem;
+}
+
+/* Zoom Modal */
+.zoom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(45, 41, 38, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  backdrop-filter: blur(4px);
+}
+
+.zoom-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.zoom-close {
+  position: absolute;
+  top: -2.5rem;
+  right: 0;
+  background: none;
+  border: none;
+  color: var(--bg-manuscript);
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.25rem;
+  font-family: var(--font-serif);
+  transition: opacity 0.2s;
+}
+
+.zoom-close:hover {
+  opacity: 0.7;
+}
+
+.zoom-image {
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile-responsive adjustments */
+@media (max-width: 1199px) {
+  .left-folio,
+  .right-folio {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (max-width: 899px) {
+  .ledger-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .left-folio {
+    border-right: none;
+    border-bottom: 1px solid var(--border-hairline);
+    padding-bottom: 2rem;
+  }
+
+  .right-folio {
+    padding-left: 0;
+    padding-top: 0;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .plate-frame {
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .coin-detail-container {
+    padding: 1rem;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .ledger-footer {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    text-align: left;
+  }
+
+  .ledger-footer .footer-item:last-child {
+    text-align: left;
+  }
+
+  .plate-frame {
+    max-width: 300px;
+    padding: 1rem;
+  }
+
+  .folio-title {
+    font-size: 2.2rem;
+  }
+
+  .thumbnail-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .thumbnail-img {
+    width: 50px;
+    height: 50px;
+  }
 }
 
 /* Reusing Zoom Modal styles from before */

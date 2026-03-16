@@ -39,7 +39,7 @@ export const CoinDetail: React.FC = () => {
 
   return (
     <div className="coin-detail-container">
-      <button onClick={handleBack} className="back-btn" aria-label="Close Ledger Entry">
+      <button onClick={handleBack} className="nav-back" aria-label="Close Ledger Entry">
         ← Close Ledger Entry
       </button>
 
@@ -82,17 +82,17 @@ export const CoinDetail: React.FC = () => {
 
         {/* Right Folio: The Record */}
         <div className="right-folio">
-          <header className="folio-header">
-            <span className="folio-meta">
-              Entry #{String(coin.id).padStart(3, '0')} // {coin.era} // {coin.issuer || 'Unknown Issuer'}
-            </span>
-            <h1 className="folio-title">{coin.title}</h1>
-            <div className="folio-subtitle">
-              {coin.mint ? `Minted at ${coin.mint}` : 'Mint Unknown'} 
-              {coin.year_display && ` // ${coin.year_display}`}
-              {coin.catalog_ref && ` // ${coin.catalog_ref}`}
-            </div>
-          </header>
+           <header className="folio-header">
+             <span className="meta-line">
+               Entry #{String(coin.id).padStart(3, '0')} // {coin.era} // {coin.issuer || 'Unknown Issuer'}
+             </span>
+             <h1 className="folio-title">{coin.title}</h1>
+             <div className="subtitle">
+               {coin.mint ? `Minted at ${coin.mint}` : 'Mint Unknown'} 
+               {coin.year_display && ` // ${coin.year_display}`}
+               {coin.catalog_ref && ` // ${coin.catalog_ref}`}
+             </div>
+           </header>
 
           {/* 1. Physical Metrics */}
           <div className="metrics-grid">
