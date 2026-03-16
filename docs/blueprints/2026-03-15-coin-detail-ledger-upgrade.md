@@ -78,7 +78,24 @@ Refactor the component to match `docs/curating-ui/proposal_coin_detail_path_b_v2
 ---
 
 ## 4. Verification Checklist
-- [ ] Database schema includes `die_axis`, `fineness`, `purchase_...` fields.
-- [ ] `CoinDetail` matches the "Path B v2" mockup visually.
-- [ ] The page has a **single scrollbar** (no nested scrolling).
-- [ ] TypeScript compilation passes with strict mode.
+- [x] Database schema includes `die_axis`, `fineness`, `purchase_...` fields.
+- [x] `CoinDetail` matches the "Path B v2" mockup visually.
+- [x] The page has a **single scrollbar** (no nested scrolling).
+- [x] TypeScript compilation passes with strict mode.
+- [x] Linting passes (ESLint v9 flat config migration completed).
+
+---
+
+## 5. Post-Implementation Notes
+
+### ESLint v9 Migration
+During implementation, the lint command was failing due to an outdated ESLint configuration using the deprecated `.eslintrc.json` format. The following fixes were applied:
+
+- Removed `.eslintrc.json` (Legacy Flat Config)
+- Installed `typescript-eslint` package
+- Created `eslint.config.js` using the new Flat Config API
+- Updated test files to use `// eslint-disable-next-line` for necessary `any` casts
+- All lint violations resolved; `npm run lint` now passes cleanly
+
+This migration ensures the codebase remains compatible with modern ESLint tooling.
+
