@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patina - Coin Detail Path B (v2) - The Complete Ledger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: The Archival Warmth */
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #7A7875;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            
+            /* Typography */
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            /* Spacing */
+            --spacing-large: clamp(3rem, 8vw, 4rem);
+            --spacing-med: 2rem;
+            --spacing-small: 1rem;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: #f5f5f5; /* Neutral bg for presentation */
+            color: var(--text-ink);
+            padding: 2rem;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- THE MOCKUP FRAME --- */
+        .browser-frame {
+            background: var(--bg-manuscript);
+            width: 100%;
+            max-width: 1400px;
+            height: 90vh;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .frame-header {
+            background: #e8e8e8;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: #ccc; }
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+        
+        .address-bar {
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 4px;
+            flex: 1;
+            margin-left: 1rem;
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .frame-content {
+            padding: var(--spacing-large);
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- SHARED COMPONENTS --- */
+        .nav-back {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid transparent;
+            padding-bottom: 2px;
+            transition: color 0.2s;
+        }
+        .nav-back:hover { color: var(--accent-manuscript); border-color: var(--accent-manuscript); }
+
+        /* --- PATH B: LEDGER FOLIO V2 --- */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 45% 55%; /* Adjusted for better data balance */
+            gap: 0;
+            /* height: 100%; Removed to allow page scroll */
+            border-top: 1px solid var(--border-hairline);
+        }
+
+        /* LEFT FOLIO: THE PLATE */
+        .left-folio {
+            padding-right: 4rem;
+            padding-top: 3rem;
+            border-right: 1px solid var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .plate-frame {
+            width: 100%;
+            aspect-ratio: 1;
+            max-width: 500px;
+            background: var(--stone-pedestal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border: 1px solid var(--border-hairline);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .coin-image-mock {
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle at 30% 30%, #e8e4d8 0%, #d1cdc0 100%);
+            border-radius: 50%;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .plate-caption {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* RIGHT FOLIO: THE RECORD */
+        .right-folio {
+            padding-left: 4rem;
+            padding-top: 3rem;
+            display: flex;
+            flex-direction: column;
+            /* overflow-y: auto; Removed to allow page scroll */
+        }
+
+        .folio-header {
+            border-bottom: 2px solid var(--text-ink);
+            padding-bottom: 1.5rem;
+            margin-bottom: 3rem; /* INCREASED SPACING per request */
+        }
+
+        .meta-line {
+            font-family: var(--font-mono);
+            color: var(--accent-manuscript);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem; /* INCREASED SPACING per request */
+            display: block;
+        }
+
+        h1 {
+            font-family: var(--font-serif);
+            font-size: 3.2rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.75rem;
+            color: var(--text-ink);
+        }
+
+        .subtitle {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Data Grid for Physical Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metric-label {
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            color: var(--text-ink);
+        }
+
+        /* Structured Numismatic Data */
+        .numismatic-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent-manuscript);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: block;
+            border-bottom: 1px solid var(--border-hairline);
+            padding-bottom: 0.5rem;
+            width: fit-content;
+        }
+
+        .desc-block {
+            margin-bottom: 1.5rem;
+        }
+
+        .desc-legend {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-ink);
+            text-transform: uppercase;
+            background: var(--stone-pedestal);
+            padding: 0.25rem 0.5rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .desc-text {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: var(--text-ink);
+        }
+
+        /* Reference & Acquisition Footer */
+        .ledger-footer {
+            margin-top: auto;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-hairline);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .footer-item strong {
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            color: var(--text-ink);
+            margin-right: 0.5rem;
+        }
+
+        .price-tag {
+            font-family: var(--font-mono);
+            color: var(--text-muted); /* Discreet */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="browser-frame">
+        <div class="frame-header">
+            <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+            <div class="address-bar">patina://cabinet/ATH-440</div>
+        </div>
+        
+        <div class="frame-content">
+            <a href="#" class="nav-back">← Close Ledger Entry</a>
+            
+            <div class="layout-grid">
+                <!-- Left Folio: The Plate -->
+                <div class="left-folio">
+                    <div class="plate-frame">
+                        <div class="coin-image-mock"></div>
+                    </div>
+                    <div class="plate-caption">
+                        PLATE V // OBVERSE // 2:1 SCALE
+                    </div>
+                    
+                    <!-- Thumbnails would go here -->
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                         <div style="width: 60px; height: 60px; background: var(--stone-pedestal); border: 1px solid var(--accent-manuscript);"></div>
+                         <div style="width: 60px; height: 60px; background: var(--stone-pedestal); border: 1px solid var(--border-hairline);"></div>
+                         <div style="width: 60px; height: 60px; background: var(--stone-pedestal); border: 1px solid var(--border-hairline);"></div>
+                    </div>
+                </div>
+
+                <!-- Right Folio: The Record -->
+                <div class="right-folio">
+                    <header class="folio-header">
+                        <span class="meta-line">Entry #042 // Ancient Greece // Attica</span>
+                        <h1>Athens Tetradrachm</h1>
+                        <div class="subtitle">
+                            Minted c. 440 BC // Starr Group V
+                        </div>
+                    </header>
+
+                    <!-- 1. Physical Metrics -->
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Weight</span>
+                            <span class="metric-value">17.20 g</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Diameter</span>
+                            <span class="metric-value">24.5 mm</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Die Axis</span>
+                            <span class="metric-value">9h</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Material</span>
+                            <span class="metric-value">Silver (AR)</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Fineness</span>
+                            <span class="metric-value">.990 (approx)</span>
+                        </div>
+                         <div class="metric-item">
+                            <span class="metric-label">Grade</span>
+                            <span class="metric-value">Choice XF</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Numismatic Data -->
+                    <div class="numismatic-section">
+                        <span class="section-label">Obverse</span>
+                        <div class="desc-block">
+                            <!-- No legend for this coin type, but spacing preserved -->
+                            <p class="desc-text">Head of Athena right, wearing crested Attic helmet decorated with three olive leaves and spiral palmette.</p>
+                        </div>
+
+                        <span class="section-label">Reverse</span>
+                        <div class="desc-block">
+                            <span class="desc-legend">AΘE</span>
+                            <p class="desc-text">Owl standing right, head facing; olive sprig and crescent to left; all within incuse square.</p>
+                        </div>
+                    </div>
+
+                    <!-- 3. Reference & Story -->
+                    <div class="numismatic-section">
+                        <span class="section-label">Curator's Note</span>
+                        <p class="desc-text" style="font-style: italic; color: var(--text-muted);">
+                            "A classic example of the mass coinage of Athens that financed the Parthenon. The owl remains sharp with full crest."
+                        </p>
+                        <div style="margin-top: 1rem; font-family: var(--font-mono); font-size: 0.85rem;">
+                            REF: HGC 4, 1597; Kroll 8
+                        </div>
+                    </div>
+
+                    <!-- 4. Acquisition Footer -->
+                    <footer class="ledger-footer">
+                        <div class="footer-item">
+                            <strong>Acquired:</strong> 12 Oct 2025 // Numismatic Auction
+                        </div>
+                        <div class="footer-item" style="text-align: right;">
+                             <strong>Prov:</strong> Ex. H. C. Collection
+                        </div>
+                    </footer>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

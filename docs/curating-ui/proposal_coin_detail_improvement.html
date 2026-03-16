@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patina - Coin Detail Proposals (v1.0)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: The Archival Warmth */
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #7A7875;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            
+            /* Typography */
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            /* Spacing */
+            --spacing-large: clamp(3rem, 8vw, 4rem);
+            --spacing-med: 2rem;
+            --spacing-small: 1rem;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: #f5f5f5; /* Neutral bg for presentation */
+            color: var(--text-ink);
+            padding: 2rem;
+        }
+
+        .proposal-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .proposal-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .proposal-title {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .proposal-meta {
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- THE MOCKUP FRAME --- */
+        .browser-frame {
+            background: var(--bg-manuscript);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            overflow: hidden;
+            height: 900px; /* Fixed height for preview */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .frame-header {
+            background: #e8e8e8;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: #ccc; }
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+        
+        .address-bar {
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 4px;
+            flex: 1;
+            margin-left: 1rem;
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .frame-content {
+            padding: var(--spacing-large);
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* --- SHARED COMPONENTS --- */
+        .nav-back {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid transparent;
+            padding-bottom: 2px;
+        }
+        .nav-back:hover { color: var(--accent-manuscript); border-color: var(--accent-manuscript); }
+
+        .coin-image-mock {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, #e8e4d8 0%, #d1cdc0 100%);
+            border-radius: 50%;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* --- PATH A: MUSEUM LABEL --- */
+        .path-a .content-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .path-a .plate-container {
+            width: 350px;
+            height: 350px;
+            margin: 0 auto 3rem;
+            padding: 2rem;
+            background: var(--stone-pedestal);
+            border-radius: 4px; /* Slight soft edge */
+        }
+
+        .path-a .title-group { margin-bottom: 3rem; }
+        .path-a h1 {
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            font-weight: 400; /* Lighter/Elegant */
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+        .path-a .subtitle {
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent-manuscript);
+        }
+
+        .path-a .data-plaque {
+            text-align: left;
+            border-top: 1px solid var(--text-ink); /* Strong line */
+            padding-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+        
+        .path-a .data-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; display: block; margin-bottom: 0.25rem; }
+        .path-a .data-value { font-family: var(--font-serif); font-size: 1.2rem; }
+        .path-a .data-value.mono { font-family: var(--font-mono); font-size: 0.9rem; }
+
+        /* --- PATH B: LEDGER FOLIO --- */
+        .path-b .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0; /* No gap, border handles it */
+            height: 100%;
+        }
+
+        .path-b .left-folio {
+            padding-right: 4rem;
+            border-right: 1px solid var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .path-b .right-folio {
+            padding-left: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .path-b .plate-frame {
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--stone-pedestal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            border: 1px solid var(--border-hairline);
+            margin-bottom: 1rem;
+        }
+
+        .path-b .folio-header {
+            border-bottom: 2px solid var(--text-ink); /* Double line feel */
+            padding-bottom: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .path-b h1 {
+            font-family: var(--font-serif);
+            font-size: 2.8rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+        }
+
+        .path-b .meta-line {
+            font-family: var(--font-mono);
+            color: var(--accent-manuscript);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .path-b .ledger-table {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin-bottom: 3rem;
+        }
+
+        .path-b .ledger-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        .path-b .ledger-label {
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .path-b .ledger-value {
+            font-family: var(--font-serif); /* Handwriting feel */
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text-ink);
+        }
+        
+        .path-b .ledger-value.mono {
+            font-family: var(--font-mono);
+            font-style: normal;
+            font-size: 0.9rem;
+        }
+
+        .path-b .curator-note {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-ink);
+            padding-top: 1rem;
+        }
+
+        /* --- PATH C: RESEARCH DOSSIER --- */
+        .path-c .header-card {
+            background: var(--stone-pedestal);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--accent-manuscript);
+        }
+
+        .path-c h1 {
+            font-family: var(--font-serif);
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .path-c .dossier-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+        
+        .path-c .image-col {
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .path-c .section-card {
+            border: 1px solid var(--border-hairline);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            background: white;
+        }
+        
+        .path-c .section-title {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="proposal-container">
+        
+        <!-- PROPOSAL A -->
+        <div class="proposal-block">
+            <div class="proposal-header">
+                <h2 class="proposal-title">Path A: The Museum Label</h2>
+                <div class="proposal-meta">Minimalist // Focus on Object // Art Gallery Style</div>
+            </div>
+            <div class="browser-frame path-a">
+                <div class="frame-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div class="address-bar">patina://cabinet/view/ATH-440</div>
+                </div>
+                <div class="frame-content">
+                    <a href="#" class="nav-back">← Return to Gallery</a>
+                    
+                    <div class="content-wrapper">
+                        <div class="plate-container">
+                            <div class="coin-image-mock"></div>
+                        </div>
+                        
+                        <div class="title-group">
+                            <h1>Athens Owl Tetradrachm</h1>
+                            <div class="subtitle">Athens, Attica // 440 BC</div>
+                        </div>
+                        
+                        <div class="data-plaque">
+                            <div>
+                                <span class="data-label">Catalog Ref</span>
+                                <span class="data-value mono">HGC 4, 1597</span>
+                            </div>
+                            <div>
+                                <span class="data-label">Material</span>
+                                <span class="data-value">Silver (AR)</span>
+                            </div>
+                            <div>
+                                <span class="data-label">Weight</span>
+                                <span class="data-value mono">17.20 g</span>
+                            </div>
+                            <!-- Second Row -->
+                            <div style="grid-column: span 3; margin-top: 1rem;">
+                                <span class="data-label">Curator's Note</span>
+                                <p class="data-value" style="font-size: 1rem; line-height: 1.6;">
+                                    A classic example of the mass coinage of Athens that financed the Parthenon and the Peloponnesian War. The owl, symbol of Athena, remains sharp with full crest.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROPOSAL B -->
+        <div class="proposal-block">
+            <div class="proposal-header">
+                <h2 class="proposal-title">Path B: The Ledger Folio (Recommended)</h2>
+                <div class="proposal-meta">Structured // Two-Column // Archival Precision</div>
+            </div>
+            <div class="browser-frame path-b">
+                <div class="frame-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div class="address-bar">patina://cabinet/view/ATH-440</div>
+                </div>
+                <div class="frame-content">
+                    <div class="layout-grid">
+                        <!-- Left Folio: The Object -->
+                        <div class="left-folio">
+                            <a href="#" class="nav-back" style="align-self: flex-start;">← Close Ledger Entry</a>
+                            <div class="plate-frame">
+                                <div class="coin-image-mock"></div>
+                            </div>
+                            <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin-top: 1rem;">
+                                PLATE V // OBVERSE
+                            </div>
+                        </div>
+
+                        <!-- Right Folio: The Record -->
+                        <div class="right-folio">
+                            <div class="folio-header">
+                                <div class="meta-line">Entry #042 // Ancient Greece</div>
+                                <h1>Athens Tetradrachm</h1>
+                                <div style="font-family: var(--font-serif); font-size: 1.2rem; color: var(--text-muted);">
+                                    Attica, Athens Mint
+                                </div>
+                            </div>
+
+                            <div class="ledger-table">
+                                <div class="ledger-row">
+                                    <span class="ledger-label">Year</span>
+                                    <span class="ledger-value">c. 440 BC</span>
+                                </div>
+                                <div class="ledger-row">
+                                    <span class="ledger-label">Material</span>
+                                    <span class="ledger-value">Silver</span>
+                                </div>
+                                <div class="ledger-row">
+                                    <span class="ledger-label">Weight</span>
+                                    <span class="ledger-value mono">17.20 g</span>
+                                </div>
+                                <div class="ledger-row">
+                                    <span class="ledger-label">Diameter</span>
+                                    <span class="ledger-value mono">24.5 mm</span>
+                                </div>
+                                <div class="ledger-row">
+                                    <span class="ledger-label">Reference</span>
+                                    <span class="ledger-value mono">HGC 4, 1597</span>
+                                </div>
+                                <div class="ledger-row">
+                                    <span class="ledger-label">Grade</span>
+                                    <span class="ledger-value">Choice XF</span>
+                                </div>
+                            </div>
+
+                            <div class="curator-note">
+                                <span class="ledger-label" style="display: block; margin-bottom: 0.5rem;">Notes</span>
+                                "Head of Athena right, wearing crested Attic helmet decorated with three olive leaves and spiral palmette."
+                                <br><br>
+                                <em>Acquired from the Numismatic Auction, Lot 44.</em>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROPOSAL C -->
+        <div class="proposal-block">
+            <div class="proposal-header">
+                <h2 class="proposal-title">Path C: The Research Dossier</h2>
+                <div class="proposal-meta">Comprehensive // Card-Based // Information Dense</div>
+            </div>
+            <div class="browser-frame path-c">
+                <div class="frame-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div class="address-bar">patina://cabinet/view/ATH-440</div>
+                </div>
+                <div class="frame-content">
+                    <a href="#" class="nav-back">← Cabinet</a>
+                    
+                    <div class="header-card">
+                        <h1>Athens Tetradrachm</h1>
+                        <div style="display: flex; gap: 2rem;">
+                            <span style="font-family: var(--font-mono); font-size: 0.8rem;">ID: ATH-2026-001</span>
+                            <span style="font-family: var(--font-mono); font-size: 0.8rem;">LOC: TRAY-A4</span>
+                        </div>
+                    </div>
+
+                    <div class="dossier-grid">
+                        <div class="image-col">
+                            <div style="background: var(--stone-pedestal); padding: 1rem; margin-bottom: 1rem;">
+                                <div class="coin-image-mock" style="height: 250px; border-radius: 50%;"></div>
+                            </div>
+                            <button class="btn-solid" style="width: 100%;">View High-Res</button>
+                        </div>
+
+                        <div class="data-col">
+                            <div class="section-card">
+                                <h3 class="section-title">Physical Metrics</h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: #999;">WEIGHT</div>
+                                        <div style="font-family: var(--font-mono); font-size: 1.1rem;">17.20 g</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: #999;">DIAMETER</div>
+                                        <div style="font-family: var(--font-mono); font-size: 1.1rem;">24.5 mm</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: #999;">AXIS</div>
+                                        <div style="font-family: var(--font-mono); font-size: 1.1rem;">9h</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section-card">
+                                <h3 class="section-title">Historical Attribution</h3>
+                                <p style="font-family: var(--font-serif); margin-bottom: 1rem;">
+                                    <strong>Era:</strong> Ancient Greece<br>
+                                    <strong>Mint:</strong> Athens<br>
+                                    <strong>Date:</strong> 440 BC
+                                </p>
+                                <div style="background: #f9f9f9; padding: 1rem; font-family: var(--font-mono); font-size: 0.8rem;">
+                                    REF: HGC 4, 1597; Starr Group V
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

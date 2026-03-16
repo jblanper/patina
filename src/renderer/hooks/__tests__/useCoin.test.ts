@@ -8,7 +8,7 @@ const mockGetCoinById = vi.fn();
 
 window.electronAPI = {
   getCoinById: mockGetCoinById,
-} as any;
+} as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 describe('useCoin Hook', () => {
   beforeEach(() => {

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCoin } from '../hooks/useCoin';
-import { CoinImage } from '../../common/types';
 
 export const CoinDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,24 +39,14 @@ export const CoinDetail: React.FC = () => {
 
   return (
     <div className="coin-detail-container">
-      {/* Header */}
-      <header className="detail-header">
-        <button onClick={handleBack} className="back-btn" aria-label="Go back">
-          ← Cabinet
-        </button>
-        <div className="detail-title-group">
-          <h1 className="detail-title">{coin.title}</h1>
-          <div className="detail-subtitle">
-            <span className="detail-issuer">{coin.issuer}</span>
-            {coin.year_display && <span className="detail-year"> // {coin.year_display}</span>}
-          </div>
-        </div>
-      </header>
+      <button onClick={handleBack} className="back-btn" aria-label="Close Ledger Entry">
+        ← Close Ledger Entry
+      </button>
 
-      <div className="detail-content">
-        {/* Left Column: The Plate */}
-        <div className="detail-plate">
-          <div className="main-image-frame" onClick={() => setIsZoomOpen(true)}>
+      <div className="ledger-layout">
+        {/* Left Folio: The Plate */}
+        <div className="left-folio">
+          <div className="plate-frame" onClick={() => setIsZoomOpen(true)}>
             {mainImage ? (
               <img 
                 src={getImageUrl(mainImage.path)} 
@@ -68,9 +57,12 @@ export const CoinDetail: React.FC = () => {
               <div className="no-image-placeholder">No Image Available</div>
             )}
           </div>
+          <div className="plate-caption">
+            PLATE V // {mainImage?.label || 'OBVERSE'} // 2:1 SCALE
+          </div>
           
           {images.length > 1 && (
-            <div className="thumbnail-strip">
+            <div className="thumbnail-strip" style={{ marginTop: '2rem' }}>
               {images.map((img) => (
                 <button 
                   key={img.id} 
@@ -88,104 +80,122 @@ export const CoinDetail: React.FC = () => {
           )}
         </div>
 
-        {/* Right Column: The Record */}
-        <div className="detail-record">
-          <section className="record-section">
-            <h3 className="record-heading">Physical Data</h3>
-            <div className="record-grid">
-              <div className="record-item">
-                <span className="record-label">Weight</span>
-                <span className="record-value mono">
-                  {coin.weight ? `${coin.weight.toFixed(2)} g` : '—'}
-                </span>
-              </div>
-              <div className="record-item">
-                <span className="record-label">Diameter</span>
-                <span className="record-value mono">
-                  {coin.diameter ? `${coin.diameter.toFixed(1)} mm` : '—'}
-                </span>
-              </div>
-              <div className="record-item">
-                <span className="record-label">Material</span>
-                <span className="record-value">{coin.metal || '—'}</span>
-              </div>
-              <div className="record-item">
-                <span className="record-label">Fineness</span>
-                <span className="record-value">{coin.fineness || '—'}</span>
-              </div>
-              <div className="record-item">
-                <span className="record-label">Axis</span>
-                <span className="record-value">{coin.die_axis || '—'}</span>
-              </div>
+        {/* Right Folio: The Record */}
+        <div className="right-folio">
+          <header className="folio-header">
+            <span className="folio-meta">
+              Entry #{String(coin.id).padStart(3, '0')} // {coin.era} // {coin.issuer || 'Unknown Issuer'}
+            </span>
+            <h1 className="folio-title">{coin.title}</h1>
+            <div className="folio-subtitle">
+              {coin.mint ? `Minted at ${coin.mint}` : 'Mint Unknown'} 
+              {coin.year_display && ` // ${coin.year_display}`}
+              {coin.catalog_ref && ` // ${coin.catalog_ref}`}
             </div>
-          </section>
+          </header>
 
-          <section className="record-section">
-            <h3 className="record-heading">Attribution</h3>
-            <div className="record-grid">
-              <div className="record-item">
-                <span className="record-label">Mint</span>
-                <span className="record-value">{coin.mint || '—'}</span>
-              </div>
-              <div className="record-item">
-                <span className="record-label">Era</span>
-                <span className="record-value">{coin.era}</span>
-              </div>
-              <div className="record-item">
-                <span className="record-label">Grade</span>
-                <span className="record-value">{coin.grade || '—'}</span>
-              </div>
-              <div className="record-item">
-                <span className="record-label">Reference</span>
-                <span className="record-value mono">{coin.catalog_ref || '—'}</span>
-              </div>
-              <div className="record-item">
-                <span className="record-label">Rarity</span>
-                <span className="record-value">{coin.rarity || '—'}</span>
-              </div>
+          {/* 1. Physical Metrics */}
+          <div className="metrics-grid">
+            <div className="metric-item">
+              <span className="metric-label">Weight</span>
+              <span className="metric-value">
+                {coin.weight ? `${coin.weight.toFixed(2)} g` : '—'}
+              </span>
             </div>
-          </section>
+            <div className="metric-item">
+              <span className="metric-label">Diameter</span>
+              <span className="metric-value">
+                {coin.diameter ? `${coin.diameter.toFixed(1)} mm` : '—'}
+              </span>
+            </div>
+            <div className="metric-item">
+              <span className="metric-label">Die Axis</span>
+              <span className="metric-value">{coin.die_axis || '—'}</span>
+            </div>
+            <div className="metric-item">
+              <span className="metric-label">Material</span>
+              <span className="metric-value">{coin.metal || '—'}</span>
+            </div>
+            <div className="metric-item">
+              <span className="metric-label">Fineness</span>
+              <span className="metric-value">{coin.fineness || '—'}</span>
+            </div>
+            <div className="metric-item">
+              <span className="metric-label">Grade</span>
+              <span className="metric-value">{coin.grade || '—'}</span>
+            </div>
+          </div>
 
-          {(coin.obverse_legend || coin.obverse_desc) && (
-            <section className="record-section">
-              <h3 className="record-heading">Obverse</h3>
-              {coin.obverse_legend && <p className="record-text mono-sm">{coin.obverse_legend}</p>}
-              {coin.obverse_desc && <p className="record-text">{coin.obverse_desc}</p>}
-            </section>
+          {/* 2. Numismatic Data */}
+          <div className="numismatic-section">
+            {(coin.obverse_legend || coin.obverse_desc) && (
+              <>
+                <span className="section-label">Obverse</span>
+                <div className="desc-block">
+                  {coin.obverse_legend && <span className="desc-legend">{coin.obverse_legend}</span>}
+                  {coin.obverse_desc && <p className="desc-text">{coin.obverse_desc}</p>}
+                </div>
+              </>
+            )}
+
+            {(coin.reverse_legend || coin.reverse_desc) && (
+              <>
+                <span className="section-label">Reverse</span>
+                <div className="desc-block">
+                  {coin.reverse_legend && <span className="desc-legend">{coin.reverse_legend}</span>}
+                  {coin.reverse_desc && <p className="desc-text">{coin.reverse_desc}</p>}
+                </div>
+              </>
+            )}
+            
+            {coin.edge_desc && (
+               <>
+                <span className="section-label">Edge</span>
+                <div className="desc-block">
+                  <p className="desc-text">{coin.edge_desc}</p>
+                </div>
+               </>
+            )}
+          </div>
+
+          {/* 3. Curator's Note */}
+          {(coin.story || coin.provenance) && (
+            <div className="numismatic-section">
+              <span className="section-label">Curator's Note</span>
+              {coin.story && (
+                <div className="desc-block">
+                  {coin.story.split('\n').map((para, i) => (
+                    <p key={i} className="desc-text" style={{ fontStyle: 'italic', color: 'var(--text-muted)' }}>
+                      "{para}"
+                    </p>
+                  ))}
+                </div>
+              )}
+              {coin.provenance && (
+                <div style={{ marginTop: '1rem', fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+                  PROVENANCE: {coin.provenance}
+                </div>
+              )}
+            </div>
           )}
 
-          {(coin.reverse_legend || coin.reverse_desc) && (
-            <section className="record-section">
-              <h3 className="record-heading">Reverse</h3>
-              {coin.reverse_legend && <p className="record-text mono-sm">{coin.reverse_legend}</p>}
-              {coin.reverse_desc && <p className="record-text">{coin.reverse_desc}</p>}
-            </section>
-          )}
+          {/* 4. Acquisition Footer */}
+          <footer className="ledger-footer">
+            <div className="footer-item">
+              <strong>Acquired:</strong> 
+              {coin.purchase_date || 'Unknown Date'} 
+              {coin.purchase_source && ` // ${coin.purchase_source}`}
+            </div>
+            {coin.purchase_price && (
+               <div className="footer-item" style={{ textAlign: 'right' }}>
+                 <strong>Cost:</strong> 
+                 {/* Formatting price discreetly */}
+                 <span style={{ opacity: 0.5 }}>HIDDEN</span>
+               </div>
+            )}
+          </footer>
         </div>
       </div>
-
-      {/* Bottom Section: The Story */}
-      {(coin.story || coin.provenance) && (
-        <div className="detail-story">
-          {coin.story && (
-            <section className="story-section">
-              <h3 className="story-heading">Curator's Note</h3>
-              <div className="story-content">
-                {coin.story.split('\n').map((para, i) => (
-                  <p key={i}>{para}</p>
-                ))}
-              </div>
-            </section>
-          )}
-          
-          {coin.provenance && (
-            <section className="story-section">
-              <h3 className="story-heading">Provenance</h3>
-              <p className="provenance-text">{coin.provenance}</p>
-            </section>
-          )}
-        </div>
-      )}
 
       {/* Image Zoom Modal */}
       {isZoomOpen && mainImage && (

@@ -25,7 +25,7 @@ const MOCK_COINS: Coin[] = [
 describe('useCoins', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (window.electronAPI.getCoins as any).mockResolvedValue(MOCK_COINS);
+    (window.electronAPI.getCoins as any).mockResolvedValue(MOCK_COINS); // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   it('should fetch coins on mount', async () => {

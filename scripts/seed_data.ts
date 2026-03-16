@@ -12,11 +12,15 @@ interface Coin {
   era: 'Ancient' | 'Medieval' | 'Modern';
   mint: string;
   metal: string;
+  fineness: string;
   weight: number;
   diameter: number;
   die_axis: string;
+  obverse_legend: string;
   obverse_desc: string;
+  reverse_legend: string;
   reverse_desc: string;
+  edge_desc: string;
   catalog_ref: string;
   rarity: string;
   grade: string;
@@ -37,11 +41,15 @@ const sampleCoins: Coin[] = [
     era: 'Ancient',
     mint: 'Athens',
     metal: 'Silver',
+    fineness: '.999',
     weight: 17.20,
     diameter: 24.5,
     die_axis: '9h',
+    obverse_legend: '',
     obverse_desc: 'Head of Athena right, wearing crested Attic helmet decorated with three olive leaves and spiral palmette.',
-    reverse_desc: 'AΘE, Owl standing right, head facing; olive sprig and crescent to left; all within incuse square.',
+    reverse_legend: 'AΘE',
+    reverse_desc: 'Owl standing right, head facing; olive sprig and crescent to left; all within incuse square.',
+    edge_desc: 'Plain',
     catalog_ref: 'HGC 4, 1597',
     rarity: 'Common',
     grade: 'Choice XF',
@@ -60,11 +68,15 @@ const sampleCoins: Coin[] = [
     era: 'Medieval',
     mint: 'London',
     metal: 'Silver',
+    fineness: '.925',
     weight: 1.43,
     diameter: 18.0,
     die_axis: '12h',
-    obverse_desc: 'EDW R ANGL DNS HYB, Crowned facing bust within inner circle.',
-    reverse_desc: 'CIVITAS LONDON, Long cross pattée with three pellets in each angle.',
+    obverse_legend: 'EDW R ANGL DNS HYB',
+    obverse_desc: 'Crowned facing bust within inner circle.',
+    reverse_legend: 'CIVITAS LONDON',
+    reverse_desc: 'Long cross pattée with three pellets in each angle.',
+    edge_desc: 'Plain',
     catalog_ref: 'Spink 1380',
     rarity: 'Common',
     grade: 'VF',
@@ -83,11 +95,15 @@ const sampleCoins: Coin[] = [
     era: 'Modern',
     mint: 'San Francisco',
     metal: 'Silver',
+    fineness: '.900',
     weight: 26.73,
     diameter: 38.1,
     die_axis: '6h',
+    obverse_legend: 'E PLURIBUS UNUM',
     obverse_desc: 'Liberty head left wearing Phrygian cap with LIBERTY on headband.',
+    reverse_legend: 'UNITED STATES OF AMERICA',
     reverse_desc: 'Eagle with wings spread holding arrows and olive branch within wreath.',
+    edge_desc: 'Reeded',
     catalog_ref: 'KM 110',
     rarity: 'Common',
     grade: 'MS65',
@@ -103,19 +119,50 @@ function seed() {
   console.log(`Connecting to database at ${DB_PATH}...`);
   const db = new Database(DB_PATH);
   
-  // Ensure table exists (schema might have been created by app already, but safe to check if it fails)
-  // Actually, we assume the schema is managed by the app or migrations.
-  // We'll proceed with insertion.
+  // Create table if it doesn't exist (using the extended schema)
+  // Note: We are manually defining this here for the script to be standalone, 
+  // mirroring src/common/schema.ts
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS coins (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      issuer TEXT,
+      denomination TEXT,
+      year_display TEXT,
+      year_numeric INTEGER,
+      era TEXT DEFAULT 'Modern',
+      mint TEXT,
+      metal TEXT,
+      fineness TEXT,
+      weight REAL,
+      diameter REAL,
+      die_axis TEXT,
+      obverse_legend TEXT,
+      obverse_desc TEXT,
+      reverse_legend TEXT,
+      reverse_desc TEXT,
+      edge_desc TEXT,
+      catalog_ref TEXT,
+      rarity TEXT,
+      grade TEXT,
+      provenance TEXT,
+      story TEXT,
+      purchase_price REAL,
+      purchase_date TEXT,
+      purchase_source TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 
   const insertStmt = db.prepare(`
     INSERT INTO coins (
-      title, issuer, denomination, year_display, year_numeric, era, mint, metal, 
-      weight, diameter, die_axis, obverse_desc, reverse_desc, catalog_ref, 
-      rarity, grade, provenance, story, purchase_price, purchase_date, purchase_source
+      title, issuer, denomination, year_display, year_numeric, era, mint, metal, fineness,
+      weight, diameter, die_axis, obverse_legend, obverse_desc, reverse_legend, reverse_desc, edge_desc,
+      catalog_ref, rarity, grade, provenance, story, purchase_price, purchase_date, purchase_source
     ) VALUES (
-      @title, @issuer, @denomination, @year_display, @year_numeric, @era, @mint, @metal,
-      @weight, @diameter, @die_axis, @obverse_desc, @reverse_desc, @catalog_ref,
-      @rarity, @grade, @provenance, @story, @purchase_price, @purchase_date, @purchase_source
+      @title, @issuer, @denomination, @year_display, @year_numeric, @era, @mint, @metal, @fineness,
+      @weight, @diameter, @die_axis, @obverse_legend, @obverse_desc, @reverse_legend, @reverse_desc, @edge_desc,
+      @catalog_ref, @rarity, @grade, @provenance, @story, @purchase_price, @purchase_date, @purchase_source
     )
   `);
 
@@ -131,6 +178,8 @@ function seed() {
         console.log(`Added: ${coin.title}`);
         addedCount++;
       } else {
+        // Optional: Update existing to ensure new fields are populated if missing
+        // For now, we just skip to avoid duplicates, but we might want a 'forced' mode later.
         console.log(`Skipped (already exists): ${coin.title}`);
       }
     }
