@@ -6,10 +6,12 @@ import { CoinDetail } from './components/CoinDetail';
 const App: React.FC = () => {
   return (
     <HashRouter>
-      <Routes>
-        <Route path="/" element={<Cabinet />} />
-        <Route path="/coin/:id" element={<CoinDetail />} />
-      </Routes>
+      <div className="app-container">
+        <Routes>
+          <Route path="/" element={<Cabinet />} />
+          <Route path="/coin/:id" element={<CoinDetail />} />
+        </Routes>
+      </div>
     </HashRouter>
   );
 };

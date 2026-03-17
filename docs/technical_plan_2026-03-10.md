@@ -91,6 +91,8 @@ The database schema has been finalized and approved following a research phase i
 - [x] Build the detailed coin record display.
 - [x] Implement the "Story" box (rich text or clean markdown).
 - [x] Add the image zoom/inspection functionality.
+- [x] **Unified Layout:** Synchronized header width and horizontal margins between the Cabinet and Ledger for a cohesive museum experience.
+- [x] **Smart Grid:** Implemented a container-aware layout that stacks automatically without rigid breakpoints.
 
 ### Phase 4: The Lens (Wireless Bridge)
 - [ ] Implement the local Node.js/Express server.

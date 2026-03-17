@@ -439,13 +439,6 @@ main {
 
 /* --- Path B v2: Ledger Folio Styles --- */
 
-.coin-detail-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  background: var(--bg-manuscript);
-  min-height: 100vh;
-}
-
 /* Back Navigation */
 .nav-back {
   font-family: var(--font-mono);
@@ -457,15 +450,15 @@ main {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 2rem;
   border-bottom: 1px solid transparent;
   padding-bottom: 2px;
   transition: color 0.2s, border-color 0.2s;
   background: none;
   border: none;
   cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  /* Ensure button text wraps if needed on tiny screens */
+  white-space: normal; 
+  text-align: left;
 }
 
 .nav-back:hover {
@@ -480,44 +473,62 @@ main {
   justify-content: center;
   height: 60vh;
   gap: 1.5rem;
+  text-align: center;
+  padding: 1rem;
 }
 
+/* 
+   THE LEDGER LAYOUT (Path C: Modern Grid Refinement)
+   Uses auto-fit to stack columns when available width < 900px.
+   Matches the 45%/55% split from the mockup on large screens.
+*/
 .ledger-layout {
   display: grid;
-  grid-template-columns: 45% 55%;
-  gap: 0;
+  /* 
+     On Desktop: 45% / 55% split.
+     On Mobile: 1 column.
+  */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr));
+  gap: 0; /* Gap is handled by internal padding for precise border alignment */
   width: 100%;
-  border-top: 1px solid var(--border-hairline);
-  margin-top: 1rem;
+  align-items: start;
 }
 
-@media (max-width: 900px) {
+/* On large screens, we force the 45/55 split and add the central divider */
+@media (min-width: 1000px) {
   .ledger-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: 45% 55%;
   }
 }
 
 /* Left Folio */
 .left-folio {
-  padding-right: 4rem;
-  padding-top: 3rem;
-  border-right: 1px solid var(--border-hairline);
+  padding-right: 4rem; /* 4rem "Sanctuary" on the right of the image */
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 0;
+}
+
+@media (min-width: 1000px) {
+  .left-folio {
+    border-right: 1px solid var(--border-hairline);
+    padding-top: 2rem; /* Reduced top padding */
+  }
 }
 
 .plate-frame {
   width: 100%;
   aspect-ratio: 1;
-  max-width: 500px;
+  max-width: 500px; /* Matched to mockup */
   background: var(--stone-pedestal);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 2.5rem; /* Increased padding within the frame */
   border: 1px solid var(--border-hairline);
   margin-bottom: 2rem;
+  margin-top: 2rem; /* Added margin top to frame instead of folio padding */
   position: relative;
   cursor: zoom-in;
 }
@@ -529,13 +540,16 @@ main {
   text-transform: uppercase;
   letter-spacing: 1px;
   text-align: center;
+  word-break: break-word;
 }
 
 /* Thumbnail Strip */
 .thumbnail-strip {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 1.5rem; /* Slightly more gap */
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .thumbnail-btn {
@@ -544,6 +558,7 @@ main {
   padding: 0.25rem;
   cursor: pointer;
   transition: border-color 0.2s;
+  flex-shrink: 0;
 }
 
 .thumbnail-btn.active {
@@ -552,16 +567,21 @@ main {
 
 .thumbnail-img {
   width: 60px;
-  aspect-ratio: 1;
+  height: 60px;
   object-fit: contain;
+  display: block;
 }
 
 /* Main Image */
 .main-image {
-  width: 100%;
-  height: 100%;
+  max-width: 80%; /* Matched to mockup shadow proportions */
+  max-height: 80%;
+  width: auto;
+  height: auto;
   object-fit: contain;
   display: block;
+  /* Add subtle shadow to the mock image silhouette */
+  filter: drop-shadow(10px 10px 20px rgba(0,0,0,0.1));
 }
 
 .no-image-placeholder {
@@ -569,20 +589,27 @@ main {
   font-family: var(--font-serif);
   font-size: 1.2rem;
   font-style: italic;
+  text-align: center;
 }
 
 /* Right Folio */
 .right-folio {
-  padding-left: 4rem;
-  padding-top: 3rem;
+  padding-left: 4rem; /* 4rem "Sanctuary" on the left of the record */
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+@media (min-width: 1000px) {
+  .right-folio {
+    padding-top: 2rem; /* Reduced top padding */
+  }
 }
 
 .folio-header {
   border-bottom: 2px solid var(--text-ink);
   padding-bottom: 1.5rem;
-  margin-bottom: 3rem;
+  margin-bottom: 3rem; /* Reduced breathability slightly */
 }
 
 .meta-line {
@@ -593,14 +620,23 @@ main {
   letter-spacing: 1px;
   margin-bottom: 1.5rem;
   display: block;
+  overflow-wrap: anywhere;
 }
 
 .folio-title {
-  font-size: 3.2rem;
+  font-size: 3.2rem; /* Exact mockup size */
   font-weight: 700;
   line-height: 1;
   margin-bottom: 0.75rem;
   color: var(--text-ink);
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+@media (max-width: 1000px) {
+  .folio-title {
+    font-size: clamp(2rem, 8vw, 2.8rem);
+  }
 }
 
 .subtitle {
@@ -608,21 +644,36 @@ main {
   font-size: 1.4rem;
   color: var(--text-muted);
   font-style: italic;
+  overflow-wrap: anywhere;
 }
 
 /* Metrics Grid */
 .metrics-grid {
   display: grid;
+  /* Exact 3-column layout from mockup on desktop */
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
-  margin-bottom: 3rem;
+  margin-bottom: 3.5rem; /* Matched header cadence */
   padding-bottom: 2rem;
   border-bottom: 1px solid var(--border-hairline);
+}
+
+@media (max-width: 1200px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .metric-item {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .metric-label {
@@ -632,17 +683,21 @@ main {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .metric-value {
   font-family: var(--font-mono);
   font-size: 0.95rem;
   color: var(--text-ink);
+  overflow-wrap: anywhere;
 }
 
 /* Numismatic Section */
 .numismatic-section {
-  margin-bottom: 3rem;
+  margin-bottom: 3.5rem; /* Matched cadence */
 }
 
 .section-label {
@@ -656,10 +711,11 @@ main {
   border-bottom: 1px solid var(--border-hairline);
   padding-bottom: 0.5rem;
   width: fit-content;
+  max-width: 100%;
 }
 
 .desc-block {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem; /* Increased whitespace between descriptions */
 }
 
 .desc-legend {
@@ -670,26 +726,59 @@ main {
   background: var(--stone-pedestal);
   padding: 0.25rem 0.5rem;
   display: inline-block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  max-width: 100%;
+  overflow-wrap: anywhere; 
 }
 
 .desc-text {
   font-family: var(--font-serif);
-  font-size: 1.1rem;
-  line-height: 1.5;
+  font-size: 1.15rem; /* Slightly larger for prestigious feel */
+  line-height: 1.6;
   color: var(--text-ink);
+  overflow-wrap: anywhere;
+  max-width: 65ch;
+}
+
+.curator-note {
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.provenance-note {
+  margin-top: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+  text-transform: uppercase; /* Matched mockup footer items */
 }
 
 /* Footer */
 .ledger-footer {
   margin-top: auto;
-  padding-top: 2rem;
+  padding-top: 2.5rem;
   border-top: 1px solid var(--border-hairline);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 2rem;
+  justify-content: space-between;
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+.footer-item {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.cost-item {
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  .cost-item {
+    text-align: left;
+  }
 }
 
 .footer-item strong {
@@ -717,13 +806,16 @@ main {
 
 .zoom-content {
   position: relative;
-  max-width: 90vw;
-  max-height: 90vh;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .zoom-close {
   position: absolute;
-  top: -2.5rem;
+  top: -3rem; /* Move up to avoid overlap */
   right: 0;
   background: none;
   border: none;
@@ -731,9 +823,10 @@ main {
   font-size: 2rem;
   cursor: pointer;
   line-height: 1;
-  padding: 0.25rem;
+  padding: 0.5rem;
   font-family: var(--font-serif);
   transition: opacity 0.2s;
+  z-index: 1001;
 }
 
 .zoom-close:hover {
@@ -742,134 +835,26 @@ main {
 
 .zoom-image {
   max-width: 100%;
-  max-height: 85vh;
+  max-height: 85vh; /* Leave room for close button */
   object-fit: contain;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
-/* ==========================================
-   OVERFLOW PREVENTION & TEXT BREAKING
-   ========================================== */
-.coin-detail-container {
-  overflow-x: hidden;
-}
-
-/* Allow grid items to shrink below content min-width */
-.left-folio,
-.right-folio,
-.metric-item,
-.footer-item {
-  min-width: 0;
-}
-
-/* Prevent long text from causing overflow */
-.folio-title,
-.meta-line,
-.subtitle,
-.desc-text,
-.metric-value,
-.plate-caption {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-/* Ensure images never exceed container */
-.main-image,
-.thumbnail-img,
-.zoom-image {
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-}
-
-/* Thumbnail strip: wrap on overflow */
-.thumbnail-strip {
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-/* Back button safety */
-.nav-back {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-
-/* Mobile-responsive adjustments */
-@media (max-width: 1199px) {
-  .left-folio,
-  .right-folio {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-}
-
-@media (max-width: 899px) {
+/* Mobile-responsive adjustments (Overrides specific to tiny screens) */
+@media (max-width: 600px) {
   .ledger-layout {
-    grid-template-columns: 1fr;
     gap: 2rem;
   }
-
-  .left-folio {
-    border-right: none;
-    border-bottom: 1px solid var(--border-hairline);
-    padding-bottom: 2rem;
-  }
-
-  .right-folio {
-    padding-left: 0;
-    padding-top: 0;
-  }
-
-  .metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .plate-frame {
-    max-width: 400px;
-  }
-}
-
-@media (max-width: 480px) {
-  .coin-detail-container {
-    padding: 1rem;
-  }
-
-  .metrics-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .ledger-footer {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    text-align: left;
-  }
-
-  .ledger-footer .footer-item:last-child {
-    text-align: left;
-  }
-
-  .plate-frame {
-    max-width: 300px;
-    padding: 1rem;
-  }
-
+  
   .folio-title {
-    font-size: 2.2rem;
+    font-size: 2rem;
   }
 
-  .thumbnail-btn {
-    min-width: 44px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .plate-frame {
+    padding: 1rem;
   }
 
-  .thumbnail-img {
-    width: 50px;
-    aspect-ratio: 1;
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr; /* Force 2 columns on mobile for compactness */
   }
 }
-
-/* Reusing Zoom Modal styles from before */

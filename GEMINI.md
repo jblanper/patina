@@ -48,6 +48,8 @@ This document defines the absolute standards for the Patina project. All develop
 ### React & Frontend Architecture
 - **Component Focused:** One file per component. Keep components small, focused, and documented with TS interfaces for props.
 - **Custom Hooks:** All database interaction, filtering logic, or bridge state must be encapsulated in custom hooks (e.g., `useCoins()`, `useLens()`).
+- **Centralized Layout:** All pages MUST be wrapped in the `.app-container` within `App.tsx`. This ensures a unified "top line" width and consistent horizontal padding (The Sanctuary) across the application. Avoid local page-level wrappers that override this.
+- **Smart Ledger Grid:** Prefer container-aware CSS Grid (`auto-fit`) over rigid media query breakpoints for primary layouts. Use `grid-template-columns: repeat(auto-fit, minmax(min(100%, <breakpoint>), 1fr))` to ensure zero-overflow responsiveness.
 - **Styling:** All CSS must be implemented using **Vanilla CSS** in the global `src/renderer/styles/index.css` file. Follow the standards in `docs/style_guide.md`. Do NOT use `styled-jsx`, `styled-components`, or utility-first frameworks like Tailwind unless specifically requested. This ensures a stable, type-safe, and archival-focused build.
 - **Optimization:** Use `React.memo` and `useCallback` strategically in the Gallery grid to ensure smooth scrolling and interaction.
 

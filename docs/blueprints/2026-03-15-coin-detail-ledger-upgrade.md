@@ -99,3 +99,9 @@ During implementation, the lint command was failing due to an outdated ESLint co
 
 This migration ensures the codebase remains compatible with modern ESLint tooling.
 
+### Final Layout & Spacing Sync (2026-03-17)
+The layout was further refined to unify the `CoinDetail` and `Cabinet` experiences:
+- **Unified Header:** Both pages now share the global `.app-header` container, ensuring identical "top line" width and alignment.
+- **Global Sanctuary:** Generous margins are now enforced via a central `.app-container` in `App.tsx`, providing consistent 3-4rem padding across the application.
+- **Modern Grid:** The folio split was implemented using a container-aware CSS Grid (`auto-fit`) instead of rigid media queries, ensuring zero overflow on all device sizes.
+

@@ -23,7 +23,7 @@ export const Cabinet: React.FC = () => {
   }
 
   return (
-    <div className="app-container">
+    <>
       <header className="app-header">
         <h1>Patina</h1>
         <div className="version-tag">Archive v1.0 // THE DISPLAY CASE</div>
@@ -62,6 +62,6 @@ export const Cabinet: React.FC = () => {
           </section>
         </main>
       </div>
-    </div>
+    </>
   );
 };

@@ -38,10 +38,12 @@ export const CoinDetail: React.FC = () => {
   }
 
   return (
-    <div className="coin-detail-container">
-      <button onClick={handleBack} className="nav-back" aria-label="Close Ledger Entry">
-        ← Close Ledger Entry
-      </button>
+    <>
+      <header className="app-header">
+        <button onClick={handleBack} className="nav-back" aria-label="Close Ledger Entry">
+          ← Close Ledger Entry
+        </button>
+      </header>
 
       <div className="ledger-layout">
         {/* Left Folio: The Plate */}
@@ -62,7 +64,7 @@ export const CoinDetail: React.FC = () => {
           </div>
           
           {images.length > 1 && (
-            <div className="thumbnail-strip" style={{ marginTop: '2rem' }}>
+            <div className="thumbnail-strip">
               {images.map((img) => (
                 <button 
                   key={img.id} 
@@ -165,14 +167,14 @@ export const CoinDetail: React.FC = () => {
               {coin.story && (
                 <div className="desc-block">
                   {coin.story.split('\n').map((para, i) => (
-                    <p key={i} className="desc-text" style={{ fontStyle: 'italic', color: 'var(--text-muted)' }}>
+                    <p key={i} className="desc-text curator-note">
                       "{para}"
                     </p>
                   ))}
                 </div>
               )}
               {coin.provenance && (
-                <div style={{ marginTop: '1rem', fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+                <div className="provenance-note">
                   PROVENANCE: {coin.provenance}
                 </div>
               )}
@@ -187,7 +189,7 @@ export const CoinDetail: React.FC = () => {
               {coin.purchase_source && ` // ${coin.purchase_source}`}
             </div>
             {coin.purchase_price && (
-               <div className="footer-item" style={{ textAlign: 'right' }}>
+               <div className="footer-item cost-item">
                  <strong>Cost:</strong> 
                  {/* Formatting price discreetly */}
                  <span style={{ opacity: 0.5 }}>HIDDEN</span>
@@ -210,6 +212,6 @@ export const CoinDetail: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };

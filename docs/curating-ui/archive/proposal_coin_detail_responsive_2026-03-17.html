@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal: CoinDetail Responsive Refactor</title>
+    <style>
+        :root {
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #7A7875;
+            --accent-manuscript: #914E32;
+            --font-serif: 'Georgia', serif;
+            --font-sans: 'Helvetica', sans-serif;
+            --font-mono: 'Courier New', monospace;
+        }
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-manuscript);
+            color: var(--text-ink);
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        h1, h2 { font-family: var(--font-serif); }
+        .proposal-header { margin-bottom: 3rem; border-bottom: 2px solid var(--text-ink); padding-bottom: 1rem; }
+        .path-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem; }
+        .path-card { border: 1px solid var(--text-muted); padding: 1.5rem; background: white; }
+        .path-title { color: var(--accent-manuscript); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; font-weight: bold; }
+        .prototype-box { background: #eee; height: 150px; margin: 1rem 0; display: flex; align-items: center; justify-content: center; font-style: italic; color: #666; border: 1px dashed #999; }
+    </style>
+</head>
+<body>
+
+    <header class="proposal-header">
+        <h1>Proposal: CoinDetail Responsive Refactor</h1>
+        <p><strong>Objective:</strong> Eliminate overflow issues and ensure flawless responsiveness across all viewports while maintaining the "Archival Ledger" aesthetic.</p>
+    </header>
+
+    <div class="path-container">
+        
+        <!-- PATH A -->
+        <div class="path-card">
+            <div class="path-title">Path A: The Disciplined Ledger</div>
+            <p><strong>Philosophy:</strong> Strict breakpoints with optimized spacing.</p>
+            <div class="prototype-box">
+                [ Mobile Stack ] -> [ Tablet Stack ] -> [ Desktop Split ]
+            </div>
+            <ul>
+                <li><strong>Mechanism:</strong> Traditional Media Queries (`@media`).</li>
+                <li><strong>Breakpoints:</strong> 
+                    <ul>
+                        <li>< 900px: Single Column (Stacked)</li>
+                        <li>> 900px: 45/55 Split</li>
+                    </ul>
+                </li>
+                <li><strong>Overflow Control:</strong> `word-break: break-word` on all text. Rigid constraints ensure predictability.</li>
+                <li><strong>Pros:</strong> Exact control over layout at specific sizes. Matches current logic but refined.</li>
+            </ul>
+        </div>
+
+        <!-- PATH B -->
+        <div class="path-card">
+            <div class="path-title">Path B: The Fluid Flex</div>
+            <p><strong>Philosophy:</strong> Natural flow based on content size.</p>
+            <div class="prototype-box">
+                [ Flex Wrap: Items flow naturally ]
+            </div>
+            <ul>
+                <li><strong>Mechanism:</strong> `display: flex; flex-wrap: wrap`.</li>
+                <li><strong>Behavior:</strong> The "Right Folio" (Data) drops below the "Left Folio" (Image) whenever there isn't enough horizontal space to display both comfortably (e.g., < 800px).</li>
+                <li><strong>Sizing:</strong> `flex-basis: 500px; flex-grow: 1`.</li>
+                <li><strong>Pros:</strong> No hard breakpoints. extremely robust for odd window sizes.</li>
+            </ul>
+        </div>
+
+        <!-- PATH C -->
+        <div class="path-card">
+            <div class="path-title">Path C: The Modern Grid (Recommended)</div>
+            <p><strong>Philosophy:</strong> "Intelligent" grid that adapts to available space.</p>
+            <div class="prototype-box">
+                [ Grid Auto-Fit ]
+            </div>
+            <ul>
+                <li><strong>Mechanism:</strong> CSS Grid `repeat(auto-fit, minmax(min(100%, 450px), 1fr))`.</li>
+                <li><strong>Behavior:</strong> Automatically switches from 2-column to 1-column when columns would be narrower than 450px.</li>
+                <li><strong>Overflow Control:</strong> `min(100%, ...)` ensures columns never overflow mobile screens.</li>
+                <li><strong>Pros:</strong> The cleanest code. Most robust "any size" support. Best alignment with modern CSS capabilities.</li>
+            </ul>
+        </div>
+
+    </div>
+
+</body>
+</html>

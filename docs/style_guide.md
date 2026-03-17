@@ -39,7 +39,7 @@ We use a **Scholarly Hybrid** approach to balance historical authority with tech
 
 ---
 
-## 3. Layout & Structure
+### Layout & Structure
 
 ### Spacing (The "Expansive" Rule)
 - Maintain large margins to create a "sanctuary" for the collector.
@@ -47,9 +47,29 @@ We use a **Scholarly Hybrid** approach to balance historical authority with tech
 - **Component Gap:** `2rem` (32px) minimum between elements.
 - **Section Margin:** `2.5rem` minimum between major sections to maintain "breathability."
 
+### The "Smart Ledger" Grid
+For primary layouts (e.g., Coin Detail), use a modern, container-aware grid that adapts automatically without rigid breakpoints:
+```css
+.ledger-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr));
+}
+
+@media (min-width: 1000px) {
+  .ledger-layout {
+    grid-template-columns: 45% 55%; /* Precise folio split */
+  }
+}
+```
+### The "Sanctuary" Rule (Padding)
+Maintain a strict horizontal breath around the central divider:
+- **Folio Padding:** Exactly `4rem` on both sides of the central hairline (creating an 8rem sanctuary).
+- **Responsive Scaling:** Padding scales down naturally via the global `.app-container` using `clamp(3rem, 8vw, 4rem)`.
+
 ### Borders & Depth
 - **Borders:** Use `1px solid var(--border-hairline)` for structural division.
 - **Elevation:** No drop shadows. Use slight background shifts (e.g., `--stone-pedestal`) to define areas.
+
 
 ### The Sidebar (The "Archive Explorer")
 - **Width:** Fixed `280px` to maintain a stable ledger structure.

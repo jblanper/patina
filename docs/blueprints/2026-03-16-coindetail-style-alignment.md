@@ -254,3 +254,9 @@ All changes are in CSS and one component. Rollback is straightforward:
 ---
 
 **Status:** Implementation complete. All fixes applied and committed.
+
+### Unified Layout Sync (2026-03-17)
+Following initial styling, the layout was unified with the main Cabinet page:
+- **Header Alignment:** Replaced the local back-button container with the global `.app-header` to match the Cabinet's top line and horizontal spacing.
+- **Smart Grid Refinement:** Transitioned from strict `@media` breakpoints to a container-aware CSS Grid: `repeat(auto-fit, minmax(min(100%, 500px), 1fr))`. This ensures the 45/55 split on desktop and a graceful stack on mobile without any overflow.
+- **Folio Spacing:** Implemented exactly `4rem` of horizontal padding on both sides of the central divider to create the 8rem "whitespace sanctuary" required for the archival aesthetic.

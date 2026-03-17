@@ -405,6 +405,31 @@
             accent-color: var(--accent-manuscript);
         }
 
+        /* Ledger Layout Demo */
+        .ledger-layout-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+            gap: 2rem;
+            border: 1px dashed var(--accent-manuscript);
+            padding: 1rem;
+            background: #fff;
+            margin-bottom: 1rem;
+        }
+
+        .folio-demo {
+            background: var(--stone-pedestal);
+            padding: 2rem;
+            border: 1px solid var(--border-hairline);
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
     </style>
 </head>
 <body>
@@ -579,6 +604,16 @@
                 <p>The ledger awaits its first historical entry.</p>
                 <div class="type-mono" style="margin-top: 1rem; font-size: 0.6rem;">Status: Index Ready // Ledger Empty</div>
             </div>
+        </section>
+
+        <section id="layout">
+            <h2>10 Smart Ledger Layout</h2>
+            <div class="ledger-layout-demo">
+                <div class="folio-demo">Left Folio (Image)</div>
+                <div class="folio-demo">Right Folio (Data)</div>
+            </div>
+            <p class="type-body">The Coin Detail view uses a container-aware grid that automatically splits into a precise <strong>45% / 55%</strong> folio on desktop and stacks on mobile. It enforces a <strong>4rem Sanctuary</strong> on both sides of the central divider.</p>
+            <div class="type-mono">Grid: repeat(auto-fit, minmax(min(100%, 500px), 1fr))</div>
         </section>
     </main>
 
