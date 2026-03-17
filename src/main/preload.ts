@@ -13,4 +13,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   addImage: (image: NewCoinImage) => ipcRenderer.invoke('db:addImage', image),
   getImagesByCoinId: (coinId: number) => ipcRenderer.invoke('db:getImagesByCoinId', coinId),
   deleteImage: (id: number) => ipcRenderer.invoke('db:deleteImage', id),
+
+  // Lens API
+  startLens: () => ipcRenderer.invoke('lens:start'),
+  stopLens: () => ipcRenderer.invoke('lens:stop'),
+  onLensImageReceived: (callback: (filePath: string) => void) => ipcRenderer.on('lens:image-received', (_, filePath) => callback(filePath)),
+  removeLensListeners: () => ipcRenderer.removeAllListeners('lens:image-received'),
 });

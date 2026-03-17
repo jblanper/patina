@@ -12,6 +12,12 @@ export interface IElectronAPI {
   addImage: (image: NewCoinImage) => Promise<number>;
   getImagesByCoinId: (coinId: number) => Promise<CoinImage[]>;
   deleteImage: (id: number) => Promise<boolean>;
+
+  // Lens API
+  startLens: () => Promise<{ url: string; status: string }>;
+  stopLens: () => Promise<{ status: string }>;
+  onLensImageReceived: (callback: (path: string) => void) => void;
+  removeLensListeners: () => void;
 }
 
 declare global {

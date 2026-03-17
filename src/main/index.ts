@@ -1,12 +1,16 @@
 import { app, BrowserWindow, ipcMain, session, protocol, net } from 'electron';
 import path from 'path';
 import { dbService } from './db';
+import { createLensServer } from './server';
+import { getLocalIp } from './ip';
 import { NewCoin, NewCoinImage } from '../common/types';
 
 // Register custom protocol as privileged
 protocol.registerSchemesAsPrivileged([
   { scheme: 'patina-img', privileges: { secure: true, supportFetchAPI: true, standard: true, bypassCSP: true } }
 ]);
+
+let lensServer: ReturnType<typeof createLensServer> | null = null;
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -91,6 +95,40 @@ app.whenReady().then(() => {
   ipcMain.handle('db:addImage', (_, image: NewCoinImage) => dbService.addImage(image));
   ipcMain.handle('db:getImagesByCoinId', (_, coinId: number) => dbService.getImagesByCoinId(coinId));
   ipcMain.handle('db:deleteImage', (_, id: number) => dbService.deleteImage(id));
+
+  // Lens Server IPC Handlers
+  ipcMain.handle('lens:start', async () => {
+    if (lensServer) {
+      lensServer.stop();
+    }
+
+    lensServer = createLensServer({
+      onUpload: (filePath) => {
+        // Notify all windows (usually just one)
+        BrowserWindow.getAllWindows().forEach(win => {
+          win.webContents.send('lens:image-received', filePath);
+        });
+      }
+    });
+
+    try {
+      const { port, token } = await lensServer.start();
+      const ip = getLocalIp();
+      const url = `http://${ip}:${port}/lens/${token}`;
+      return { url, status: 'active' };
+    } catch (error) {
+      console.error('Failed to start Lens server:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('lens:stop', () => {
+    if (lensServer) {
+      lensServer.stop();
+      lensServer = null;
+    }
+    return { status: 'stopped' };
+  });
 
   ipcMain.handle('ping', () => 'pong');
   createWindow();
