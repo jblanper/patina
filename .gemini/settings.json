@@ -1,4 +1,9 @@
 {
+  "context": {
+    "fileName": [
+      "AGENTS.md"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -17,14 +22,24 @@
         "matcher": "always",
         "hooks": [
           {
+            "name": "patina-git-status",
+            "type": "command",
+            "command": "git status --short >&2; echo '{}'"
+          },
+          {
+            "name": "patina-type-check",
+            "type": "command",
+            "command": "node scripts/gemini_hook.js type-check"
+          },
+          {
             "name": "patina-build-check",
             "type": "command",
-            "command": "node $GEMINI_PROJECT_DIR/scripts/check_build.cjs"
+            "command": "node scripts/gemini_hook.js build"
           },
           {
             "name": "patina-lint-check",
             "type": "command",
-            "command": "node $GEMINI_PROJECT_DIR/scripts/check_lint.cjs"
+            "command": "node scripts/gemini_hook.js lint"
           }
         ]
       }

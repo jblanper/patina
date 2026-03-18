@@ -12,4 +12,8 @@ window.electronAPI = {
   addImage: vi.fn(),
   getImagesByCoinId: vi.fn(),
   deleteImage: vi.fn(),
+  startLens: vi.fn(),
+  stopLens: vi.fn(),
+  onLensImageReceived: vi.fn(),
+  removeLensListeners: vi.fn(),
 };

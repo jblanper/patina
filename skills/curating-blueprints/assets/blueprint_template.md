@@ -8,11 +8,12 @@
 [Clear, concise description of the goal.]
 
 ### Philosophical Alignment
-- [ ] **Curator-First:** Does this feel like a museum tool? (Archival Ledger aesthetic)
+- [ ] **Archival Ledger Aesthetic:** Does this feel like a museum tool? (Per `docs/style_guide.md`)
 - [ ] **Privacy First:** No external CDNs or telemetry introduced?
 - [ ] **Single-Click Rule:** Is the UI hierarchy flat and intuitive?
 
-...
+## 2. Technical Strategy
+[Detailed plan including schema changes, API handlers, and UI components.]
 
 ## 3. Verification Strategy (Quality Oversight)
 - **Testing Plan:** [Specific test cases for hooks/components.]
@@ -27,8 +28,8 @@
 - **System Integrity:** [Cross-process consistency, type safety.]
 - **Abstraction:** [Does logic leak into the Electron bridge?]
 
-### Recommendations:
-- [Recommendation 1]
+### Review Notes & Suggestions:
+- [Note 1]
 
 ---
 
@@ -38,8 +39,8 @@
 - **The Filter:** [Zod validation, .strict() schemas.]
 - **Protocols:** [patina-img:// path sanitization.]
 
-### Recommendations:
-- [Recommendation 1]
+### Review Notes & Suggestions:
+- [Note 1]
 
 ---
 
@@ -49,8 +50,8 @@
 - **Coverage Check:** [Targets: 100% validation, 90% hooks, 80% components.]
 - **Async Safety:** [waitFor, findBy* usage.]
 
-### Recommendations:
-- [Recommendation 1]
+### Review Notes & Suggestions:
+- [Note 1]
 
 ---
 
@@ -60,22 +61,32 @@
 - **Aesthetic Compliance:** [Manuscript Hybrid v3.3 standards.]
 - **Accessibility:** [Semantic HTML, contrast, keyboard nav.]
 
-### Recommendations:
-- [Recommendation 1]
+### Review Notes & Suggestions:
+- [Note 1]
 
 ---
 
-## 8. Numismatic Assessment (`curating-coins`)
+## 8. Numismatic & UX Assessment (`curating-coins`)
 **Status:** [Pending/Verified]
 ### Audit Findings:
-- [Finding 1]
+- **Historical Accuracy:** [Catalog references, terminology.]
+- **Collector UX:** [Does the design meet archival/numismatic needs?]
 
-### Recommendations:
-- [Recommendation 1]
+### Review Notes & Suggestions:
+- [Note 1]
 
 ---
 
-## 9. Post-Implementation Retrospective
+## 9. User Consultation & Decisions
+### Open Questions:
+1. [Question 1]
+
+### Final Decisions:
+- [Decision 1]
+
+---
+
+## 10. Post-Implementation Retrospective
 **Date:** [YYYY-MM-DD]  
 **Outcome:** [Summary of success or failure]
 
@@ -87,4 +98,4 @@
 
 ### Things to Consider
 - [Future improvement 1]
-- **Core Doc Revision:** [Confirm if GEMINI.md, style_guide.md, or style_guide.html were updated.]
+- **Core Doc Revision:** [Confirm if @AGENTS.md, style_guide.md, or style_guide.html were updated.]
