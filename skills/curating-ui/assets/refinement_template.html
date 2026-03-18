@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curatorial Refinement: [Component Name] - Patina</title>
+    <!-- 
+        IMPORTANT: These variables and fonts are synchronized with src/renderer/styles/index.css
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: The Archival Warmth */
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #7A7875;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            
+            /* Typography */
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            /* Spacing */
+            --spacing-large: clamp(3rem, 8vw, 4rem);
+            --spacing-med: 2rem;
+            --spacing-small: 1rem;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: #F5F5F5; /* Presentation background */
+            color: var(--text-ink);
+            line-height: 1.6;
+            padding: var(--spacing-large);
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+
+        /* Curator's Brief (Rationale & Audit) */
+        .curator-brief {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            background: white;
+            border: 1px solid var(--border-hairline);
+            border-left: 4px solid var(--accent-manuscript);
+            padding: 3rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 4rem;
+        }
+
+        .brief-main h1 {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            margin-bottom: 0.5rem;
+            display: block;
+            font-weight: 600;
+        }
+
+        .rationale {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--text-ink);
+            max-width: 65ch;
+            line-height: 1.6;
+        }
+
+        .brief-audit h3 {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-hairline);
+            padding-bottom: 0.5rem;
+        }
+
+        .audit-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .audit-item strong {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .audit-item p {
+            font-size: 0.9rem;
+        }
+
+        /* Browser Frame Mockup */
+        .browser-frame {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            background: var(--bg-manuscript);
+            border: 1px solid var(--border-hairline);
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            overflow: hidden;
+            height: 900px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .frame-header {
+            background: #E8E8E8;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: #CCC; }
+        .dot.red { background: #FF5F56; }
+        .dot.yellow { background: #FFBD2E; }
+        .dot.green { background: #27C93F; }
+        
+        .address-bar {
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 4px;
+            flex: 1;
+            margin-left: 1rem;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            border: 1px solid var(--border-hairline);
+        }
+
+        .frame-content {
+            flex: 1;
+            overflow: auto;
+            background-color: var(--bg-manuscript);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- APP CSS EMULATION --- */
+        .app-header {
+            padding: 1rem var(--spacing-large);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-manuscript);
+            border-bottom: 1px solid var(--border-hairline);
+            z-index: 10;
+        }
+
+        .nav-back {
+            background: none; border: none;
+            font-family: var(--font-sans); font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); cursor: pointer;
+        }
+
+        .btn-solid { background: var(--text-ink); color: white; padding: 0.6rem 1.5rem; border: none; font-family: var(--font-mono); font-size: 0.75rem; cursor: pointer; }
+        .btn-minimal { background: none; border: none; border-bottom: 1px solid var(--text-ink); padding-bottom: 2px; font-family: var(--font-mono); font-size: 0.75rem; cursor: pointer; }
+
+        .ledger-layout {
+            display: grid;
+            grid-template-columns: 45% 55%;
+            height: 100%;
+        }
+
+        .left-folio {
+            background: var(--stone-pedestal);
+            border-right: 1px solid var(--border-hairline);
+            padding: var(--spacing-large);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .right-folio {
+            padding: var(--spacing-large);
+            overflow-y: auto;
+        }
+
+        @media (max-width: 1000px) {
+            .curator-brief { grid-template-columns: 1fr; gap: 2rem; }
+            .ledger-layout { grid-template-columns: 1fr; }
+            .left-folio { border-right: none; border-bottom: 1px solid var(--border-hairline); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <section class="curator-brief">
+        <div class="brief-main">
+            <span class="tag">Refinement Proposal</span>
+            <h1>[Component Name]: [Refinement Goal]</h1>
+            <div class="rationale">
+                [Rationale: Describe the specific refinement intent, explaining the "why" behind the changes (e.g., "Improving information hierarchy in the right folio to highlight catalog references").]
+            </div>
+        </div>
+
+        <div class="brief-audit">
+            <h3>Curatorial Audit</h3>
+            <ul class="audit-list">
+                <li class="audit-item">
+                    <strong>Contrast & Accessibility</strong>
+                    <p>[Assessment]</p>
+                </li>
+                <li class="audit-item">
+                    <strong>Archival Integrity</strong>
+                    <p>[Assessment]</p>
+                </li>
+                <li class="audit-item">
+                    <strong>Interaction Feel</strong>
+                    <p>[Assessment]</p>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <div class="browser-frame">
+        <div class="frame-header">
+            <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+            <div class="address-bar">patina://cabinet/[component-route]</div>
+        </div>
+        <div class="frame-content">
+            <!-- Full Page Mockup starts here -->
+            <header class="app-header">
+                <button class="nav-back">← Back to Ledger</button>
+                <div class="header-actions">
+                    <button class="btn-minimal">Save Changes</button>
+                </div>
+            </header>
+
+            <div class="ledger-layout">
+                <div class="left-folio">
+                    <!-- Left content (e.g., Image/Lens) -->
+                    [Left Folio Content]
+                </div>
+                <div class="right-folio">
+                    <!-- Right content (e.g., Form/Data) -->
+                    [Right Folio Content]
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

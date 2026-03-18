@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Curatorial Proposal: [Component Name] - Patina</title>
     <!-- 
-        IMPORTANT: These variables and fonts MUST be synchronized with the latest version of 
-        docs/style_guide.md and docs/style_guide.html.
+        IMPORTANT: These variables and fonts are synchronized with src/renderer/styles/index.css
     -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,13 +21,15 @@
             --stone-pedestal: #F0EDE6;
             --error-red: #B22222;
             
-            /* Typography: The Archival Hybrid */
+            /* Typography */
             --font-serif: 'Cormorant Garamond', serif;
             --font-sans: 'Montserrat', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             
-            /* Responsive Spacing */
+            /* Spacing */
             --spacing-large: clamp(3rem, 8vw, 4rem);
+            --spacing-med: 2rem;
+            --spacing-small: 1rem;
         }
 
         * {
@@ -40,166 +41,315 @@
 
         body {
             font-family: var(--font-sans);
-            background-color: var(--bg-manuscript);
+            background-color: #F5F5F5; /* Presentation background */
             color: var(--text-ink);
             line-height: 1.6;
             padding: var(--spacing-large);
         }
 
-        header {
+        /* Proposal Header */
+        .proposal-header {
+            max-width: 1400px;
+            margin: 0 auto 4rem;
             border-bottom: 2px solid var(--text-ink);
-            margin-bottom: var(--spacing-large);
             padding-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
 
-        h1 { 
+        .proposal-header h1 { 
             font-family: var(--font-serif);
-            font-size: 2.4rem;
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
             font-weight: 700;
             font-style: italic;
-            letter-spacing: -0.5px;
+            letter-spacing: -1px;
+            line-height: 1;
         }
         
-        .meta-info {
+        .proposal-meta {
             font-family: var(--font-mono);
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--accent-manuscript);
-            margin-top: 0.5rem;
+            text-align: right;
         }
 
-        .proposal-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 3rem;
-        }
-
-        .path-card {
-            background: #FFF;
-            padding: 2.5rem;
-            border: 1px solid var(--border-hairline);
+        /* 3-Path Grid */
+        .proposal-container {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
+            gap: 6rem;
+        }
+
+        .path-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .path-info {
+            max-width: 800px;
         }
 
         .tag {
             font-family: var(--font-mono);
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 2px;
             color: var(--accent-manuscript);
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
+            display: block;
             font-weight: 600;
         }
 
         .path-title {
             font-family: var(--font-serif);
-            font-size: 1.6rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .rationale {
-            font-size: 0.95rem;
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-style: italic;
             color: var(--text-ink);
             margin-bottom: 2rem;
-            min-height: 80px;
-            font-family: var(--font-serif);
-            font-style: italic;
+            max-width: 65ch;
+            line-height: 1.6;
         }
 
-        .preview-area {
-            background: var(--stone-pedestal);
-            border: 1px dashed var(--border-hairline);
-            flex-grow: 1;
-            min-height: 350px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 2rem;
-            padding: 2rem;
-        }
-
-        .audit-results {
-            font-size: 0.8rem;
+        /* Browser Frame Mockup */
+        .browser-frame {
             background: var(--bg-manuscript);
-            padding: 1.5rem;
-            border-left: 3px solid var(--accent-manuscript);
+            border: 1px solid var(--border-hairline);
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            overflow: hidden;
+            height: 800px; /* Fixed height for consistent preview */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .frame-header {
+            background: #E8E8E8;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: #CCC; }
+        .dot.red { background: #FF5F56; }
+        .dot.yellow { background: #FFBD2E; }
+        .dot.green { background: #27C93F; }
+        
+        .address-bar {
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 4px;
+            flex: 1;
+            margin-left: 1rem;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            border: 1px solid var(--border-hairline);
+        }
+
+        .frame-content {
+            flex: 1;
+            overflow: auto;
+            background-color: var(--bg-manuscript);
+            /* App CSS will be applied inside here */
+        }
+
+        /* Curatorial Audit Section */
+        .audit-results {
+            background: white;
+            padding: 2.5rem;
+            border: 1px solid var(--border-hairline);
+            border-left: 4px solid var(--accent-manuscript);
+        }
+
+        .audit-results h3 {
             font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            margin-bottom: 1.5rem;
         }
 
-        .audit-results ul {
-            list-style: none;
-            margin-top: 0.5rem;
+        .audit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
         }
 
-        .audit-results li {
+        .audit-item strong {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
             margin-bottom: 0.25rem;
         }
+
+        .audit-item p {
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+        }
+
+        /* --- SHARED APP CSS (EXCERPT) --- */
+        /* These classes can be used inside .frame-content */
+        .app-container { padding: var(--spacing-large); }
+        .btn-solid { background: var(--text-ink); color: white; padding: 0.8rem 2rem; border: none; font-family: var(--font-mono); font-size: 0.75rem; cursor: pointer; }
+        .btn-minimal { background: none; border: none; border-bottom: 1px solid var(--text-ink); padding-bottom: 2px; font-family: var(--font-mono); font-size: 0.75rem; cursor: pointer; }
+        .stone-frame { background: var(--stone-pedestal); border: 1px solid var(--border-hairline); padding: 2rem; display: flex; align-items: center; justify-content: center; }
+        .type-meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-manuscript); text-transform: uppercase; }
+
     </style>
 </head>
 <body>
-    <header>
-        <h1>Curatorial Proposal: [Component Name]</h1>
-        <div class="meta-info">Project: Patina // Date: [YYYY-MM-DD] // Ref: [PROPOSAL_ID]</div>
+    <header class="proposal-header">
+        <h1>Proposal: [Component Name]</h1>
+        <div class="proposal-meta">
+            Project: Patina // Ref: [PROPOSAL_ID]<br>
+            Date: [YYYY-MM-DD]
+        </div>
     </header>
 
-    <main class="proposal-grid">
-        <!-- Path A: The Minimalist -->
-        <section class="path-card">
-            <span class="tag">Archetype A</span>
-            <h2 class="path-title">The Minimalist</h2>
-            <p class="rationale">[Rationale: Focus on whitespace and sensory sanctuary. Minimum interference with the object.]</p>
-            <div class="preview-area">
-                <!-- Mockup HTML here -->
-                [Interactive Preview A]
+    <main class="proposal-container">
+        <!-- Path A -->
+        <section class="path-section">
+            <div class="path-info">
+                <span class="tag">Archetype A</span>
+                <h2 class="path-title">The Minimalist</h2>
+                <div class="rationale">
+                    [Rationale: Describe the curatorial intent, focusing on whitespace, sensory sanctuary, and minimal interference with the historical object.]
+                </div>
             </div>
+
+            <div class="browser-frame">
+                <div class="frame-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div class="address-bar">patina://cabinet/[component-route]</div>
+                </div>
+                <div class="frame-content">
+                    <!-- Mockup HTML Path A starts here -->
+                    <div class="app-container">
+                        [Path A Mockup content]
+                    </div>
+                </div>
+            </div>
+
             <div class="audit-results">
-                <strong>CURATORIAL AUDIT:</strong>
-                <ul>
-                    <li>Contrast: [Pass/Ratio]</li>
-                    <li>Focus: [Description]</li>
-                    <li>Breathability: [Expansive]</li>
-                </ul>
+                <h3>Curatorial Audit</h3>
+                <div class="audit-grid">
+                    <div class="audit-item">
+                        <strong>Contrast</strong>
+                        <p>[Pass / Ratio]</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Information Density</strong>
+                        <p>[Description]</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Archival Tone</strong>
+                        <p>[Assessment]</p>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- Path B: The Ledger -->
-        <section class="path-card">
-            <span class="tag">Archetype B</span>
-            <h2 class="path-title">The Ledger</h2>
-            <p class="rationale">[Rationale: High information density, archival clarity. Prioritizes scholarly metrics.]</p>
-            <div class="preview-area">
-                <!-- Mockup HTML here -->
-                [Interactive Preview B]
+        <!-- Path B -->
+        <section class="path-section">
+            <div class="path-info">
+                <span class="tag">Archetype B</span>
+                <h2 class="path-title">The Ledger</h2>
+                <div class="rationale">
+                    [Rationale: Describe the intent for high information density and archival clarity, prioritizing scholarly metrics and technical precision.]
+                </div>
             </div>
+
+            <div class="browser-frame">
+                <div class="frame-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div class="address-bar">patina://cabinet/[component-route]</div>
+                </div>
+                <div class="frame-content">
+                    <!-- Mockup HTML Path B starts here -->
+                    <div class="app-container">
+                        [Path B Mockup content]
+                    </div>
+                </div>
+            </div>
+
             <div class="audit-results">
-                <strong>CURATORIAL AUDIT:</strong>
-                <ul>
-                    <li>Contrast: [Pass/Ratio]</li>
-                    <li>Focus: [Description]</li>
-                    <li>Breathability: [Archival]</li>
-                </ul>
+                <h3>Curatorial Audit</h3>
+                <div class="audit-grid">
+                    <div class="audit-item">
+                        <strong>Contrast</strong>
+                        <p>[Pass / Ratio]</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Information Density</strong>
+                        <p>[Description]</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Archival Tone</strong>
+                        <p>[Assessment]</p>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- Path C: The Hybrid -->
-        <section class="path-card">
-            <span class="tag">Archetype C</span>
-            <h2 class="path-title">The Hybrid</h2>
-            <p class="rationale">[Rationale: Progressive disclosure for balanced utility. The modern archival standard.]</p>
-            <div class="preview-area">
-                <!-- Mockup HTML here -->
-                [Interactive Preview C]
+        <!-- Path C -->
+        <section class="path-section">
+            <div class="path-info">
+                <span class="tag">Archetype C</span>
+                <h2 class="path-title">The Hybrid</h2>
+                <div class="rationale">
+                    [Rationale: Describe the balanced approach, often utilizing progressive disclosure or modern layout refinements to bridge minimalist aesthetics with archival utility.]
+                </div>
             </div>
+
+            <div class="browser-frame">
+                <div class="frame-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div class="address-bar">patina://cabinet/[component-route]</div>
+                </div>
+                <div class="frame-content">
+                    <!-- Mockup HTML Path C starts here -->
+                    <div class="app-container">
+                        [Path C Mockup content]
+                    </div>
+                </div>
+            </div>
+
             <div class="audit-results">
-                <strong>CURATORIAL AUDIT:</strong>
-                <ul>
-                    <li>Contrast: [Pass/Ratio]</li>
-                    <li>Focus: [Description]</li>
-                    <li>Breathability: [Balanced]</li>
-                </ul>
+                <h3>Curatorial Audit</h3>
+                <div class="audit-grid">
+                    <div class="audit-item">
+                        <strong>Contrast</strong>
+                        <p>[Pass / Ratio]</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Information Density</strong>
+                        <p>[Description]</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Archival Tone</strong>
+                        <p>[Assessment]</p>
+                    </div>
+                </div>
             </div>
         </section>
     </main>

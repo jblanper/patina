@@ -5,6 +5,7 @@ For any UI task, you MUST propose **3 distinct alternatives** to ensure a thorou
 ## Delivery Requirements
 - **Format:** A single, self-contained HTML mockup file in `docs/curating-ui/`.
 - **Naming Convention:** `proposal_[component_name]_[YYYY-MM-DD_HHmm].html`.
+- **Template:** Use `skills/curating-ui/assets/proposal_template.html` as the structural foundation.
 - **Styling:** ALWAYS use the latest CSS variables and typography from `docs/style_guide.html`.
 
 ## Mockup Content Checklist

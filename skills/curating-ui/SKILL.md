@@ -31,7 +31,7 @@ For any new UI feature or structural overhaul, you **MUST** follow the "Three-Pa
 For refinements to existing components or UI-related bug fixes:
 1. **The Curator's Audit:** Analyze the current implementation against the style guide and identified usability issues.
 2. **Surgical Refinement:** Propose one specific, refined direction first. Explain the "why" behind each change (e.g., "Improving contrast for RIC references").
-3. **Conditional Mockup:** A visual mockup is only required if requested by the user or if the proposed change is structurally significant enough to require visual validation.
+3. **Conditional Mockup:** A visual mockup is only required if requested by the user or if the proposed change is structurally significant enough to require visual validation. Use `assets/refinement_template.html` for single-path refinements.
 
 ## 4. Design Principles: The Collector's Utility
 - **Archival Ledger Aesthetic:** Follow the standards in `docs/style_guide.md`.
@@ -48,7 +48,7 @@ Curatorial Workflow:
 - [ ] Phase 2: Path Selection (Determine if Case A or Case B is required)
 - [ ] Phase 3: Propose/Audit
     - [Case A] Deliver 3-path mockup using assets/proposal_template.html
-    - [Case B] Deliver surgical audit and refined proposal
+    - [Case B] Deliver surgical audit and optional mockup using assets/refinement_template.html
 - [ ] Phase 4: Skill Synergy (Invoke curating-coins for numismatic UI validation)
 - [ ] Phase 5: Selection/Approval (Wait for user approval)
 - [ ] Phase 6: Execute/Review (Guide implementation or audit the final PR)
