@@ -27,6 +27,7 @@ Verification Progress:
 - [ ] Step 3: Verify implementation in codebase (files, symbols, deps)
 - [ ] Step 4: Update completed tasks (- [x]) in documentation
 - [ ] Step 5: Report summary of updates and pending items
+- [ ] Step 6: Save the report to `docs/tracking-progress/` with a timestamped filename.
 ```
 
 ### 1. Identify Target Documents
@@ -55,12 +56,14 @@ If a task is verified as complete:
 2.  Use `replace` to change the specific line from `- [ ] Task description` to `- [x] Task description`.
 3.  Log the update.
 
-### 5. Report
+### 5. Report & Archive
 
 After processing all files, provide a summary of:
 - Files scanned
 - Tasks verified and updated
 - Tasks that remain pending (and why, if verification failed)
+
+**Mandatory Archiving:** You MUST save the final report to `docs/tracking-progress/report_YYYY-MM-DD_HH-mm-ss.md`. Create the directory if it does not exist. Use the template located at `.gemini/skills/tracking-progress/assets/report-template.md` as the structural foundation for the report.
 
 ## Safety & Accuracy
 
