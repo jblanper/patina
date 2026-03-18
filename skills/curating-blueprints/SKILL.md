@@ -15,16 +15,18 @@ You are the **Senior Architect** for the Patina project. Your mission is to ensu
 - [ ] **Initial Consultation:** Use `ask_user` to clarify the "Curator's Intent" if the objective is ambiguous before drafting the blueprint.
 - [ ] **Exit Plan Mode:** Once the strategy is designed and the research is complete, use the `exit_plan_mode` tool before proceeding to formal drafting and audits.
 
-### Phase I: Blueprint Drafting
-- [ ] Create or update the blueprint in `docs/blueprints/YYYY-MM-DD-title.md` using the `blueprint_template.md`.
+### Phase I: Blueprint Drafting (Status: Draft -> Proposed)
+- [ ] **Status Check:** Immediately identify the blueprint's status (`Draft`, `Proposed`, `Approved`, `In-Progress`, `Verification`, `Completed`).
+- [ ] **Drafting:** Create or update the blueprint in `docs/blueprints/YYYY-MM-DD-title.md` using the `blueprint_template.md`. Ensure the status is set to **Draft**.
 - [ ] **Philosophy Check:** 
     - **Archival Ledger Aesthetic:** Does the feature feel like a museum tool? (Museum-grade UI per `docs/style_guide.md`).
     - **Privacy First:** Ensure no external CDNs or telemetry are introduced; all assets must be local.
     - **The Single-Click Rule:** Verify that the UI hierarchy remains flat and navigation is intuitive.
 - [ ] **Technical Foundation:** Align with "The Filter" (Zod validation) and the "Colocation Rule" (testing).
 - [ ] **Verification Strategy:** Define clear, verifiable steps for hooks, components, and schema changes.
+- [ ] **Promotion:** Once the draft is complete and self-reviewed, update status to **Proposed**.
 
-### Phase II: Multi-Disciplinary Audits (Mandatory Review)
+### Phase II: Multi-Disciplinary Audits (Status: Proposed)
 A blueprint is incomplete without specialized peer review. You **MUST** coordinate the following audits:
 - **Security Assessment:** Activate `securing-electron` to audit IPC, isolation, and sanitization.
 - **Quality Assessment:** Activate `assuring-quality` to verify the testing strategy and coverage mandates.
@@ -32,22 +34,27 @@ A blueprint is incomplete without specialized peer review. You **MUST** coordina
 - **UI Assessment:** Activate `curating-ui` for style guide compliance and aesthetic prestige.
 - **Review Note Requirement:** Each specialized skill **MUST** leave a specific "Review Note" with suggestions and findings in the corresponding section of the blueprint. If no issues are found, explicitly state "Verified: No issues identified."
 
-### Phase III: User Review & Decision Log
+### Phase III: User Review & Decision Log (Status: Approved)
 Once the draft and audits are complete:
 - [ ] **Present the Blueprint:** Summarize the proposed changes and all audit findings for the user.
 - [ ] **Clarify Decisions:** Use `ask_user` to resolve any open questions or trade-offs identified during Phase II.
 - [ ] **Log Decisions:** Document the user's input and final decisions in the "User Consultation & Decisions" section of the blueprint.
-- [ ] **Approval:** Stop and wait for a Directive to proceed with implementation.
+- [ ] **Approval:** Update status to **Approved**. Stop and wait for a Directive to proceed with implementation.
 
-### Phase IV: Execution Oversight
+### Phase IV: Execution Oversight (Status: In-Progress -> Verification)
 Monitor the implementation to prevent architectural drift:
+- [ ] **Start Implementation:** Update status to **In-Progress** upon user directive.
 - [ ] **Build Integrity:** Mandate a clean `npx tsc --noEmit` run before finalization.
 - [ ] **Cross-Process Consistency:** Ensure types in `src/common/` are used by both Main and Renderer processes.
 - [ ] **Abstraction Integrity:** Prevent business logic from leaking into the raw Electron bridge.
+- [ ] **Ready for Verification:** Once implementation is code-complete and initial tests pass, update status to **Verification**.
 
-### Phase V: Retrospective & Core Doc Sync
-- [ ] **Standardization:** Codify successful new patterns in `@AGENTS.md`.
-- [ ] **Style Sync:** Update `docs/style_guide.md` if UI components were refined.
+### Phase V: Final Verification & Archival (Status: Verification -> Completed -> Archived)
+- [ ] **Mandatory Re-Audit:** In the **Verification** stage, you MUST reactivate `securing-electron`, `curating-ui`, `curating-coins`, and `assuring-quality` to verify the *implemented* code against the approved design.
+- [ ] **Completion:** If all re-audits pass, update status to **Completed**.
+- [ ] **Retrospective:** Fill out the "Post-Implementation Retrospective" section.
+- [ ] **Standardization:** Codify successful new patterns in `@AGENTS.md` and `docs/style_guide.md`.
+- [ ] **Archival:** Move the completed blueprint file to `docs/blueprints/archive/`.
 
 ## 2. Reference Material
 - **`architectural_standards.md`**: Deep-dive on "The Filter", custom protocols, and the Express.js stateless design.

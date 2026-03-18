@@ -130,7 +130,49 @@ expect(await screen.findByText('Athens Owl')).toBeInTheDocument();
 
 ---
 
-## 6. Snapshot Policy
+### 6. Snapshot Policy
 -   **Use Sparingly:** Only for "dumb" UI components with complex DOM structures (e.g., `CoinCard`).
 -   **Avoid for Logic:** Never use snapshots for hooks or functions. Assert specific values instead.
 -   **Commit:** Snapshot files must be committed to git.
+
+---
+
+## 7. Testing Main Process Servers (Express)
+
+Phase 4 introduces an Express.js server in the Main process (The Lens). To test this in isolation without starting the full Electron environment, use `supertest`.
+
+### 7.1 Unit Testing the App Factory
+Export the Express app factory from `src/main/server.ts` to allow tests to instantiate it independently.
+
+```typescript
+// src/main/__tests__/server.test.ts
+import request from 'supertest';
+import { createApp } from '../server';
+
+describe('Lens Express Server', () => {
+  const app = createApp('test-token');
+
+  it('rejects uploads without a valid token', async () => {
+    const response = await request(app)
+      .post('/lens/wrong-token/upload')
+      .attach('image', 'test-image.jpg');
+
+    expect(response.status).toBe(403);
+  });
+
+  it('accepts valid image uploads with a correct token', async () => {
+    const response = await request(app)
+      .post('/lens/test-token/upload')
+      .attach('image', Buffer.from('fake-image-data'), 'test.jpg');
+
+    expect(response.status).toBe(200);
+  });
+});
+```
+
+### 7.2 Validation Testing
+Ensure that `multer` configurations are tested for:
+-   **File Type:** Rejecting non-image files (e.g., `.pdf`, `.exe`).
+-   **File Size:** Rejecting files larger than the 10MB limit.
+-   **Rate Limiting:** If implemented, verify that rapid requests are throttled.
+

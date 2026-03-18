@@ -105,7 +105,7 @@ To further harden the Renderer, we enforce a strict CSP via the `helmet` middlew
 
 ---
 
-## 6. Future: Custom Protocol (`patina-img://`)
+## 6. Custom Protocol (`patina-img://`)
 
 To securely serve local images without exposing the file system, we will implement a custom protocol handler in the Main process.
 
@@ -115,3 +115,23 @@ To securely serve local images without exposing the file system, we will impleme
     2.  Verifies the file exists in `data/images/`.
     3.  Serves the file with correct MIME type.
     4.  Denies access to any file outside the sanctioned image directory.
+
+---
+
+## 7. The Lens Express Bridge (Local Network)
+
+Phase 4 introduces a local network entry point via an Express.js server. This allows mobile devices to upload images directly to the desktop application.
+
+### 7.1 "The Filter" for Lens
+Because this server is accessible on the local network, it must implement an even more rigorous version of "The Filter":
+
+1.  **Network Isolation:** The server binds only to the local network interface (e.g., `192.168.1.x`) and is only active when the user explicitly opens the "Lens" modal.
+2.  **Session Tokens:** Every Lens session generates a unique UUID. This token is embedded in the QR code and must be included in all mobile requests (e.g., `POST /lens/:token/upload`).
+3.  **Strict Multipart Validation:** We use `multer` to enforce:
+    -   **File Type:** `['image/jpeg', 'image/png', 'image/webp']` only.
+    -   **File Size:** Maximum 10MB per upload.
+4.  **Content Security Policy (CSP):** The mobile web app served by Lens includes a strict CSP to prevent any external script execution.
+
+### 7.2 Data Handover
+Once an image is validated and saved to `data/images/temp/`, the Main process notifies the Renderer via an IPC event (`lens:image-received`). The Renderer then handles the final association with a coin record, ensuring the core database remains isolated from the network bridge.
+

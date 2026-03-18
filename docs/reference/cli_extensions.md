@@ -22,9 +22,10 @@ Enforces the **Colocation Rule** and **Coverage Mandates** (100% validation, 90%
 - **Verification:** Automated execution of specific tests and coverage analysis.
 
 ### `curating-blueprints`
-Provides **Senior Architect** oversight for system-wide consistency.
+Provides **Senior Architect** oversight for system-wide consistency and lifecycle management.
+- **7-Stage Lifecycle:** Enforces a strict status system (`Draft`, `Proposed`, `Approved`, `In-Progress`, `Verification`, `Completed`, `Archived`).
 - **Philosophy:** Enforces "Curator-First", "Privacy First", and the "Single-Click Rule".
-- **Integrity:** Prevents architectural drift and ensures cross-process consistency.
+- **Audits:** Mandates multi-disciplinary audits at both the **Proposed** (Design) and **Verification** (Implementation) stages.
 
 ### `securing-electron`
 Protects user data through **"The Filter"** (strict Zod validation).
@@ -40,8 +41,8 @@ Background scripts that provide the agent with real-time feedback after every tu
 | Hook | Command | Description |
 | :--- | :--- | :--- |
 | **Schema Context** | `scripts/extract_schema.cjs` | Injects current database schema into active context. |
-| **Build Check** | `scripts/check_build.cjs` | Runs `tsc --noEmit` to identify TypeScript errors. |
-| **Style Audit** | `scripts/check_lint.cjs` | Runs ESLint to verify design and code standards. |
+| **Build Check** | `scripts/gemini_hook.js type-check` | Runs `tsc --noEmit` to identify TypeScript errors. |
+| **Style Audit** | `scripts/gemini_hook.js lint` | Runs ESLint to verify design and code standards. |
 
 ---
 

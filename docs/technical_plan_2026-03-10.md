@@ -94,10 +94,14 @@ The database schema has been finalized and approved following a research phase i
 - [x] **Unified Layout:** Synchronized header width and horizontal margins between the Cabinet and Ledger for a cohesive museum experience.
 - [x] **Smart Grid:** Implemented a container-aware layout that stacks automatically without rigid breakpoints.
 
-### Phase 4: The Lens (Wireless Bridge)
-- [ ] Implement the local Node.js/Express server.
-- [ ] Create the QR code generator.
-- [ ] Build the minimal mobile upload page.
+### Phase 4: The Lens (Wireless Bridge) (In Progress)
+**Detailed Blueprint:** [2026-03-17-phase-4-lens.md](./blueprints/2026-03-17-phase-4-lens.md)
+- [x] **Express Foundation:** Implement the lightweight server within the Main process with `multer` validation. [Blueprint](./blueprints/2026-03-17-phase-4-lens.md)
+- [x] **The Filter (Lens):** Enforce strict session-specific UUID tokens and 10MB file size limits.
+- [x] **Mobile UI:** Design a minimal, responsive HTML template served directly by the Main process.
+- [x] **IPC Handlers:** Create `lens:start`, `lens:stop`, and `lens:get-status` for the Renderer.
+- [ ] **Renderer Integration:** Build the `useLens()` hook and the `QRCodeDisplay` component.
+- [ ] **Add Coin Integration:** Connect the Lens subsystem to the "Add Coin" or "Edit Coin" forms.
 
 ### Phase 5: Preservation (Security/Export)
 - [ ] Build the "Export to USB" one-click archive.

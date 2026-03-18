@@ -1,7 +1,7 @@
 # Implementation Blueprint: [Title]
 
 **Date:** [YYYY-MM-DD]  
-**Status:** [Draft/In-Review/Approved]  
+**Status:** [Draft/Proposed/Approved/In-Progress/Verification/Completed]  
 **Reference:** [Relevant documentation or parent blueprint]
 
 ## 1. Objective
