@@ -34,7 +34,7 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
 
   // Security Headers (CSP Mandate)
   expressApp.use((req, res, next) => {
-    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com");
     res.setHeader('X-Content-Type-Options', 'nosniff');
     next();
   });
@@ -97,34 +97,106 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Patina Lens</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
         <style>
           :root {
             --color-parchment: #FCF9F2;
             --color-ink: #2D2926;
-            --font-serif: 'Georgia', serif; /* Fallback for Cormorant */
+            --color-muted: #A8A6A3;
+            --accent: #C27856;
+            --error: #B22222;
           }
+          * { box-sizing: border-box; margin: 0; padding: 0; }
           body {
             background-color: var(--color-ink);
             color: var(--color-parchment);
-            font-family: var(--font-serif);
+            font-family: 'Cormorant Garamond', Georgia, serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
+            padding: 2rem;
+          }
+          header {
+            margin-bottom: 3rem;
             text-align: center;
           }
-          h1 { margin-bottom: 2rem; font-weight: normal; letter-spacing: 1px; }
-          #status { margin-top: 2rem; min-height: 1.5rem; }
-          .success { color: #4CAF50; }
-          .error { color: #FF5252; }
+          h1 {
+            font-weight: 400;
+            font-size: 1.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+          }
+          .subtitle {
+            font-size: 0.875rem;
+            color: var(--color-muted);
+            font-style: italic;
+          }
+          /* Custom file upload button - input is invisible but functional */
+          .file-upload {
+            position: relative;
+            display: block;
+            width: 100%;
+            max-width: 320px;
+          }
+          .file-upload input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 1;
+          }
+          .file-upload-btn {
+            display: block;
+            width: 100%;
+            padding: 1.25rem 2rem;
+            background-color: var(--color-parchment);
+            color: var(--color-ink);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.125rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-align: center;
+            pointer-events: none;
+          }
+          .file-upload input[type="file"]:active + .file-upload-btn {
+            background-color: var(--color-muted);
+            color: var(--color-parchment);
+          }
+          /* Feedback messages */
+          #status {
+            margin-top: 2rem;
+            min-height: 1.5rem;
+            font-size: 1rem;
+            display: none;
+          }
+          .uploading { color: var(--color-muted); font-style: italic; }
+          .success { 
+            color: var(--accent); 
+            font-style: normal;
+            font-weight: 600;
+            font-size: 1.125rem;
+          }
+          .error { color: var(--error); font-style: italic; }
         </style>
       </head>
       <body>
-        <h1>Patina Lens</h1>
-        <input type="file" accept="image/*" capture="environment">
-        <p id="status" style="display: none;"></p>
+        <header>
+          <h1>Patina Lens</h1>
+          <p class="subtitle">Transfer to Ledger</p>
+        </header>
+        <label class="file-upload">
+          <input type="file" accept="image/*" capture="environment">
+          <span class="file-upload-btn">Capture Image</span>
+        </label>
+        <p id="status"></p>
         <script src="/lens-script.js"></script>
       </body>
       </html>

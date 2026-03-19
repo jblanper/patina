@@ -12,7 +12,7 @@ interface PlateEditorProps {
 }
 
 export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, images }) => {
-  const { url, startLens } = useLens();
+  const { url, startLens, stopLens } = useLens();
   const [activeSlot, setActiveSlot] = useState<'obverse' | 'reverse' | 'edge'>('obverse');
   const [showQR, setShowQR] = useState(false);
 
@@ -26,11 +26,12 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, image
     window.electronAPI.onLensImageReceived((path) => {
       onImageCaptured(activeSlot, path);
       setShowQR(false);
+      stopLens();
     });
     return () => {
       window.electronAPI.removeLensListeners();
     };
-  }, [activeSlot, onImageCaptured]);
+  }, [activeSlot, onImageCaptured, stopLens]);
 
   const slots: Array<{ id: 'obverse' | 'reverse' | 'edge'; label: string }> = [
     { id: 'obverse', label: 'Obverse (Primary)' },
