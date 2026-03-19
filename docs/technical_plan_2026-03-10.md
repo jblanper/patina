@@ -104,17 +104,18 @@ The database schema has been finalized and approved following a research phase i
 - [x] **IPC Handlers:** Implemented `coin:create` and `coin:update` in the Main process with strict validation using "The Filter".
 - [x] **Auto-Draft:** Implemented a debounced "Save Draft" feature to prevent data loss during long cataloging sessions.
 
-### Phase 4: The Lens (Wireless Bridge) (In Progress)
+### Phase 4: The Lens (Wireless Bridge) (Completed)
 **Detailed Blueprint:** [2026-03-17-phase-4-lens.md](./blueprints/2026-03-17-phase-4-lens.md)
 - [x] **Express Foundation:** Implement the lightweight server within the Main process with `multer` validation. [Blueprint](./blueprints/2026-03-17-phase-4-lens.md)
 - [x] **The Filter (Lens):** Enforce strict session-specific UUID tokens and 10MB file size limits.
 - [x] **Mobile UI:** Design a minimal, responsive HTML template served directly by the Main process.
 - [x] **IPC Handlers:** Create `lens:start`, `lens:stop`, and `lens:get-status` for the Renderer.
-- [ ] **Renderer Integration:** Build the `useLens()` hook and the `QRCodeDisplay` component.
-- [ ] **Add Coin Integration:** Connect the Lens subsystem to the "Add Coin" or "Edit Coin" forms.
+- [x] **Renderer Integration:** Build the `useLens()` hook and the `QRCodeDisplay` component.
+- [x] **Add Coin Integration:** Connect the Lens subsystem to the "Add Coin" or "Edit Coin" forms.
 
-### Phase 5: Preservation (Security/Export)
-- [ ] Build the "Export to USB" one-click archive.
+### Phase 5: Preservation (Security/Export) (Proposed)
+**Detailed Blueprint:** [2026-03-19-phase-5-preservation.md](./blueprints/2026-03-19-phase-5-preservation.md)
+- [ ] Build the "Export Archive" one-click feature (ZIP with DB, CSV, images).
 - [ ] Implement PDF "Catalog" generation using a library like `jspdf` or `react-pdf`.
 
 ---
