@@ -123,7 +123,7 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
       </head>
       <body>
         <h1>Patina Lens</h1>
-        <input type="file" accept="image/*" capture="environment" onchange="uploadFile(this)">
+        <input type="file" accept="image/*" capture="environment">
         <p id="status" style="display: none;"></p>
         <script src="/lens-script.js"></script>
       </body>

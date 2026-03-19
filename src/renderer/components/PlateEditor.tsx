@@ -25,6 +25,7 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, image
   React.useEffect(() => {
     window.electronAPI.onLensImageReceived((path) => {
       onImageCaptured(activeSlot, path);
+      setShowQR(false);
     });
     return () => {
       window.electronAPI.removeLensListeners();
@@ -44,11 +45,24 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, image
           <div key={slot.id} className={`plate-slot ${activeSlot === slot.id ? 'active' : ''}`} onClick={() => setActiveSlot(slot.id)}>
             <div className="plate-frame-edit">
               {images[slot.id] ? (
-                <img 
-                  src={`patina-img://${images[slot.id]}`} 
-                  alt={slot.label} 
-                  className="plate-preview-img"
-                />
+                <>
+                  <img 
+                    src={`patina-img://${images[slot.id]}`} 
+                    alt={slot.label} 
+                    className="plate-preview-img"
+                  />
+                  <div className="lens-cta-overlay">
+                    <button 
+                      className="btn-lens-primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStartLens(slot.id);
+                      }}
+                    >
+                      Replace
+                    </button>
+                  </div>
+                </>
               ) : (
                 <div className="lens-cta-stack">
                   <div className="plate-icon">
