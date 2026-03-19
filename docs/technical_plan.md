@@ -113,14 +113,41 @@ The database schema has been finalized and approved following a research phase i
 - [x] **Renderer Integration:** Build the `useLens()` hook and the `QRCodeDisplay` component.
 - [x] **Add Coin Integration:** Connect the Lens subsystem to the "Add Coin" or "Edit Coin" forms.
 
-### Phase 5: Preservation (Security/Export) (Proposed)
-**Detailed Blueprint:** [2026-03-19-phase-5-preservation.md](./blueprints/2026-03-19-phase-5-preservation.md)
-- [ ] Build the "Export Archive" one-click feature (ZIP with DB, CSV, images).
-- [ ] Implement PDF "Catalog" generation using a library like `jspdf` or `react-pdf`.
+### Phase 5: Preservation (Security/Export) (Completed)
+**Detailed Blueprint:** [2026-03-19-phase-5-preservation.md](./blueprints/archive/2026-03-19-phase-5-preservation.md)
+- [x] Build the "Export Archive" one-click feature (ZIP with DB, CSV, images).
+- [x] Implement PDF "Catalog" generation using `jspdf`.
+
+### Phase 6: Enhancement Suite (Approved)
+**Objective:** Enhance the curator experience with standardized data entry, internationalization, and customizable views.
+
+#### Phase 6A: Standardized Values with Autocomplete (Approved)
+**Detailed Blueprint:** [2026-03-19-phase-6a-standardized-values.md](./blueprints/2026-03-19-phase-6a-standardized-values.md)
+- [ ] **Vocabulary Tables:** Create `vocabularies` and `preferences` tables for standardized field values.
+- [ ] **Numismatic Vocabularies:** Seed metals (Gold, Silver, Bronze, Electrum), denominations (Aureus, Denarius, Antoninianus), grades (NGC/PCGS scale), eras, and die axis values.
+- [ ] **Autocomplete Component:** Build `AutocompleteField` with dropdown, filtering, and "Add new value" functionality.
+- [ ] **IPC Handlers:** Implement `vocab:get`, `vocab:add`, `vocab:search` with Zod validation.
+- [ ] **Usage Tracking:** Track `usage_count` for sorting by frequency.
+
+#### Phase 6B: Internationalization - Spanish/English (Approved)
+**Detailed Blueprint:** [2026-03-19-phase-6b-internationalization.md](./blueprints/2026-03-19-phase-6b-internationalization.md)
+- [ ] **i18n Foundation:** Integrate `react-i18next` for translation management.
+- [ ] **Translation Files:** Create `en.json` and `es.json` with complete UI translations.
+- [ ] **Language Selector:** Build `LanguageSelector` component with immediate language switch.
+- [ ] **Numismatic Translations:** Translate field labels (Anverso, Reverso, Bordura) and use "Aleación" for metal.
+- [ ] **Locale Formats:** Support DD/MM/YYYY for Spanish.
+
+#### Phase 6C: Field Visibility Settings (Approved)
+**Detailed Blueprint:** [2026-03-19-phase-6c-field-visibility.md](./blueprints/2026-03-19-phase-6c-field-visibility.md)
+- [ ] **Visibility Table:** Create `field_visibility` table with sensible defaults.
+- [ ] **Settings Panel:** Build `FieldVisibilitySettings` component for toggling fields.
+- [ ] **Context Provider:** Implement `FieldVisibilityProvider` for global state.
+- [ ] **Conditional Rendering:** Update `CoinDetail` and `CoinCard` to respect visibility settings.
+- [ ] **Reset Function:** Allow users to restore default visibility.
 
 ---
 
-## 6. Design Guidelines (Updated to v3.3)
+## 7. Design Guidelines (Updated to v3.3)
 > **Note:** See [style_guide.md](./style_guide.md) for the definitive design system.
 
 - **Theme:** "Manuscript Hybrid" (Parchment & Iron Gall Ink).

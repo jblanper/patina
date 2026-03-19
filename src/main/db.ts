@@ -4,7 +4,7 @@ import fs from 'fs';
 import { app } from 'electron';
 import { z } from 'zod';
 import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage } from '../common/types';
-import { NewCoinSchema } from '../common/validation';
+import { NewCoinSchema, NewCoinImageSchema } from '../common/validation';
 
 import { SCHEMA, generateSQL } from '../common/schema';
 
@@ -25,6 +25,13 @@ db.pragma('journal_mode = WAL');
 
 // Initialize tables
 db.exec(generateSQL(SCHEMA));
+
+// Migration: Add UNIQUE constraint on images(coin_id, path) if not exists
+try {
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_images_coin_path ON images(coin_id, path)');
+} catch (e) {
+  // Index may already exist in some SQLite versions
+}
 
 /**
  * Validation Helper
@@ -87,10 +94,14 @@ export const dbService = {
   },
 
   addImage: (image: NewCoinImage): number => {
-    validate(idSchema, image.coin_id);
+    validate(NewCoinImageSchema, image);
     const info = db.prepare(
-      'INSERT INTO images (coin_id, path, label, is_primary, sort_order) VALUES (?, ?, ?, ?, ?)'
+      'INSERT OR IGNORE INTO images (coin_id, path, label, is_primary, sort_order) VALUES (?, ?, ?, ?, ?)'
     ).run(image.coin_id, image.path, image.label, image.is_primary ? 1 : 0, image.sort_order);
+    if (info.changes === 0) {
+      const existing = db.prepare('SELECT id FROM images WHERE coin_id = ? AND path = ?').get(image.coin_id, image.path) as { id: number } | undefined;
+      return existing?.id ?? 0;
+    }
     return info.lastInsertRowid as number;
   },
 

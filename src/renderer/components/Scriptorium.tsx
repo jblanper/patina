@@ -18,7 +18,7 @@ export const Scriptorium: React.FC = () => {
     updateImage, 
     submit,
     setFormData
-  } = useCoinForm(coin);
+  } = useCoinForm(coin, existingImages);
 
   // Sync existing images when editing
   useEffect(() => {

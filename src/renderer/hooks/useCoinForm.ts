@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { NewCoin, Coin } from '../../common/types';
+import { NewCoin, Coin, CoinImage } from '../../common/types';
 import { NewCoinSchema } from '../../common/validation';
 
 interface CoinFormState extends NewCoin {
@@ -16,7 +16,7 @@ const DEFAULT_STATE: CoinFormState = {
   images: {}
 };
 
-export function useCoinForm(initialCoin?: Coin | null) {
+export function useCoinForm(initialCoin?: Coin | null, existingImages: CoinImage[] = []) {
   const [formData, setFormData] = useState<CoinFormState>(() => {
     // Try to load from auto-draft if no initial coin
     if (!initialCoin) {
@@ -40,6 +40,9 @@ export function useCoinForm(initialCoin?: Coin | null) {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [existingImagePaths] = useState<Set<string>>(
+    () => new Set(existingImages.map(img => img.path))
+  );
 
   // Sync formData when initialCoin changes (for Edit mode)
   useEffect(() => {
@@ -114,17 +117,19 @@ export function useCoinForm(initialCoin?: Coin | null) {
         coinId = await window.electronAPI.addCoin(coinData);
       }
       
-      // Save images
-      const imagePromises = Object.entries(images).map(([label, path], index) => {
-        if (!path) return Promise.resolve();
-        return window.electronAPI.addImage({
-          coin_id: coinId,
-          path,
-          label: label.charAt(0).toUpperCase() + label.slice(1),
-          is_primary: label === 'obverse',
-          sort_order: index
+      // Save images (only new ones not already in database)
+      const imagePromises = Object.entries(images)
+        .filter(([, path]) => path && !existingImagePaths.has(path))
+        .map(([label, path], index) => {
+          if (!path) return Promise.resolve();
+          return window.electronAPI.addImage({
+            coin_id: coinId,
+            path,
+            label: label.charAt(0).toUpperCase() + label.slice(1),
+            is_primary: label === 'obverse',
+            sort_order: index
+          });
         });
-      });
       
       await Promise.all(imagePromises);
       

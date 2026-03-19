@@ -54,7 +54,7 @@ export const SCHEMA: TableDefinition[] = [
       { name: 'sort_order', type: 'INTEGER', constraints: 'DEFAULT 0' },
       { name: 'created_at', type: 'DATETIME', constraints: 'DEFAULT CURRENT_TIMESTAMP' }
     ],
-    extraSQL: 'FOREIGN KEY (coin_id) REFERENCES coins(id) ON DELETE CASCADE'
+    extraSQL: 'FOREIGN KEY (coin_id) REFERENCES coins(id) ON DELETE CASCADE, UNIQUE(coin_id, path)'
   }
 ];
 
