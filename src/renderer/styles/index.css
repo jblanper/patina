@@ -840,8 +840,7 @@ main {
 .scriptorium-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  padding: var(--spacing-large);
+  flex: 1;
   background-color: var(--bg-manuscript);
 }
 
