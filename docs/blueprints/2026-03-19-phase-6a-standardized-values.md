@@ -300,6 +300,21 @@ LIMIT 30
 | **Diameter Range** | Variable - not a taxonomy | Use actual measurement in mm |
 | **Technique** | Minting technique (struck/cast) - partially covered | Use Nomisma's `nmo:Manufacture` (cast, struck, milled) |
 
+**Modern Online Resources (for Reference Lookup):**
+
+These services can be used to validate catalog references and provide external links:
+
+| Resource | URL | Description |
+|----------|-----|-------------|
+| **OCRE** | `https://numismatics.org/ocre` | Online Coins of the Roman Empire - RIC database with type lookup |
+| **CRRO** | `https://numismatics.org/crro` | Coinage of the Roman Republic Online - Crawford database |
+| **PAS** | `https://finds.org.uk/database` | Portable Antiquities Scheme - UK find database with identifications |
+| **ACS** | (American Coin Atlas) | Greek coin type database and geographical mapping |
+| **CoinArchivesPro** | (commercial) | Auction record database for pricing research |
+| **NGC Coin Explorer** | `https://www.ngccoin.com/coin-explorer/` | Modern world coin database with grading standards |
+
+> **Note:** These are external resources for reference validation only. Patina maintains local vocabulary for privacy. Future integration could include auto-linking to OCRE/CRRO URIs for coin type lookups.
+
 ---
 
 ### D. UI Component: AutocompleteField
