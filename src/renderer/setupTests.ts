@@ -16,4 +16,6 @@ window.electronAPI = {
   stopLens: vi.fn(),
   onLensImageReceived: vi.fn(),
   removeLensListeners: vi.fn(),
+  exportToZip: vi.fn(),
+  exportToPdf: vi.fn(),
 };

@@ -1,10 +1,22 @@
-import { app, BrowserWindow, ipcMain, session, protocol, net } from 'electron';
+import { app, BrowserWindow, ipcMain, session, protocol, dialog } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { dbService } from './db';
 import { createLensServer } from './server';
 import { getLocalIp } from './ip';
 import { NewCoin, NewCoinImage } from '../common/types';
+import { ExportOptionsSchema } from '../common/validation';
+import { exportToZip } from './export/zip';
+import { exportToPdf } from './export/pdf';
+
+function validateExportOptions(data: unknown) {
+  const result = ExportOptionsSchema.safeParse(data);
+  if (!result.success) {
+    const errorMessages = result.error.issues.map(issue => issue.message).join(', ');
+    throw new Error(`Validation failed: ${errorMessages}`);
+  }
+  return result.data;
+}
 
 // Register custom protocol as privileged
 protocol.registerSchemesAsPrivileged([
@@ -138,6 +150,36 @@ app.whenReady().then(() => {
       lensServer = null;
     }
     return { status: 'stopped' };
+  });
+
+  // Export IPC Handlers
+  ipcMain.handle('export:toZip', async (_, options: unknown) => {
+    const validated = validateExportOptions(options);
+    const result = await dialog.showSaveDialog({
+      title: 'Export Archive',
+      defaultPath: `patina-export-${Date.now()}.zip`,
+      filters: [{ name: 'ZIP Archive', extensions: ['zip'] }]
+    });
+    
+    if (result.canceled || !result.filePath) {
+      return { success: false, error: 'Export cancelled' };
+    }
+    
+    return exportToZip(result.filePath, validated.includeImages, validated.includeCsv);
+  });
+
+  ipcMain.handle('export:toPdf', async () => {
+    const result = await dialog.showSaveDialog({
+      title: 'Export PDF Catalog',
+      defaultPath: `patina-catalog-${Date.now()}.pdf`,
+      filters: [{ name: 'PDF Document', extensions: ['pdf'] }]
+    });
+    
+    if (result.canceled || !result.filePath) {
+      return { success: false, error: 'Export cancelled' };
+    }
+    
+    return exportToPdf(result.filePath);
   });
 
   ipcMain.handle('ping', () => 'pong');

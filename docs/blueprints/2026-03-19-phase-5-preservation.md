@@ -1,7 +1,7 @@
 # Implementation Blueprint: Phase 5 - Preservation (Security/Export)
 
 **Date:** 2026-03-19
-**Status:** Proposed
+**Status:** In-Progress
 **Reference:** `docs/technical_plan_2026-03-10.md`
 
 ## 1. Objective
@@ -40,9 +40,10 @@ Implement the "Preservation" system enabling curators to:
   5. Main returns `{ success: true, path: string }` or error
 
 **CSV Format (coins.csv):**
-- Headers: All `Coin` fields (id, title, issuer, year_display, era, metal, weight, ...)
+- Headers: All `Coin` fields + `obverse_image`, `reverse_image`, `edge_image`
 - UTF-8 with BOM for Excel compatibility
 - Dates in ISO 8601 format
+- Image columns: relative paths to images/ directory
 
 **Zod Validation:**
 ```typescript
@@ -82,31 +83,31 @@ export const ExportOptionsSchema = z.object({
 - Converted to base64 for PDF embedding
 - Max resolution: 800px width to keep PDF manageable
 
-**PDF Styling (Manuscript Hybrid v3.3):**
-- **Background:** Parchment (#FCF9F2)
-- **Text:** Iron Gall Ink (#2D2926)
-- **Headings:** Cormorant Garamond, serif
-- **Body:** Montserrat, sans-serif
-- **Metadata:** JetBrains Mono, monospace
-- **Borders:** Subtle hairline borders (1px, muted color) for tables
-- **Coin Images:** Centered, with thin border frame
-- **Page Numbers:** Bottom center, JetBrains Mono
-- **Layout:** Museum catalog aesthetic—clean, generous whitespace, archival feel
+**PDF Styling (Manuscript Hybrid v3.3 - Final):**
+- **Background:** White (#FFFFFF)
+- **Typography:** Garamond (Times) throughout - serif for elegant, scholarly feel
+- **Layout:** Left-aligned text, clean section separators with hairline borders
+- **Coin Images:** Side-by-side obverse/reverse with thin border frame
+- **Specifications Table:** 4-column grid (Label | Value | Label | Value), 35mm label width
+- **Inscriptions/Additional Tables:** 2-column grid, 35mm label width (all sections aligned)
+- **Page Numbers:** Bottom center, Garamond
+- **Visual:** Minimal, museum-quality catalog aesthetic
 
 ### C. UI Components
 
-**Sidebar Integration:**
-- New "Preservation" section in sidebar
-- Two CTAs:
-  - "Export Archive" (icon: archive box)
-  - "Generate Catalog" (icon: book)
+**Header Integration (Rev 1):**
+- Export buttons moved to Cabinet header, next to "+ New Entry" button
+- Two CTAs: "Export Archive" | "Generate Catalog"
+- Follows Single-Click Rule - one click from main view
 
-**Modal Components:**
-- `ExportModal.tsx`: Shows progress bar during ZIP/PDF generation
-- Uses existing modal pattern from LensModal
+**Toast Notification (Rev 1):**
+- Removed modal entirely - replaced with simple toast notification
+- Auto-dismisses after 5 seconds
+- Fixed bottom-right position
+- Shows success message with filename or error message
 
 **Hook:**
-- `useExport.ts`: Manages export state, progress, and error handling
+- `useExport.ts`: Manages export state (idle/exporting/success/error)
 
 ---
 
@@ -132,11 +133,11 @@ export const ExportOptionsSchema = z.object({
 - [ ] Enforce 800px max image dimension
 - [ ] Add `export:toPdf` IPC handler in `index.ts`
 
-### Step 6: Renderer Integration
-- [ ] Create `src/renderer/hooks/useExport.ts`
-- [ ] Create `src/renderer/hooks/__tests__/useExport.test.ts`
-- [ ] Create `src/renderer/components/ExportModal.tsx` with ARIA attributes
-- [ ] Add "Preservation" section to sidebar with archival-style icons
+### Step 6: Renderer Integration (Rev 1)
+- [x] Create `src/renderer/hooks/useExport.ts`
+- [x] Create `src/renderer/components/ExportToast.tsx` (replaces ExportModal)
+- [x] Add export buttons to Cabinet header
+- [x] Remove preservation section from sidebar
 
 ---
 

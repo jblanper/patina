@@ -19,4 +19,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   stopLens: () => ipcRenderer.invoke('lens:stop'),
   onLensImageReceived: (callback: (filePath: string) => void) => ipcRenderer.on('lens:image-received', (_, filePath) => callback(filePath)),
   removeLensListeners: () => ipcRenderer.removeAllListeners('lens:image-received'),
+
+  // Export API
+  exportToZip: (options: { includeImages?: boolean; includeCsv?: boolean }) => ipcRenderer.invoke('export:toZip', options),
+  exportToPdf: () => ipcRenderer.invoke('export:toPdf'),
 });

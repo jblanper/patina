@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import path from 'path';
 
 /**
  * Numismatic Precision Refiners
@@ -70,3 +71,39 @@ export const FilterStateSchema = z.object({
 });
 
 export type FilterState = z.infer<typeof FilterStateSchema>;
+
+/**
+ * NewCoinImage Schema (Strict for image validation)
+ */
+export const NewCoinImageSchema = z.object({
+  coin_id: z.number().int().positive(),
+  path: z.string().min(1),
+  label: z.enum(['Obverse', 'Reverse', 'Edge']).optional(),
+  is_primary: z.boolean().optional().default(false),
+  sort_order: z.number().int().min(0).optional().default(0)
+}).strict();
+
+/**
+ * Export Options Schema for ZIP export
+ */
+export const ExportOptionsSchema = z.object({
+  targetPath: z.string()
+    .optional()
+    .refine(val => !val || !val.includes('..'), "Path traversal forbidden")
+    .refine(val => !val || path.isAbsolute(val), "Must be absolute path"),
+  includeImages: z.boolean().default(true),
+  includeCsv: z.boolean().default(true),
+}).strict();
+
+/**
+ * CSV field escaping to prevent formula injection
+ * Prefixes formula characters with apostrophe
+ */
+export function exportCsvField(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  const str = String(value);
+  if (/^[=+\-@\t\r\n]/.test(str)) {
+    return "'" + str;
+  }
+  return str;
+}

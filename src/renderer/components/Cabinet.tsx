@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCoins } from '../hooks/useCoins';
+import { useExport } from '../hooks/useExport';
 import { GalleryGrid } from './GalleryGrid';
 import { PatinaSidebar } from './PatinaSidebar';
 import { SearchBar } from './SearchBar';
+import { ExportToast } from './ExportToast';
 
 export const Cabinet: React.FC = () => {
   const navigate = useNavigate();
@@ -18,9 +20,19 @@ export const Cabinet: React.FC = () => {
     availableMetals 
   } = useCoins();
 
+  const { status, resultPath, error: exportError, exportToZip, exportToPdf, reset } = useExport();
+
   if (error) {
     throw error;
   }
+
+  const handleExportZip = () => {
+    exportToZip();
+  };
+
+  const handleExportPdf = () => {
+    exportToPdf();
+  };
 
   return (
     <>
@@ -39,7 +51,7 @@ export const Cabinet: React.FC = () => {
 
         <main className="app-main">
           <section className="cabinet-section">
-            <header className="cabinet-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <header className="cabinet-header">
               <div>
                 <h2 className="cabinet-title">The Cabinet</h2>
                 <p className="type-body cabinet-subtitle">
@@ -48,9 +60,18 @@ export const Cabinet: React.FC = () => {
                     : `The collection contains ${filteredCoins.length} verified historical objects.`}
                 </p>
               </div>
-              <button className="btn-solid" onClick={() => navigate('/scriptorium/add')}>
-                + New Entry
-              </button>
+              <div className="header-actions">
+                <button className="btn-action" onClick={handleExportZip}>
+                  Export Archive
+                </button>
+                <button className="btn-action" onClick={handleExportPdf}>
+                  Generate Catalog
+                </button>
+                <span className="header-divider">|</span>
+                <button className="btn-action btn-primary" onClick={() => navigate('/scriptorium/add')}>
+                  + New Entry
+                </button>
+              </div>
             </header>
 
             <SearchBar 
@@ -67,6 +88,16 @@ export const Cabinet: React.FC = () => {
           </section>
         </main>
       </div>
+
+      <ExportToast 
+        isVisible={status === 'success' || status === 'error'}
+        type={status === 'success' ? 'success' : 'error'}
+        message={status === 'success' 
+          ? `Export complete: ${resultPath ? resultPath.split('/').pop() : 'file'}`
+          : `Export failed: ${exportError || 'Unknown error'}`
+        }
+        onDismiss={reset}
+      />
     </>
   );
 };

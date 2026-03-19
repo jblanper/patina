@@ -18,6 +18,10 @@ export interface IElectronAPI {
   stopLens: () => Promise<{ status: string }>;
   onLensImageReceived: (callback: (path: string) => void) => void;
   removeLensListeners: () => void;
+
+  // Export API
+  exportToZip: (options: { includeImages?: boolean; includeCsv?: boolean }) => Promise<{ success: boolean; path?: string; error?: string }>;
+  exportToPdf: () => Promise<{ success: boolean; path?: string; error?: string }>;
 }
 
 declare global {
