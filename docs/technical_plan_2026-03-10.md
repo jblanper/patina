@@ -94,6 +94,16 @@ The database schema has been finalized and approved following a research phase i
 - [x] **Unified Layout:** Synchronized header width and horizontal margins between the Cabinet and Ledger for a cohesive museum experience.
 - [x] **Smart Grid:** Implemented a container-aware layout that stacks automatically without rigid breakpoints.
 
+### Phase 3.5: The Scriptorium (Data Entry) (Completed)
+**Detailed Blueprint:** [2026-03-18-phase-3-5-scriptorium.md](./blueprints/2026-03-18-phase-3-5-scriptorium.md)
+**Objective:** Build the specialized form for adding and editing coin records, prioritizing high-density numismatic data and seamless integration with the Lens bridge.
+- [x] **Scriptorium Form:** Developed a high-fidelity, React-based form based on the "The Scriptorium v6" mockup.
+- [x] **Dual-Folio Layout:** Implemented the 45/55 split with the Plate Editor on the left and the Ledger Folio on the right.
+- [x] **Zod-Guarded Inputs:** Enforced technical precision (e.g., 2-decimal weights) using Zod schemas shared between Main and Renderer.
+- [x] **Lens Integration:** Connected the `useLens()` hook to the "Establish Wireless Bridge" CTA to enable real-time image capture during data entry.
+- [x] **IPC Handlers:** Implemented `coin:create` and `coin:update` in the Main process with strict validation using "The Filter".
+- [x] **Auto-Draft:** Implemented a debounced "Save Draft" feature to prevent data loss during long cataloging sessions.
+
 ### Phase 4: The Lens (Wireless Bridge) (In Progress)
 **Detailed Blueprint:** [2026-03-17-phase-4-lens.md](./blueprints/2026-03-17-phase-4-lens.md)
 - [x] **Express Foundation:** Implement the lightweight server within the Main process with `multer` validation. [Blueprint](./blueprints/2026-03-17-phase-4-lens.md)

@@ -43,6 +43,12 @@ export const CoinDetail: React.FC = () => {
         <button onClick={handleBack} className="nav-back" aria-label="Close Ledger Entry">
           ← Close Ledger Entry
         </button>
+        <button 
+          onClick={() => navigate(`/scriptorium/edit/${coin.id}`)} 
+          className="btn-minimal"
+        >
+          Edit Record
+        </button>
       </header>
 
       <div className="ledger-layout">

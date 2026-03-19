@@ -39,13 +39,18 @@ export const Cabinet: React.FC = () => {
 
         <main className="app-main">
           <section className="cabinet-section">
-            <header className="cabinet-header">
-              <h2 className="cabinet-title">The Cabinet</h2>
-              <p className="type-body cabinet-subtitle">
-                {loading 
-                  ? 'Synchronizing with the local archive...' 
-                  : `The collection contains ${filteredCoins.length} verified historical objects.`}
-              </p>
+            <header className="cabinet-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+              <div>
+                <h2 className="cabinet-title">The Cabinet</h2>
+                <p className="type-body cabinet-subtitle">
+                  {loading 
+                    ? 'Synchronizing with the local archive...' 
+                    : `The collection contains ${filteredCoins.length} verified historical objects.`}
+                </p>
+              </div>
+              <button className="btn-solid" onClick={() => navigate('/scriptorium/add')}>
+                + New Entry
+              </button>
             </header>
 
             <SearchBar 
