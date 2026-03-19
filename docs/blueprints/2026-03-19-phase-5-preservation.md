@@ -95,10 +95,12 @@ export const ExportOptionsSchema = z.object({
 
 ### C. UI Components
 
-**Header Integration (Rev 1):**
-- Export buttons moved to Cabinet header, next to "+ New Entry" button
-- Two CTAs: "Export Archive" | "Generate Catalog"
-- Follows Single-Click Rule - one click from main view
+**Header Integration (Rev 2 - Final):**
+- Export buttons in dedicated toolbar below subtitle (left-aligned)
+- Three CTAs: "Export Archive" | "Generate Catalog" | "+ New Entry"
+- Generous spacing: 3rem horizontal gap between buttons, 1.5rem vertical below subtitle
+- Button styling: minimal actions with bottom border, primary action (solid) for "+ New Entry"
+- Single-Click Rule: one click from main view
 
 **Toast Notification (Rev 1):**
 - Removed modal entirely - replaced with simple toast notification

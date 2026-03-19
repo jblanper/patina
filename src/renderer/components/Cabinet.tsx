@@ -60,14 +60,13 @@ export const Cabinet: React.FC = () => {
                     : `The collection contains ${filteredCoins.length} verified historical objects.`}
                 </p>
               </div>
-              <div className="header-actions">
+              <div className="cabinet-toolbar">
                 <button className="btn-action" onClick={handleExportZip}>
                   Export Archive
                 </button>
                 <button className="btn-action" onClick={handleExportPdf}>
                   Generate Catalog
                 </button>
-                <span className="header-divider">|</span>
                 <button className="btn-action btn-primary" onClick={() => navigate('/scriptorium/add')}>
                   + New Entry
                 </button>

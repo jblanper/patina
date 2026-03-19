@@ -160,6 +160,19 @@ main {
   margin-bottom: 2.5rem;
 }
 
+.cabinet-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  margin-top: 1.5rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
 .cabinet-title {
   font-size: clamp(2.5rem, 6vw, 3.5rem);
   margin-bottom: 0.5rem;
@@ -1304,34 +1317,44 @@ main {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .header-divider {
-  color: var(--border-hairline);
-  font-size: 1.2rem;
+  display: none;
 }
 
 .btn-action {
   background: none;
   border: none;
+  border-bottom: 1px solid var(--border-hairline);
   padding: 0.5rem 0;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   cursor: pointer;
   color: var(--text-muted);
-  transition: color 0.2s;
+  transition: border-color 0.2s, color 0.2s;
 }
 
 .btn-action:hover {
-  color: var(--text-ink);
+  color: var(--accent-manuscript);
+  border-color: var(--accent-manuscript);
 }
 
 .btn-action.btn-primary {
-  color: var(--text-ink);
+  background: var(--text-ink);
+  color: var(--bg-manuscript);
+  border: none;
+  padding: 0.6rem 1.2rem;
   font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.btn-action.btn-primary:hover {
+  background: var(--accent-manuscript);
+  border: none;
 }
 
 /* Export Toast */
