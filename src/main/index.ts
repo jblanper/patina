@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, session, protocol, net } from 'electron';
 import path from 'path';
+import fs from 'fs';
 import { dbService } from './db';
 import { createLensServer } from './server';
 import { getLocalIp } from './ip';
@@ -79,7 +80,16 @@ app.whenReady().then(() => {
       return new Response('Access Denied', { status: 403 });
     }
 
-    return net.fetch(`file://${fullPath}`);
+    // Use fs to read file and return as Response (more reliable than file:// URL)
+    try {
+      const fileBuffer = fs.readFileSync(fullPath);
+      const mimeType = path.extname(fullPath).toLowerCase().replace('.jpg', 'jpeg').replace('.jpeg', 'jpeg').replace('.png', 'png').replace('.webp', 'webp');
+      return new Response(fileBuffer, {
+        headers: { 'Content-Type': `image/${mimeType}` }
+      });
+    } catch (e) {
+      return new Response('Image not found', { status: 404 });
+    }
   });
 
   // Set permission request handler to deny all by default

@@ -34,20 +34,24 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
 
   // Security Headers (CSP Mandate)
   expressApp.use((req, res, next) => {
-    res.setHeader('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline'");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'");
     res.setHeader('X-Content-Type-Options', 'nosniff');
     next();
   });
 
-  // Multer Config (The Filter)
-  const uploadDir = path.join(app.getPath('userData'), 'images', 'temp');
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+  // Multer Config - save to correct location based on environment
+  const isDev = !app.isPackaged;
+  const imagesDir = isDev
+    ? path.join(process.cwd(), 'data', 'images', 'coins')
+    : path.join(app.getPath('userData'), 'images', 'coins');
+    
+  if (!fs.existsSync(imagesDir)) {
+    fs.mkdirSync(imagesDir, { recursive: true });
   }
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, uploadDir);
+      cb(null, imagesDir);
     },
     filename: (req, file, cb) => {
       // Sanitize filename (Security Mandate)
@@ -74,6 +78,12 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
   });
 
   // Routes
+  expressApp.get('/lens-script.js', (req: Request, res: Response) => {
+    const scriptPath = path.join(__dirname, 'lens-mobile.js');
+    res.setHeader('Content-Type', 'application/javascript');
+    res.sendFile(scriptPath);
+  });
+
   expressApp.get('/lens/:token', (req: Request, res: Response) => {
     if (req.params.token !== activeToken) {
       return res.status(403).send('Invalid or expired session.');
@@ -106,52 +116,16 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
             text-align: center;
           }
           h1 { margin-bottom: 2rem; font-weight: normal; letter-spacing: 1px; }
-          .upload-btn {
-            background-color: var(--color-parchment);
-            color: var(--color-ink);
-            padding: 1rem 2rem;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            border-radius: 4px;
-            text-decoration: none;
-          }
-          input[type="file"] { display: none; }
+          #status { margin-top: 2rem; min-height: 1.5rem; }
+          .success { color: #4CAF50; }
+          .error { color: #FF5252; }
         </style>
       </head>
       <body>
         <h1>Patina Lens</h1>
-        <label class="upload-btn">
-          Capture / Upload
-          <input type="file" accept="image/*" capture="environment" onchange="uploadFile(this)">
-        </label>
-        <p id="status"></p>
-        <script>
-          async function uploadFile(input) {
-            const file = input.files[0];
-            if (!file) return;
-            
-            const formData = new FormData();
-            formData.append('image', file);
-            
-            document.getElementById('status').innerText = 'Uploading...';
-            
-            try {
-              const res = await fetch(window.location.href + '/upload', {
-                method: 'POST',
-                body: formData
-              });
-              if (res.ok) {
-                document.getElementById('status').innerText = 'Added to Ledger.';
-                input.value = ''; // Reset
-              } else {
-                document.getElementById('status').innerText = 'Error: ' + res.statusText;
-              }
-            } catch (e) {
-              document.getElementById('status').innerText = 'Upload failed.';
-            }
-          }
-        </script>
+        <input type="file" accept="image/*" capture="environment" onchange="uploadFile(this)">
+        <p id="status" style="display: none;"></p>
+        <script src="/lens-script.js"></script>
       </body>
       </html>
     `;
@@ -166,8 +140,14 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
       return res.status(400).send('No file uploaded.');
     }
     
+    // Return relative path for patina-img:// protocol (relative to imageRoot which is data/images)
+    const baseDir = isDev 
+      ? path.join(process.cwd(), 'data', 'images')
+      : app.getPath('userData');
+    const relativePath = path.relative(baseDir, req.file.path);
+    
     if (config.onUpload) {
-      config.onUpload(req.file.path);
+      config.onUpload(relativePath);
     }
     
     res.status(200).send('Upload successful');
