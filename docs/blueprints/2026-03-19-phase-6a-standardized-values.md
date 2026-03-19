@@ -103,7 +103,206 @@ CREATE TABLE preferences (
 | 11h |
 | 12h |
 
-### C. UI Component: AutocompleteField
+### C. Nomisma.org Integration (Official Taxonomy Source)
+
+> **NOTE:** We can optionally use **Nomisma.org** (American Numismatic Society) as an authoritative external source for standardized vocabulary. This is a **privacy-respecting** approach: we fetch once at seed time and cache locally in SQLite - no external API calls during normal app operation.
+
+**Why Nomisma:**
+- Linked Open Data (LOD) standard for numismatic concepts
+- CC-BY licensed, free for commercial and non-commercial use
+- Provides labels in 40+ languages (EN, ES, DE, FR, IT, etc.)
+- Contains 25+ concept types: materials, denominations, mints, periods, regions, manufacture methods, wear, corrosion, shapes, and more
+
+**Query Examples:**
+
+```bash
+# Get label for a concept (plain text)
+curl "https://nomisma.org/apis/getLabel?uri=http://nomisma.org/id/ar&lang=en"
+# Response: "Silver"
+
+curl "https://nomisma.org/apis/getLabel?uri=http://nomisma.org/id/aureus&lang=es"
+# Response: "Áureo"
+
+# Get mints as GeoJSON
+curl "https://nomisma.org/apis/getMints?id=rome"
+```
+
+**SPARQL Query Examples (for bulk seed):**
+
+```sparql
+# Get all materials (metals + alloys)
+PREFIX nmo: <http://nomisma.org/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?id ?label WHERE {
+  ?id a nmo:Material ;
+      skos:prefLabel ?label .
+  FILTER(lang(?label) = "en")
+}
+LIMIT 100
+
+# Get all Roman denominations
+PREFIX nmo: <http://nomisma.org/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?id ?label WHERE {
+  ?id a nmo:Denomination ;
+      skos:prefLabel ?label ;
+      <http://nomisma.org/ontology#hasEndDate> ?date .
+  FILTER(lang(?label) = "en")
+  FILTER(?date >= -27)
+}
+ORDER BY ?date
+
+# Get mints with geographic coordinates
+PREFIX nmo: <http://nomisma.org/ontology#>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?mint ?label ?lat ?long WHERE {
+  ?mint a nmo:Mint ;
+         skos:prefLabel ?label ;
+         geo:location ?loc .
+  ?loc geo:lat ?lat ;
+       geo:long ?long .
+  FILTER(lang(?label) = "en")
+}
+LIMIT 50
+
+# Get eras/periods
+PREFIX nmo: <http://nomisma.org/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?id ?label WHERE {
+  ?id a nmo:Period ;
+      skos:prefLabel ?label .
+  FILTER(lang(?label) = "en")
+}
+ORDER BY ?label
+
+# Get manufacture methods (cast, struck, hammered)
+PREFIX nmo: <http://nomisma.org/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?id ?label WHERE {
+  ?id a nmo:Manufacture ;
+      skos:prefLabel ?label .
+  FILTER(lang(?label) = "en")
+}
+
+# Get coin wear levels
+PREFIX nmo: <http://nomisma.org/ontology#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?id ?label WHERE {
+  ?id a nmo:CoinWear ;
+      skos:prefLabel ?label .
+  FILTER(lang(?label) = "en")
+}
+
+# Get regions with coordinates
+PREFIX nmo: <http://nomisma.org/ontology#>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?region ?label ?lat ?long WHERE {
+  ?region a nmo:Region ;
+          skos:prefLabel ?label ;
+          geo:location ?loc .
+  ?loc geo:lat ?lat ;
+       geo:long ?long .
+  FILTER(lang(?label) = "en")
+}
+LIMIT 30
+```
+
+**Nomisma Concept Types (Complete List):**
+
+| Concept Type | Description | Example IDs |
+|--------------|-------------|-------------|
+| **Material** | Metals and alloys | `av`, `ar`, `aes`, `cu`, `billon`, `electrum`, `orichalcum`, `potin`, `ni` (nickel), `sn` (tin), `zn` (zinc), `cupro-nickel` |
+| **Denomination** | Coin denominations | `aureus`, `denarius`, `antoninianus`, `sestertius`, `dupondius`, `as`, `semis`, `quadrans`, `quinarius`, `miliarense`, `siliqua`, `follis`, `nummus` |
+| **Mint** | Minting locations | `rome`, `constantinople`, `antioch`, `alexandria`, `smyrna`, `athens`, `carthage` |
+| **Period** | Historical periods | `roman_republic`, `roman_imperial`, `byzantine_numismatics`, `medieval_numismatics`, `islamic_numismatics`, `greek_numismatics` |
+| **Region** | Geographic regions | `italy`, `gaul`, `hispania`, `britannia`, `syria`, `asia_minor` |
+| **Manufacture** | Production methods | `cast` (cast coinage), `struck` (hammered/struck), `milled` (machine made) |
+| **Coin Wear** | Wear levels (German scale) | `little_to_no_wear`, `worn`, `very_worn`, `extremely_worn`, `wear_undetermined` |
+| **Corrosion** | Corrosion types | (various corrosion states) |
+| **Shape** | Coin shapes | `round`, `square`, `irregular`, `shaped` |
+| **Object Type** | Type of numismatic object | `coin`, `follis`, `ingot`, `token`, `medal` |
+| **Symbol** | Monograms, mint marks | Various |
+| **Monogram** | Monogram symbols | Various |
+| **Authenticity** | Authenticity status | `genuine`, `counterfeit`, `forgery`, `authentic` |
+| **Deity** | deities depicted on coins | `jupiter`, `mars`, `venus`, `apollo`, `minerva` |
+| **Person** | Historical figures | `augustus`, `constantine`, `trajan` |
+| **Organization** | Issuing authorities | `roman_empire`, `roman_republic`, `byzantine_empire` |
+| **Field of Numismatics** | Academic fields | `roman_numismatics`, `greek_numismatics`, `byzantine_numismatics`, `medieval_numismatics` |
+| **Series** | Coin series/types | `ric` (Roman Imperial Coinage), `rrc` (Roman Republican Coinage), `rpc` (Roman Provincial Coinage) |
+
+**Nomisma ID Reference for Seed Data:**
+
+| Field | Nomisma ID | Example Label (EN) |
+|-------|------------|---------------------|
+| **Metals** | | |
+| Gold | `av` | Gold |
+| Silver | `ar` | Silver |
+| Bronze | `aes` | Bronze |
+| Copper | `cu` | Copper |
+| Billon | `billon` | Billon |
+| Electrum | `electrum` | Electrum |
+| Orichalcum | `orichalcum` | Orichalcum |
+| Potin | `potin` | Potin |
+| Nickel | `ni` | Nickel |
+| **Denominations** | | |
+| Aureus | `aureus` | Aureus |
+| Denarius | `denarius` | Denarius |
+| Antoninianus | `antoninianus` | Antoninianus |
+| Sestertius | `sestertius` | Sestertius |
+| Dupondius | `dupondius` | Dupondius |
+| As | `as` | As |
+| Semis | `semis` | Semis |
+| Quadrans | `quadrans` | Quadrans |
+| Quinarius | `quinarius` | Quinarius |
+| Miliarense | `miliarense` | Miliarense |
+| Siliqua | `siliqua` | Siliqua |
+| Follis | `follis` | Follis |
+| Nummus | `nummus` | Nummus |
+| **Manufacture** | | |
+| Cast | `cast` | Cast |
+| Struck/Hammered | `struck` | Struck |
+| **Coin Wear** | | |
+| Little to no wear | `little_to_no_wear` | Little to no wear |
+| Worn | `worn` | Worn (U 3) |
+| Very worn | `very_worn` | Very worn (U 4) |
+| Extremely worn | `extremely_worn` | Extremely worn (U 5) |
+| **Mints** | | |
+| Rome | `rome` | Rome |
+| Constantinople | `constantinople` | Constantinople |
+| Antioch | `antioch` | Antioch |
+| Alexandria | `alexandria` | Alexandria |
+| **Eras** | | |
+| Roman Republic | `roman_republic` | Roman Republic |
+| Roman Imperial | `roman_imperial` | Roman Imperial |
+| Roman Provincial | `roman_provincial` | Roman Provincial |
+| Byzantine | `byzantine_numismatics` | Byzantine Numismatics |
+| Medieval | `medieval_numismatics` | Medieval Numismatics |
+| Islamic | `islamic_numismatics` | Islamic Numismatics |
+
+**Implementation Note:** Fetch Nomisma data at build/seed time via `getLabel` API or SPARQL, then store in local SQLite. No external network calls required during app runtime. This maintains the "Privacy First" principle while leveraging authoritative taxonomy.
+
+**Fields NOT Covered by Nomisma.org:**
+
+| Field | Why Not in Nomisma | Recommendation for Patina |
+|-------|---------------------|---------------------------|
+| **Grade** | Commercial grading (NGC/PCGS) - not public taxonomy | Use numeric scale: MS-60, MS-65, MS-70, AU-58, etc. to FR-2 |
+| **Die Axis** | Technical metric, not in ontology | Use clock notation: 1h, 2h, ... 12h |
+| **Catalog References** | Available via specialized APIs (OCRE, CRRO) | Link to RIC, RPC, Crawford via external references |
+| **Condition Details** | Patina, toning levels - subjective | Custom vocabulary or free text |
+| **Provenance** | Collection history - user-specific | Per-coin free text field |
+| **Purchase Price** | Market value - volatile and private | Optional private field |
+| **Edge Type** | Reeded, plain, lettered - not in ontology | Custom vocabulary: "Reeded", "Plain", "Lettered", " milled" |
+| **Certification** | NGC/PCGS cert numbers - private | Optional field with format validation |
+| **Die Variety** | Die identifiers - highly specific | Per-collection, free text |
+| **Weight Range** | Variable - not a taxonomy | Use actual measurement in grams |
+| **Diameter Range** | Variable - not a taxonomy | Use actual measurement in mm |
+| **Technique** | Minting technique (struck/cast) - partially covered | Use Nomisma's `nmo:Manufacture` (cast, struck, milled) |
+
+---
+
+### D. UI Component: AutocompleteField
 
 ```typescript
 interface AutocompleteFieldProps {
@@ -129,7 +328,7 @@ interface AutocompleteFieldProps {
 - Hover state with slight background tint
 - "Add '[value]'" option styled differently (italic, muted)
 
-### D. IPC Handlers
+### E. IPC Handlers
 
 | Handler | Purpose |
 |---------|---------|
@@ -138,7 +337,7 @@ interface AutocompleteFieldProps {
 | `vocab:search` | Search values (for autocomplete) |
 | `vocab:seed` | Seed initial vocabulary tables |
 
-### E. Implementation Steps
+### F. Implementation Steps
 
 1. **Database Migration**
    - Create `vocabularies` table
