@@ -116,7 +116,7 @@ describe('CoinDetail Component', () => {
     // Acquisition Footer
     expect(screen.getByText(/2023-01-01/)).toBeInTheDocument();
     expect(screen.getByText(/Test Dealer/)).toBeInTheDocument();
-    expect(screen.getByText('HIDDEN')).toBeInTheDocument(); // Cost is hidden
+    expect(screen.getByText('$100.00')).toBeInTheDocument(); // Purchase price displayed
   });
 
   it('navigates back', () => {

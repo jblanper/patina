@@ -15,6 +15,10 @@ const dbPath = isDev
   ? path.join(process.cwd(), 'data', 'patina.db')
   : path.join(app.getPath('userData'), 'patina.db');
 
+const imageRoot = isDev
+  ? path.join(process.cwd(), 'data', 'images')
+  : path.join(app.getPath('userData'), 'images');
+
 // Ensure directory exists
 if (!fs.existsSync(path.dirname(dbPath))) {
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
@@ -90,7 +94,24 @@ export const dbService = {
 
   deleteCoin: (id: number): boolean => {
     validate(idSchema, id);
+    
+    const images = db.prepare('SELECT path FROM images WHERE coin_id = ?').all(id) as { path: string }[];
+    
     const info = db.prepare('DELETE FROM coins WHERE id = ?').run(id);
+    
+    if (info.changes > 0) {
+      images.forEach(img => {
+        const fullPath = path.join(imageRoot, img.path);
+        try {
+          if (fs.existsSync(fullPath)) {
+            fs.unlinkSync(fullPath);
+          }
+        } catch (err) {
+          console.error(`Failed to delete image file: ${fullPath}`, err);
+        }
+      });
+    }
+    
     return info.changes > 0;
   },
 

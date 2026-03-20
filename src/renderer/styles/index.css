@@ -340,7 +340,7 @@ main {
 
 .cabinet-status {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   color: var(--accent-manuscript);
   text-transform: uppercase;
   letter-spacing: 1px;

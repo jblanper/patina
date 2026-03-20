@@ -33,9 +33,10 @@ export function useLens(onImageReceived?: (path: string) => void) {
   }, []);
 
   useEffect(() => {
-    window.electronAPI.onLensImageReceived((filePath) => {
+    window.electronAPI.onLensImageReceived(async (filePath) => {
       setLastImage(filePath);
       onImageReceived?.(filePath);
+      await stopLens();
     });
 
     return () => {

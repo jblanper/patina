@@ -1,6 +1,7 @@
 import archiver from 'archiver';
 import fs from 'fs';
 import path from 'path';
+import Database from 'better-sqlite3';
 import { app } from 'electron';
 import { Coin, CoinImage } from '../../common/types';
 import { dbService } from '../db';
@@ -71,7 +72,6 @@ export async function exportToZip(targetPath: string, includeImages = true, incl
       const coinIds = coins.map(c => c.id).filter((id): id is number => id !== undefined);
       if (coinIds.length > 0) {
         const placeholders = coinIds.map(() => '?').join(',');
-        const Database = require('better-sqlite3');
         const database = new Database(dbPath);
         const rows = database.prepare(`SELECT * FROM images WHERE coin_id IN (${placeholders})`).all(...coinIds) as CoinImage[];
         database.close();

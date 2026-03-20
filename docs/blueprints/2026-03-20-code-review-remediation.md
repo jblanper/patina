@@ -506,3 +506,99 @@ All new tests placed in `__tests__` directories adjacent to source files.
 ### Things to Consider
 - **Core Doc Revision:** Update `@AGENTS.md` with Era default decision.
 - **Future Enhancement:** Implement virtualization for GalleryGrid if collection exceeds 500 coins.
+
+---
+
+## 11. Post-Commit Review Report
+
+**Review Date:** 2026-03-20  
+**Commit:** a54bed6
+
+### 🔴 Critical Issues
+
+#### CR-01: Test Failure - CoinDetail.test.tsx
+**File:** `src/renderer/components/__tests__/CoinDetail.test.tsx:119`  
+**Summary:** Test expects `HIDDEN` text which was removed as part of UX-06 (purchase price display). Test must be updated to check for actual price display.
+
+**Status:** ✅ Fixed - Test now expects `$100.00` price display
+
+#### CR-02: SEC-01 Incomplete - Physical File Cleanup Missing
+**File:** `src/main/db.ts:91-94`  
+**Summary:** Blueprint spec 1.1 states "Implement physical file cleanup in `deleteCoin()` for orphaned image files." The commit enables foreign keys (DB cascade) but does NOT delete orphaned image files from the filesystem. Orphaned `.jpg/.png/.webp` files will accumulate.
+
+**Status:** ✅ Fixed - `deleteCoin()` now queries images before deletion and removes physical files from `data/images/`
+
+#### CR-03: BUG-01 Behavioral Regression - stopLens() Not Called
+**File:** `src/renderer/hooks/useLens.ts:36-42`  
+**Summary:** Original code called `stopLens()` after receiving an image. New consolidated code does NOT call `stopLens()` in `handleImageReceived`. The Lens server remains running after each capture, causing a resource leak and potential security issue.
+
+**Status:** ✅ Fixed - `stopLens()` now called in useLens's `onLensImageReceived` handler after invoking the callback
+
+---
+
+### 🟡 Medium Issues
+
+#### MD-01: WCAG-01 Incomplete - Font Size Too Small
+**File:** `src/renderer/styles/index.css:343`  
+**Summary:** Blueprint spec 2.8 says "Remove 0.6rem font size — change to minimum 0.75rem." Line 343 still has `font-size: 0.6rem` (was not changed).
+
+**Status:** ✅ Fixed - Changed to `0.75rem`
+
+#### MD-02: Missing Tests (Blueprint Phase 4 Mandates)
+**Files:** Various  
+**Summary:**
+- `src/common/__tests__/validation.test.ts` - Missing (requires 100% branch coverage)
+- `src/renderer/hooks/__tests__/useLens.test.ts` - Missing
+- `src/renderer/components/__tests__/PlateEditor.test.tsx` - Missing
+
+**Status:** ⚠️ Pending - Tests still need to be created
+
+---
+
+### 📝 Inconsistencies
+
+#### IN-01: PERF-02 - Mixed Import Style
+**File:** `src/main/export/zip.ts:77-78`  
+**Summary:** Uses `require('better-sqlite3')` instead of ES imports, inconsistent with the rest of the codebase which uses ES imports.
+
+**Status:** ✅ Fixed - Changed to ES import `import Database from 'better-sqlite3'`
+
+---
+
+### ✅ Correctly Implemented
+
+| Spec | Status | Notes |
+|------|--------|-------|
+| SEC-02 | ✅ | MIME allowlist correctly restricts to JPEG/PNG/WebP |
+| SEC-03 | ✅ | `bypassCSP` removed from protocol privileges |
+| SEC-04 | ✅ | Proper `Server` type annotation added |
+| PERF-01 | ✅ | Async file reads with proper mime mapping |
+| BUG-02 | ✅ | `useMemo` correctly replaces stale `useState` |
+| BUG-03 | ✅ | `submitError` state and `clearError` exposed |
+| UX-01 | ✅ | Era selector added with correct defaults |
+| UX-05 | ✅ | Delete confirmation modal added |
+| UX-02 | ✅ | `<button>` elements replace `<li>` for accessibility |
+| UX-06 | ✅ | `issuer` and `denomination` fields added |
+| UX-07 | ✅ | Keyboard activation on CoinCard |
+| UX-08 | ✅ | ARIA labels on zoom close buttons |
+| UX-03 | ✅ | ARIA roles on modals |
+| UX-04 | ✅ | Stub button disabled with tooltip |
+| ERR-01 | ✅ | `resetErrorBoundary()` replaces `reload()` |
+| CODE-01 | ✅ | `any` types eliminated |
+| CODE-03 | ✅ | ErrorBoundary styles migrated to CSS |
+| CODE-04 | ✅ | Hardcoded color replaced with variable |
+| SCHEMA-01 | ✅ | Duplicate constraint removed |
+| Schema Alignment | ✅ | Both schema.ts and useCoinForm use 'Ancient' default |
+
+---
+
+### Recommended Follow-Up Actions
+
+1. **[HIGH]** Fix test `CoinDetail.test.tsx:119` - expect price display, not 'HIDDEN'
+2. **[HIGH]** Add `stopLens()` call in `handleImageReceived` callback in PlateEditor.tsx
+3. **[HIGH]** Implement file cleanup in `deleteCoin()` or create follow-up task
+4. **[MEDIUM]** Change `0.6rem` to `0.75rem` in `index.css:343`
+5. **[MEDIUM]** Create `validation.test.ts` (100% coverage mandate)
+6. **[MEDIUM]** Create `useLens.test.ts`
+7. **[LOW]** Create `PlateEditor.test.tsx`
+8. **[LOW]** Consider ES import in zip.ts for consistency
