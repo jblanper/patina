@@ -145,6 +145,22 @@ The database schema has been finalized and approved following a research phase i
 - [ ] **Conditional Rendering:** Update `CoinDetail` and `CoinCard` to respect visibility settings.
 - [ ] **Reset Function:** Allow users to restore default visibility.
 
+### Phase 7: Code Review Remediation (Approved)
+**Detailed Blueprint:** [2026-03-20-code-review-remediation.md](./blueprints/2026-03-20-code-review-remediation.md)
+**Objective:** Remediate 38 issues across Security, Performance, UX/Accessibility, Code Quality, and Testing identified in the 2026-03-20 code review.
+- [ ] **Security:** Enable SQLite foreign keys, fix MIME allowlist, remove `bypassCSP`, fix type annotations.
+- [ ] **Performance:** Convert sync file reads to async; optimize N+1 export queries.
+- [ ] **UX/Accessibility:** Add Era selector, Delete button, keyboard navigation, ARIA compliance, contrast fixes.
+- [ ] **Code Quality:** Eliminate `any` types, move inline styles to CSS, remove dead code.
+- [ ] **Testing:** Add missing tests for validation, hooks, and components.
+
+#### UX/UI Refinements (Completed)
+**Detailed Blueprint:** [2026-03-20-ux-ui-ledger-edit-refinements.md](./blueprints/archive/2026-03-20-ux-ui-ledger-edit-refinements.md)
+- [x] Updated Cabinet header to "Patina — The Cabinet"
+- [x] Moved CTAs above collection count
+- [x] Redesigned filters with visible checkbox controls
+- [x] Aligned Edit Coin form fields vertically via CSS grid
+
 ---
 
 ## 7. Design Guidelines (Updated to v3.3)

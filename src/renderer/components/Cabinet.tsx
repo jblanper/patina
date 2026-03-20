@@ -37,7 +37,7 @@ export const Cabinet: React.FC = () => {
   return (
     <>
       <header className="app-header">
-        <h1>Patina</h1>
+        <h1>Patina — The Cabinet</h1>
         <div className="version-tag">Archive v1.0 // THE DISPLAY CASE</div>
       </header>
 
@@ -52,14 +52,6 @@ export const Cabinet: React.FC = () => {
         <main className="app-main">
           <section className="cabinet-section">
             <header className="cabinet-header">
-              <div>
-                <h2 className="cabinet-title">The Cabinet</h2>
-                <p className="type-body cabinet-subtitle">
-                  {loading 
-                    ? 'Synchronizing with the local archive...' 
-                    : `The collection contains ${filteredCoins.length} verified historical objects.`}
-                </p>
-              </div>
               <div className="cabinet-toolbar">
                 <button className="btn-action" onClick={handleExportZip}>
                   Export Archive
@@ -71,6 +63,11 @@ export const Cabinet: React.FC = () => {
                   + New Entry
                 </button>
               </div>
+              <p className="type-body cabinet-subtitle">
+                {loading 
+                  ? 'Synchronizing with the local archive...' 
+                  : `The collection contains ${filteredCoins.length} verified historical objects.`}
+              </p>
             </header>
 
             <SearchBar 

@@ -14,6 +14,7 @@ const ERAS = ['Ancient', 'Medieval', 'Modern'] as const;
  * PatinaSidebar Component
  * The "Archive Explorer" providing navigation via multi-select filters.
  * Fixed 280px width, adhering to the Manuscript Hybrid (v3.3) guide.
+ * Filters use checkbox controls for clear selection state indication.
  */
 export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({ 
   filters, 
@@ -38,35 +39,43 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
   return (
     <aside className="patina-sidebar">
       <div className="filter-group">
-        <label className="type-meta filter-label">Eras</label>
+        <span className="type-meta filter-label">Eras</span>
         <ul className="filter-list">
           {ERAS.map(era => (
             <li key={era}>
-              <button
-                className={`filter-item ${isSelected('era', era) ? 'active' : ''}`}
-                onClick={() => toggleFilter('era', era)}
-                aria-pressed={isSelected('era', era)}
-              >
-                {era}
-              </button>
+              <label className={`filter-item-label ${isSelected('era', era) ? 'active' : ''}`}>
+                <input
+                  type="checkbox"
+                  className="filter-input"
+                  checked={isSelected('era', era)}
+                  onChange={() => toggleFilter('era', era)}
+                  aria-label={`Filter by ${era} era`}
+                />
+                <span className="filter-checkbox" aria-hidden="true"></span>
+                <span className="filter-text">{era}</span>
+              </label>
             </li>
           ))}
         </ul>
       </div>
 
       <div className="filter-group">
-        <label className="type-meta filter-label">Metals</label>
+        <span className="type-meta filter-label">Metals</span>
         <ul className="filter-list">
           {availableMetals.length > 0 ? (
             availableMetals.map(metal => (
               <li key={metal}>
-                <button
-                  className={`filter-item ${isSelected('metal', metal) ? 'active' : ''}`}
-                  onClick={() => toggleFilter('metal', metal)}
-                  aria-pressed={isSelected('metal', metal)}
-                >
-                  {metal.toUpperCase()}
-                </button>
+                <label className={`filter-item-label ${isSelected('metal', metal) ? 'active' : ''}`}>
+                  <input
+                    type="checkbox"
+                    className="filter-input"
+                    checked={isSelected('metal', metal)}
+                    onChange={() => toggleFilter('metal', metal)}
+                    aria-label={`Filter by ${metal} metal`}
+                  />
+                  <span className="filter-checkbox" aria-hidden="true"></span>
+                  <span className="filter-text">{metal.toUpperCase()}</span>
+                </label>
               </li>
             ))
           ) : (

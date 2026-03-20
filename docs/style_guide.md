@@ -115,3 +115,5 @@ Maintain a strict horizontal breath around the central divider:
 - **Eras:** Ancient, Medieval, Modern.
 - **Metals:** Dynamically generated from the collection (AU, AR, AE, EL, BI).
 - **Sort:** Default to `year_numeric` to preserve the chronological integrity of the archive.
+
+> **Exception:** Filter controls use visible checkbox indicators (1px hairline border, accent fill on checked state) rather than pure "Archival Labels" text-only approach. This trade-off prioritizes user clarity for multi-select operations while maintaining the archival aesthetic through hairline borders and accent color states.

@@ -25,20 +25,19 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
           {errors.title && <span className="error-hint">{errors.title}</span>}
         </div>
         
-        <div className="subtitle-item">
-          <span className="subtitle-label">Era</span>
-          <select 
-            className="input-metric"
-            value={formData.era}
-            onChange={(e) => updateField('era', e.target.value as 'Ancient' | 'Medieval' | 'Modern')}
-          >
-            <option value="Ancient">Ancient</option>
-            <option value="Medieval">Medieval</option>
-            <option value="Modern">Modern</option>
-          </select>
-        </div>
-        
         <div className="subtitle-stack">
+          <div className="subtitle-item">
+            <span className="subtitle-label">Era</span>
+            <select 
+              className="input-sub"
+              value={formData.era}
+              onChange={(e) => updateField('era', e.target.value as 'Ancient' | 'Medieval' | 'Modern')}
+            >
+              <option value="Ancient">Ancient</option>
+              <option value="Medieval">Medieval</option>
+              <option value="Modern">Modern</option>
+            </select>
+          </div>
           <div className="subtitle-item">
             <span className="subtitle-label">Minted at</span>
             <input
