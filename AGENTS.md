@@ -2,8 +2,8 @@
 
 This document defines the absolute standards for the Patina project. All development must rigorously adhere to these rules to maintain the "Curator-First" experience and ensure system integrity.
 
-**Version:** 1.0  
-**Last Updated:** 2026-03-12
+**Version:** 1.1  
+**Last Updated:** 2026-03-20
 
 ---
 
@@ -59,6 +59,7 @@ This document defines the absolute standards for the Patina project. All develop
 - **Secure Image Loading:** Use a custom protocol (e.g., `patina-img://`) in the Main process to serve local images to the Renderer. This preserves the sandbox and CSP integrity by avoiding `file://` protocols or direct filesystem access.
 - **Atomic File Operations:**
  When moving or saving images from the "Lens" bridge, use atomic move/write operations to prevent data loss.
+- **Preservation & Export (Phase 5):** The export system (`src/main/export/`) generates PDF catalogs and ZIP archives for collection backup. PDF uses Garamond font with aligned tables; ZIP includes CSV data and database snapshot. All export operations are atomic and preserve data integrity.
 
 ---
 
@@ -82,7 +83,7 @@ This document defines the absolute standards for the Patina project. All develop
   - **QA Oversight:** Utilize the `assuring-quality` skill to audit testing plans and verify coverage metrics.
 ---
 
-## 5. Error Handling
+## 4. Error Handling
 
 All async operations must use try/catch with descriptive error messages.
 
@@ -102,6 +103,6 @@ Never use empty catch blocks. Log errors with context for debugging, ensuring no
 
 ---
 
-## 6. Skill Synergy (Specialized Agents)
+## 5. Skill Synergy (Specialized Agents)
 To maintain the high standards of the Patina project, utilize the specialized skills and sub-agents defined in [docs/workflows_and_skills.md](docs/workflows_and_skills.md). These extensions provide expert guidance and validation for specific domains of the project.
 
