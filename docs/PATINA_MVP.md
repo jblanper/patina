@@ -11,7 +11,52 @@
 
 ---
 
-## 2. MVP Feature Set
+## 2. Implementation Phases
+
+### Phase 1: Foundation (Completed)
+- [x] Electron + React (TypeScript) scaffold
+- [x] SQLite3 database with curator schema
+- [x] Museum Label design system
+- [x] Secure IPC bridge
+
+### Phase 2: The Display Case (Completed)
+- [x] Gallery grid with high-resolution coin images
+- [x] Sidebar filters (Era, Metal)
+- [x] Global search bar
+- [x] Empty state view
+
+### Phase 3: The Ledger (Completed)
+- [x] Detailed coin record display
+- [x] Story box for provenance and history
+- [x] Image zoom functionality
+- [x] Smart responsive grid
+
+### Phase 3.5: The Scriptorium (Completed)
+- [x] Add/Edit form with dual-folio layout
+- [x] Plate Editor for obverse/reverse/edge images
+- [x] Lens integration for wireless capture
+- [x] Auto-draft with localStorage
+- [x] Zod validation for technical precision
+
+### Phase 4: The Lens (Completed)
+- [x] Express server for wireless image transfer
+- [x] QR code session initiation
+- [x] Mobile web interface
+- [x] Multer validation (10MB limit)
+
+### Phase 5: Preservation (Completed)
+- [x] ZIP export with database, CSV, images
+- [x] PDF catalog generation
+- [x] Toast notifications
+
+### Phase 6: Enhancement Suite (In Progress)
+- [ ] Standardized vocabulary with autocomplete
+- [ ] Internationalization (English/Spanish)
+- [ ] Field visibility settings
+
+---
+
+## 3. Feature Set
 
 ### A. The Gallery (The "Display Case")
 - **Visual Browsing:** High-resolution grid view of coin obverses.
@@ -33,16 +78,18 @@
 
 ---
 
-## 3. Design Identity (Cues for UI/UX)
-- **Primary Color Palette:** A deep, muted "Oxford Blue" or a rich "Forest Green" (mimicking an old leather-bound ledger).
-- **Accent Colors:** A soft, aged bronze or "Verdigris" (the classic oxidized copper green) for buttons and highlights.
-- **Typography:** - **Headings:** High-legibility Serif font (e.g., *Georgia* or *Playfair Display*) for a "Museum Label" feel.
-  - **Body/Data:** Simple, clean Sans-Serif (e.g., *Inter* or *Arial*) at a minimum 16px size for maximum readability.
-- **Visual Metaphor:** Large margins and clean borders, avoiding cluttered "technical" dashboards.
+## 4. Design Identity (Manuscript Hybrid v3.3)
+- **Primary Colors:** Parchment (#FCF9F2) & Iron Gall Ink (#2D2926)
+- **Accent Colors:** Burnt Sienna (#914E32) & Vellum (#E0DCCD)
+- **Typography:**
+  - *Cormorant Garamond* (Serif) for headings
+  - *Montserrat* (Sans-Serif) for body text
+  - *JetBrains Mono* (Monospace) for technical metrics
+- **Visual Metaphor:** Large margins and clean borders, avoiding cluttered "technical" dashboards
 
 ---
 
-## 4. Competitive Research
+## 5. Competitive Research
 
 | App Name | Platform | Key Features | The Friction Point |
 | :--- | :--- | :--- | :--- |
@@ -56,7 +103,7 @@
 
 ---
 
-## 5. Technical Foundation
+## 6. Technical Foundation
 - **Identity:** Patina (Desktop Electron App)
 - **Engine:** SQLite3
 - **Bridge:** Local Node.js / Express listener for the "Lens" feature.
