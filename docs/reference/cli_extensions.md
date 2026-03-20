@@ -2,47 +2,49 @@
 
 This reference provides technical details for the specialized skills, sub-agents, and background hooks that extend the Gemini CLI for the Patina project.
 
+For the rationale and philosophy behind these tools, see [Explanation: The Curator's Automation](../workflows_and_skills.md).
+
 ## Core Skills
 
-| Skill | Primary Goal | Triggers / Usage |
+| Skill | Purpose | When to Trigger |
 | :--- | :--- | :--- |
-| **`assuring-quality`** | Testing Standards | When creating components, hooks, or core logic. |
-| **`curating-blueprints`** | Senior Architect | When initiating features or architectural reviews. |
-| **`curating-coins`** | Numismatic Integrity | When modifying `src/main/db.ts` or cataloging coins. |
-| **`curating-ui`** | Archival Ledger Design | When creating or refactoring React components. |
-| **`evaluating-skills`** | Agent Standards | When creating or reviewing skills in `.gemini/skills/`. |
-| **`saving-context`** | Session Integrity | Before clearing a session or documenting a milestone. |
-| **`securing-electron`** | "The Filter" Principle | When modifying IPC, preload, or Main process logic. |
-| **`tracking-progress`** | Project Audit | To sync code state with blueprints and changelogs. |
-| **`writing-tech-docs`** | Diátaxis Compliance | When drafting or refactoring guides in `docs/`. |
+| **`assuring-quality`** | Enforces Colocation Rule and coverage mandates (100% validation, 90% hooks) | When creating or modifying components, hooks, or core logic |
+| **`curating-blueprints`** | Senior Architect oversight for lifecycle management and multi-disciplinary audits | When initiating features, architectural reviews, or audits |
+| **`curating-coins`** | Ensures numismatic accuracy (weights to 2 decimals, proper catalog refs like RIC/RPC) | When modifying `src/main/db.ts` or cataloging coins |
+| **`curating-ui`** | Manages archival ledger aesthetic via Three-Path Protocol and interactive mockups | When creating or refactoring React components |
+| **`evaluating-skills`** | Audits extensions against AgentSkills.io Open Standard | When creating or reviewing skills in `.claude/skills/` or `.opencode/skills/` |
+| **`saving-context`** | Preserves session state and creates milestone snapshots | Before clearing a session or documenting changes |
+| **`securing-electron`** | Enforces "The Filter" principle with strict Zod validation for IPC | When modifying IPC handlers, preload scripts, or Main process logic |
+| **`tracking-progress`** | Syncs code state with blueprints and changelogs | To verify implementation status against documentation |
+| **`writing-tech-docs`** | Enforces Diátaxis framework for all project documentation | When drafting or refactoring guides in `docs/` |
 
-### `assuring-quality`
-Enforces the **Colocation Rule** and **Coverage Mandates** (100% validation, 90% hooks).
-- **Strategy:** Mandatory review of testing plans in blueprints.
-- **Verification:** Automated execution of specific tests and coverage analysis.
+### `curating-blueprints` — Blueprint Lifecycle
 
-### `curating-blueprints`
-Provides **Senior Architect** oversight for system-wide consistency and lifecycle management.
-- **7-Stage Lifecycle:** Enforces a strict status system (`Draft`, `Proposed`, `Approved`, `In-Progress`, `Verification`, `Completed`, `Archived`).
-- **Philosophy:** Enforces "Curator-First", "Privacy First", and the "Single-Click Rule".
-- **Audits:** Mandates multi-disciplinary audits at both the **Proposed** (Design) and **Verification** (Implementation) stages.
+The 7-stage lifecycle enforces architectural integrity through Design and Implementation phase audits.
 
-### `securing-electron`
-Protects user data through **"The Filter"** (strict Zod validation).
-- **Boundary:** Mandates `.strict()` schemas for all IPC handlers.
-- **Protocols:** Audits the `patina-img://` custom protocol for path traversal.
+| State | Description |
+|:------|:------------|
+| **Draft** | Initial research and design |
+| **Proposed** | Ready for Design-phase audits |
+| **Approved** | Audits passed, user approved |
+| **In-Progress** | Implementation underway |
+| **Verification** | Ready for Implementation-phase audits |
+| **Completed** | Final audits passed, feature merged |
+| **Archived** | Superseded or abandoned |
+
+For lifecycle philosophy, see [Explanation: The Curator's Automation](../workflows_and_skills.md#blueprint-lifecycle).
 
 ---
 
 ## Automated Quality Hooks
 
-Background scripts that provide the agent with real-time feedback after every turn.
+Background scripts that provide real-time feedback after every tool call.
 
 | Hook | Command | Description |
 | :--- | :--- | :--- |
-| **Schema Context** | `scripts/extract_schema.cjs` | Injects current database schema into active context. |
-| **Build Check** | `scripts/gemini_hook.js type-check` | Runs `tsc --noEmit` to identify TypeScript errors. |
-| **Style Audit** | `scripts/gemini_hook.js lint` | Runs ESLint to verify design and code standards. |
+| **Schema Context** | `scripts/extract_schema.cjs` | Injects current database schema into active context |
+| **Build Check** | `scripts/gemini_hook.js type-check` | Runs `tsc --noEmit` to identify TypeScript errors |
+| **Style Audit** | `scripts/gemini_hook.js lint` | Runs ESLint to verify design and code standards |
 
 ---
 
@@ -50,8 +52,8 @@ Background scripts that provide the agent with real-time feedback after every tu
 
 Specialized experts for high-volume or cross-cutting tasks.
 
-- **`codebase_investigator`**: Used for architectural mapping and large-scale refactors of the Ledger or Lens systems.
-- **`generalist`**: Efficient for repetitive, low-complexity tasks like batch processing or localized text generation.
+- **`codebase_investigator`**: Architectural mapping and large-scale refactors of the Ledger or Lens systems
+- **`generalist`**: Repetitive, low-complexity tasks like batch processing or localized text generation
 
 ## Related resources
 - [How-to: Manage CLI Extensions](../how-to/manage_cli_extensions.md)
