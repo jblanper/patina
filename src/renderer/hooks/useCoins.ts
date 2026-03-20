@@ -6,6 +6,7 @@ import { useDebounce } from './useDebounce';
 const DEFAULT_FILTERS: FilterState = {
   era: [],
   metal: [],
+  grade: [],
   searchTerm: '',
   sortBy: 'year_numeric',
   sortAsc: true
@@ -53,7 +54,12 @@ export function useCoins() {
       result = result.filter(coin => coin.metal && filters.metal.includes(coin.metal));
     }
 
-    // 3. Search Filter
+    // 3. Grade Filter
+    if (filters.grade.length > 0) {
+      result = result.filter(coin => coin.grade && filters.grade.includes(coin.grade));
+    }
+
+    // 4. Search Filter
     if (debouncedSearchTerm) {
       const term = debouncedSearchTerm.toLowerCase();
       result = result.filter(coin => 
@@ -66,7 +72,7 @@ export function useCoins() {
       );
     }
 
-    // 4. Sorting
+    // 5. Sorting
     if (filters.sortBy) {
       const field = filters.sortBy as keyof Coin;
       result.sort((a, b) => {
@@ -98,6 +104,12 @@ export function useCoins() {
     const metals = new Set<string>();
     coins.forEach(c => c.metal && metals.add(c.metal));
     return Array.from(metals).sort();
+  }, [coins]);
+
+  const availableGrades = useMemo(() => {
+    const grades = new Set<string>();
+    coins.forEach(c => c.grade && grades.add(c.grade));
+    return Array.from(grades).sort();
   }, [coins]);
 
   /**
@@ -149,6 +161,7 @@ export function useCoins() {
     error,
     filters,
     availableMetals,
+    availableGrades,
     addCoin,
     updateCoin,
     deleteCoin,

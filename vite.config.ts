@@ -23,6 +23,19 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './setupTests.ts',
+    coverage: {
+      provider: 'v8',
+      include: [
+        '../../common/validation.ts',
+        'hooks/useVocabularies.ts',
+        'components/AutocompleteField.tsx',
+      ],
+      thresholds: {
+        '../../common/validation.ts': { branches: 100 },
+        'hooks/useVocabularies.ts': { functions: 90 },
+        'components/AutocompleteField.tsx': { statements: 80 },
+      },
+    },
   },
 });
 

@@ -285,6 +285,75 @@ main {
   background: none;
 }
 
+/* Sort radio indicator — single-select ring */
+.filter-radio {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border-hairline);
+  border-radius: 50%;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease;
+}
+
+.filter-item-label.active .filter-radio {
+  border-color: var(--accent-manuscript);
+}
+
+.filter-radio::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--accent-manuscript);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.filter-item-label.active .filter-radio::after {
+  opacity: 1;
+}
+
+/* Sort direction toggle — two-segment Asc/Desc */
+.sort-dir-toggle {
+  display: flex;
+  border: 1px solid var(--border-hairline);
+  overflow: hidden;
+  margin-top: 0.25rem;
+}
+
+.dir-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border-hairline);
+  padding: 0.4rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dir-btn:last-child {
+  border-right: none;
+}
+
+.dir-btn.active {
+  background: var(--accent-manuscript);
+  color: white;
+}
+
+.dir-btn:not(.active):hover {
+  background: var(--stone-pedestal);
+  color: var(--text-ink);
+}
+
 .filter-checkbox {
   width: 16px;
   height: 16px;

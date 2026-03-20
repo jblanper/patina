@@ -53,6 +53,13 @@ This document defines the absolute standards for the Patina project. All develop
 - **Styling:** All CSS must be implemented using **Vanilla CSS** in the global `src/renderer/styles/index.css` file. Follow the standards in `docs/style_guide.md`. Do NOT use `styled-jsx`, `styled-components`, or utility-first frameworks like Tailwind unless specifically requested. This ensures a stable, type-safe, and archival-focused build.
 - **Optimization:** Use `React.memo` and `useCallback` strategically in the Gallery grid to ensure smooth scrolling and interaction.
 
+### Vocabulary System (Phase 6a)
+- **Managed Fields:** Six coin fields use the vocabulary system: `metal`, `denomination`, `grade`, `era`, `die_axis`, `mint`. Valid field names are the single source of truth in `ALLOWED_VOCAB_FIELDS` in `src/common/validation.ts`.
+- **Defence-in-Depth:** Vocabulary IPC handlers validate input with `.strict()` Zod schemas at the IPC boundary. DB service methods perform a redundant `ALLOWED_VOCAB_FIELDS` allowlist check before any field string is used in SQL. Never interpolate a `field` parameter directly into SQL — use only parameterized queries.
+- **Seed Versioning:** `seedVocabularies()` is called from `app.whenReady()` — never via IPC. Bump `CURRENT_SEED_VERSION` (e.g. `'6a.1'` → `'6b.1'`) to trigger a re-seed on next launch. The `INSERT OR IGNORE` pattern preserves user-modified `usage_count` values and user-added entries across re-seeds.
+- **Schema Extension:** Add new tables to the `SCHEMA` array in `src/common/schema.ts` — never as raw SQL in `db.ts`. The `generateSQL()` / `CREATE TABLE IF NOT EXISTS` pattern handles migration automatically on next startup.
+- **AutocompleteField Pattern:** Vocab-backed form fields use the `AutocompleteField` component + `useVocabularies(field)` hook. The hook holds a module-level cache; call `clearVocabCache()` (exported for tests only) in `beforeEach` to prevent cross-test contamination. Usage increment (`incrementUsage`) is fire-and-forget — never block the UI on it.
+
 ### Database & File System
 - **SQLite Integrity:** Use `better-sqlite3` with WAL mode and `foreign_keys = ON`. Foreign key constraints must be enabled to ensure cascade deletes work correctly. All writes must be atomic and follow the structured schema defined in `src/common/schema.ts`.
 - **Data Defaults:** New coins default to `era: 'Ancient'` as most collections focus on ancient coinage. This default is enforced in both `schema.ts` (database level) and `useCoinForm.ts` (form level).

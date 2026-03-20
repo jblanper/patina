@@ -14,10 +14,11 @@ export const Cabinet: React.FC = () => {
     filteredCoins, 
     loading, 
     error, 
-    filters, 
+    filters,
     updateFilters,
     clearFilters,
-    availableMetals 
+    availableMetals,
+    availableGrades
   } = useCoins();
 
   const { status, resultPath, error: exportError, exportToZip, exportToPdf, reset } = useExport();
@@ -42,11 +43,12 @@ export const Cabinet: React.FC = () => {
       </header>
 
       <div className="app-layout">
-        <PatinaSidebar 
+        <PatinaSidebar
           filters={filters}
           updateFilters={updateFilters}
           clearFilters={clearFilters}
           availableMetals={availableMetals}
+          availableGrades={availableGrades}
         />
 
         <main className="app-main">

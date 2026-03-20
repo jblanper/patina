@@ -1,7 +1,7 @@
 # Implementation Blueprint: Cabinet Sort Controls & Grade Filter
 
 **Date:** 2026-03-20
-**Status:** Approved
+**Status:** In-Progress
 **Reference:** `docs/blueprints/` — Cabinet UX enhancement; no parent phase. UI design approved via `docs/curating-ui/proposal_sidebar_sort_2026-03-20.html` (Path B selected).
 
 ---

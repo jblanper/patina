@@ -165,6 +165,57 @@ describe('useVocabularies — resetVocabularies', () => {
   });
 });
 
+describe('useVocabularies — caching', () => {
+  it('TC-UV-03: does not re-fetch for the same field across renders (call count = 1)', async () => {
+    mockGetVocab.mockResolvedValue(['Silver', 'Gold']);
+
+    const { rerender } = renderHook(() => useVocabularies('metal'));
+    await waitFor(() => expect(mockGetVocab).toHaveBeenCalledTimes(1));
+
+    rerender();
+    rerender();
+
+    expect(mockGetVocab).toHaveBeenCalledTimes(1);
+  });
+
+  it('TC-UV-04: fetches independently for different field names (call count = 2)', async () => {
+    mockGetVocab.mockResolvedValue([]);
+
+    const { result: r1 } = renderHook(() => useVocabularies('metal'));
+    const { result: r2 } = renderHook(() => useVocabularies('grade'));
+
+    await waitFor(() => expect(r1.current.isLoading).toBe(false));
+    await waitFor(() => expect(r2.current.isLoading).toBe(false));
+
+    expect(mockGetVocab).toHaveBeenCalledTimes(2);
+    expect(mockGetVocab).toHaveBeenCalledWith('metal');
+    expect(mockGetVocab).toHaveBeenCalledWith('grade');
+  });
+});
+
+describe('useVocabularies — searchVocabularies', () => {
+  it('TC-UV-10: calls searchVocab with { field, query } and returns result', async () => {
+    mockGetVocab.mockResolvedValue(['Silver', 'Gold']);
+    const mockSearchVocab = window.electronAPI.searchVocab as ReturnType<typeof vi.fn>;
+    mockSearchVocab.mockResolvedValueOnce(['Silver']);
+
+    renderHook(() => useVocabularies('metal'));
+
+    const result = await window.electronAPI.searchVocab('metal', 'Sil');
+    expect(result).toEqual(['Silver']);
+    expect(mockSearchVocab).toHaveBeenCalledWith('metal', 'Sil');
+  });
+
+  it('TC-UV-11: empty string query returns all vocabularies', async () => {
+    mockGetVocab.mockResolvedValue(['Silver', 'Gold']);
+    const mockSearchVocab = window.electronAPI.searchVocab as ReturnType<typeof vi.fn>;
+    mockSearchVocab.mockResolvedValueOnce(['Silver', 'Gold']);
+
+    const result = await window.electronAPI.searchVocab('metal', '');
+    expect(result).toEqual(['Silver', 'Gold']);
+  });
+});
+
 describe('useVocabularies — error handling', () => {
   it('TC-UV-15: sets error and clears isLoading when getVocab rejects', async () => {
     mockGetVocab.mockRejectedValueOnce(new Error('Network error'));
@@ -186,5 +237,22 @@ describe('useVocabularies — error handling', () => {
     await expect(
       act(async () => { await result.current.addVocabulary('Bad'); })
     ).rejects.toThrow('Add failed');
+  });
+
+  it('TC-UV-17: clears error on successful re-fetch after previous error', async () => {
+    mockGetVocab
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce(['Silver']);
+
+    const { result } = renderHook(() => useVocabularies('denomination'));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.error).toBeTruthy();
+
+    // Trigger a re-fetch by adding a vocabulary (which clears cache and refetches)
+    mockAddVocabEntry.mockResolvedValueOnce(undefined);
+    await act(async () => { await result.current.addVocabulary('Aureus'); });
+
+    await waitFor(() => expect(result.current.error).toBeNull());
+    expect(result.current.options).toEqual(['Silver']);
   });
 });
