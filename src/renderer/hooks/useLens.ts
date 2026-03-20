@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 type LensStatus = 'idle' | 'starting' | 'active' | 'error';
 
-export function useLens() {
+export function useLens(onImageReceived?: (path: string) => void) {
   const [status, setStatus] = useState<LensStatus>('idle');
   const [url, setUrl] = useState<string | null>(null);
   const [lastImage, setLastImage] = useState<string | null>(null);
@@ -33,17 +33,16 @@ export function useLens() {
   }, []);
 
   useEffect(() => {
-    // Listen for incoming images
     window.electronAPI.onLensImageReceived((filePath) => {
       setLastImage(filePath);
+      onImageReceived?.(filePath);
     });
 
     return () => {
-      // Cleanup: Stop server and remove listeners
       stopLens();
       window.electronAPI.removeLensListeners();
     };
-  }, [stopLens]);
+  }, [onImageReceived, stopLens]);
 
   return {
     status,

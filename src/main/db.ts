@@ -22,6 +22,7 @@ if (!fs.existsSync(path.dirname(dbPath))) {
 
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
 
 // Initialize tables
 db.exec(generateSQL(SCHEMA));

@@ -41,12 +41,14 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
         <label className="type-meta filter-label">Eras</label>
         <ul className="filter-list">
           {ERAS.map(era => (
-            <li 
-              key={era} 
-              className={`filter-item ${isSelected('era', era) ? 'active' : ''}`}
-              onClick={() => toggleFilter('era', era)}
-            >
-              {era}
+            <li key={era}>
+              <button
+                className={`filter-item ${isSelected('era', era) ? 'active' : ''}`}
+                onClick={() => toggleFilter('era', era)}
+                aria-pressed={isSelected('era', era)}
+              >
+                {era}
+              </button>
             </li>
           ))}
         </ul>
@@ -57,12 +59,14 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
         <ul className="filter-list">
           {availableMetals.length > 0 ? (
             availableMetals.map(metal => (
-              <li 
-                key={metal} 
-                className={`filter-item ${isSelected('metal', metal) ? 'active' : ''}`}
-                onClick={() => toggleFilter('metal', metal)}
-              >
-                {metal.toUpperCase()}
+              <li key={metal}>
+                <button
+                  className={`filter-item ${isSelected('metal', metal) ? 'active' : ''}`}
+                  onClick={() => toggleFilter('metal', metal)}
+                  aria-pressed={isSelected('metal', metal)}
+                >
+                  {metal.toUpperCase()}
+                </button>
               </li>
             ))
           ) : (

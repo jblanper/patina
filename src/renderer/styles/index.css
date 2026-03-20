@@ -4,7 +4,7 @@
   /* Palette: The Archival Warmth */
   --bg-manuscript: #FCF9F2; /* Primary background (Parchment) */
   --text-ink: #2D2926;      /* High-contrast typography (Iron Gall Ink) */
-  --text-muted: #7A7875;    /* Secondary metadata and labels */
+  --text-muted: #6A6764;    /* Secondary metadata and labels */
   --border-hairline: #E0DCCD; /* Subtle structural dividers (Vellum tone) */
   --accent-manuscript: #914E32; /* Action states and primary accents (Burnt Sienna) */
   --stone-pedestal: #F0EDE6;    /* Soft background for coin frames and containers */
@@ -369,7 +369,7 @@ main {
 }
 
 .coin-card:hover, .coin-card:focus-visible {
-  background: #F4F1E9;
+  background: var(--stone-pedestal);
 }
 
 .coin-card:hover::after, .coin-card:focus-visible::after {
@@ -1411,4 +1411,74 @@ main {
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+/* Error Boundary */
+.error-boundary {
+  padding: clamp(2rem, 5vw, 3rem);
+  background-color: var(--bg-manuscript);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: var(--font-sans);
+}
+
+.error-boundary__container {
+  border-left: 4px solid var(--error-red);
+  padding-left: 2rem;
+  max-width: 800px;
+}
+
+.error-boundary__title {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  color: var(--text-ink);
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.error-boundary__message {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.error-boundary__code {
+  background-color: var(--stone-pedestal);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--error-red);
+  border: 1px solid var(--border-hairline);
+}
+
+.error-boundary__button {
+  background-color: var(--text-ink);
+  color: #FFFFFF;
+  padding: 1rem 2.5rem;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.error-boundary__button:hover {
+  background-color: var(--accent-manuscript);
+}
+
+/* Ledger Form Overrides */
+.input-block-tall {
+  height: 180px;
+}
+
+.provenance-input {
+  width: 100%;
+  color: var(--text-ink);
 }

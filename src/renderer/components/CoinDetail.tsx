@@ -8,6 +8,17 @@ export const CoinDetail: React.FC = () => {
   const { coin, images, isLoading, error } = useCoin(id);
   const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDelete = async () => {
+    if (!id) return;
+    try {
+      await window.electronAPI.deleteCoin(parseInt(id, 10));
+      navigate('/');
+    } catch (err) {
+      console.error('Failed to delete coin:', err);
+    }
+  };
 
   // Determine which image to show as main
   const mainImage = selectedImageId 
@@ -43,13 +54,34 @@ export const CoinDetail: React.FC = () => {
         <button onClick={handleBack} className="nav-back" aria-label="Close Ledger Entry">
           ← Close Ledger Entry
         </button>
-        <button 
-          onClick={() => navigate(`/scriptorium/edit/${coin.id}`)} 
-          className="btn-minimal"
-        >
-          Edit Record
-        </button>
+        <div className="header-actions">
+          <button 
+            onClick={() => setShowDeleteConfirm(true)} 
+            className="btn-minimal"
+          >
+            Delete Record
+          </button>
+          <button 
+            onClick={() => navigate(`/scriptorium/edit/${coin.id}`)} 
+            className="btn-minimal"
+          >
+            Edit Record
+          </button>
+        </div>
       </header>
+
+      {showDeleteConfirm && (
+        <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2>Confirm Deletion</h2>
+            <p>Are you certain you wish to remove this record from the archive? This action cannot be undone.</p>
+            <div className="export-result">
+              <button className="btn-primary" onClick={handleDelete}>Delete</button>
+              <button className="btn-minimal" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="ledger-layout">
         {/* Left Folio: The Plate */}
@@ -197,8 +229,7 @@ export const CoinDetail: React.FC = () => {
             {coin.purchase_price && (
                <div className="footer-item cost-item">
                  <strong>Cost:</strong> 
-                 {/* Formatting price discreetly */}
-                 <span style={{ opacity: 0.5 }}>HIDDEN</span>
+                 ${coin.purchase_price.toFixed(2)}
                </div>
             )}
           </footer>
@@ -207,9 +238,9 @@ export const CoinDetail: React.FC = () => {
 
       {/* Image Zoom Modal */}
       {isZoomOpen && mainImage && (
-        <div className="zoom-modal" onClick={() => setIsZoomOpen(false)}>
+        <div className="zoom-modal" role="dialog" aria-modal="true" onClick={() => setIsZoomOpen(false)}>
           <div className="zoom-content" onClick={e => e.stopPropagation()}>
-            <button className="zoom-close" onClick={() => setIsZoomOpen(false)}>×</button>
+            <button className="zoom-close" onClick={() => setIsZoomOpen(false)} aria-label="Close image zoom">×</button>
             <img 
               src={getImageUrl(mainImage.path)} 
               alt={mainImage.label || coin.title} 

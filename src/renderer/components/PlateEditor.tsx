@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useLens } from '../hooks/useLens';
 import { QRCodeDisplay } from './Lens/QRCodeDisplay';
 
@@ -12,26 +12,21 @@ interface PlateEditorProps {
 }
 
 export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, images }) => {
-  const { url, startLens, stopLens } = useLens();
   const [activeSlot, setActiveSlot] = useState<'obverse' | 'reverse' | 'edge'>('obverse');
   const [showQR, setShowQR] = useState(false);
+
+  const handleImageReceived = useCallback((path: string) => {
+    onImageCaptured(activeSlot, path);
+    setShowQR(false);
+  }, [activeSlot, onImageCaptured]);
+
+  const { url, startLens, stopLens } = useLens(handleImageReceived);
 
   const handleStartLens = async (slot: 'obverse' | 'reverse' | 'edge') => {
     setActiveSlot(slot);
     await startLens();
     setShowQR(true);
   };
-
-  React.useEffect(() => {
-    window.electronAPI.onLensImageReceived((path) => {
-      onImageCaptured(activeSlot, path);
-      setShowQR(false);
-      stopLens();
-    });
-    return () => {
-      window.electronAPI.removeLensListeners();
-    };
-  }, [activeSlot, onImageCaptured, stopLens]);
 
   const slots: Array<{ id: 'obverse' | 'reverse' | 'edge'; label: string }> = [
     { id: 'obverse', label: 'Obverse (Primary)' },
@@ -81,7 +76,7 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, image
                   >
                     Establish Wireless Bridge
                   </button>
-                  <button className="btn-lens-minimal">Import from Digital Archive</button>
+                  <button className="btn-lens-minimal" disabled title="Coming soon">Import from Digital Archive</button>
                 </div>
               )}
             </div>
@@ -93,9 +88,9 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, image
       </div>
 
       {showQR && url && (
-        <div className="qr-overlay" onClick={() => setShowQR(false)}>
+        <div className="qr-overlay" role="dialog" aria-modal="true" onClick={() => setShowQR(false)}>
           <div className="qr-container" onClick={(e) => e.stopPropagation()}>
-            <button className="qr-close" onClick={() => setShowQR(false)}>×</button>
+            <button className="qr-close" onClick={() => setShowQR(false)} aria-label="Close QR code">×</button>
             <QRCodeDisplay url={url} />
             <p className="qr-hint">Scan with mobile to capture <strong>{activeSlot.toUpperCase()}</strong></p>
           </div>

@@ -6,9 +6,6 @@ import { useDebounce } from './useDebounce';
 const DEFAULT_FILTERS: FilterState = {
   era: [],
   metal: [],
-  mint: [],
-  rarity: [],
-  grade: [],
   searchTerm: '',
   sortBy: 'year_numeric',
   sortAsc: true

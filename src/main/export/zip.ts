@@ -66,24 +66,32 @@ export async function exportToZip(targetPath: string, includeImages = true, incl
     try {
       const coins = dbService.getCoins();
       const imagesMap = new Map<number, CoinImages>();
+      const allImages: CoinImage[] = [];
       
-      coins.forEach(coin => {
-        if (coin.id) {
-          const images = dbService.getImagesByCoinId(coin.id);
-          const coinImages: CoinImages = {};
-          images.forEach(img => {
-            const relativePath = `images/${path.basename(img.path)}`;
-            if (img.label === 'Obverse' || (!img.label && img.is_primary)) {
-              coinImages.obverse = relativePath;
-            } else if (img.label === 'Reverse') {
-              coinImages.reverse = relativePath;
-            } else if (img.label === 'Edge') {
-              coinImages.edge = relativePath;
-            }
-          });
-          imagesMap.set(coin.id, coinImages);
-        }
-      });
+      const coinIds = coins.map(c => c.id).filter((id): id is number => id !== undefined);
+      if (coinIds.length > 0) {
+        const placeholders = coinIds.map(() => '?').join(',');
+        const Database = require('better-sqlite3');
+        const database = new Database(dbPath);
+        const rows = database.prepare(`SELECT * FROM images WHERE coin_id IN (${placeholders})`).all(...coinIds) as CoinImage[];
+        database.close();
+        
+        rows.forEach(img => {
+          allImages.push(img);
+          if (!imagesMap.has(img.coin_id)) {
+            imagesMap.set(img.coin_id, {});
+          }
+          const coinImages = imagesMap.get(img.coin_id)!;
+          const relativePath = `images/${path.basename(img.path)}`;
+          if (img.label === 'Obverse' || (!img.label && img.is_primary)) {
+            coinImages.obverse = relativePath;
+          } else if (img.label === 'Reverse') {
+            coinImages.reverse = relativePath;
+          } else if (img.label === 'Edge') {
+            coinImages.edge = relativePath;
+          }
+        });
+      }
 
       const output = fs.createWriteStream(targetPath);
       const archive = archiver('zip', { zlib: { level: 9 } });
@@ -110,14 +118,11 @@ export async function exportToZip(targetPath: string, includeImages = true, incl
       }
 
       if (includeImages) {
-        coins.forEach(coin => {
-          const images = dbService.getImagesByCoinId(coin.id);
-          images.forEach(img => {
-            const fullPath = path.join(imageRoot, img.path);
-            if (fs.existsSync(fullPath)) {
-              archive.file(fullPath, { name: `images/${path.basename(img.path)}` });
-            }
-          });
+        allImages.forEach(img => {
+          const fullPath = path.join(imageRoot, img.path);
+          if (fs.existsSync(fullPath)) {
+            archive.file(fullPath, { name: `images/${path.basename(img.path)}` });
+          }
         });
       }
 

@@ -39,6 +39,12 @@ export const CoinCard: React.FC<CoinCardProps> = React.memo(({ coin, onClick }) 
     <article 
       className="coin-card"
       onClick={() => onClick?.(coin.id)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.(coin.id);
+        }
+      }}
       tabIndex={0}
       aria-label={`Coin card for ${coin.title}`}
     >

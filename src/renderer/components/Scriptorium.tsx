@@ -23,11 +23,11 @@ export const Scriptorium: React.FC = () => {
   // Sync existing images when editing
   useEffect(() => {
     if (coin && existingImages.length > 0) {
-      const imageMap: any = {};
+      const imageMap: Partial<Record<'obverse' | 'reverse' | 'edge', string>> = {};
       existingImages.forEach(img => {
         const label = img.label?.toLowerCase();
         if (label === 'obverse' || label === 'reverse' || label === 'edge') {
-          imageMap[label] = img.path;
+          imageMap[label as 'obverse' | 'reverse' | 'edge'] = img.path;
         }
       });
       

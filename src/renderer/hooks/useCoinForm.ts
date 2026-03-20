@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { NewCoin, Coin, CoinImage } from '../../common/types';
 import { NewCoinSchema } from '../../common/validation';
 
@@ -40,8 +40,10 @@ export function useCoinForm(initialCoin?: Coin | null, existingImages: CoinImage
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
-  const [existingImagePaths] = useState<Set<string>>(
-    () => new Set(existingImages.map(img => img.path))
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const existingImagePaths = useMemo(
+    () => new Set(existingImages.map(img => img.path)),
+    [existingImages]
   );
 
   // Sync formData when initialCoin changes (for Edit mode)
@@ -66,7 +68,7 @@ export function useCoinForm(initialCoin?: Coin | null, existingImages: CoinImage
     return () => clearTimeout(timeoutId);
   }, [formData, initialCoin]);
 
-  const updateField = useCallback((field: keyof NewCoin, value: any) => {
+  const updateField = useCallback((field: keyof NewCoin, value: string | number | null | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // Clear error for this field
@@ -141,6 +143,7 @@ export function useCoinForm(initialCoin?: Coin | null, existingImages: CoinImage
       return true;
     } catch (err) {
       console.error('Submission failed:', err);
+      setSubmitError(err instanceof Error ? err.message : 'Submission failed');
       return false;
     } finally {
       setIsSaving(false);
@@ -156,10 +159,12 @@ export function useCoinForm(initialCoin?: Coin | null, existingImages: CoinImage
     formData,
     errors,
     isSaving,
+    submitError,
+    clearError: () => setSubmitError(null),
     updateField,
     updateImage,
     submit,
     clearDraft,
-    setFormData // For loading existing coin images if needed
+    setFormData
   };
 }

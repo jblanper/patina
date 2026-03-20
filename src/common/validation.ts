@@ -62,11 +62,8 @@ export const NewCoinSchema = CoinSchema.omit({
 export const FilterStateSchema = z.object({
   era: z.array(z.enum(['Ancient', 'Medieval', 'Modern'])),
   metal: z.array(z.string()),
-  mint: z.array(z.string()),
-  rarity: z.array(z.string()),
-  grade: z.array(z.string()),
   searchTerm: z.string(),
-  sortBy: z.string().nullable(), // keyof Coin | null
+  sortBy: z.string().nullable(),
   sortAsc: z.boolean()
 });
 

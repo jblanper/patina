@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from 'express';
+import type { Server } from 'http';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import rateLimit from 'express-rate-limit';
@@ -20,7 +21,7 @@ interface ServerInstance {
 
 export function createLensServer(config: ServerConfig = {}): ServerInstance {
   const expressApp = express();
-  let server: any = null;
+  let server: Server | null = null;
   let activeToken: string | null = null;
   
   // Rate Limiting (Security Mandate)
@@ -65,14 +66,17 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
     }
   });
 
+  const ALLOWED_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
   const upload = multer({ 
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
-      if (file.mimetype.startsWith('image/')) {
+      if (ALLOWED_MIMES.has(file.mimetype)) {
         cb(null, true);
       } else {
-        cb(new Error('Only images are allowed'));
+        const err = new Error('Only JPEG, PNG, and WebP images are accepted.');
+        cb(err as unknown as null, false);
       }
     }
   });

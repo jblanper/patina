@@ -20,7 +20,7 @@ function validateExportOptions(data: unknown) {
 
 // Register custom protocol as privileged
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'patina-img', privileges: { secure: true, supportFetchAPI: true, standard: true, bypassCSP: true } }
+  { scheme: 'patina-img', privileges: { secure: true, supportFetchAPI: true, standard: true } }
 ]);
 
 let lensServer: ReturnType<typeof createLensServer> | null = null;
@@ -78,28 +78,30 @@ app.whenReady().then(() => {
     : path.join(app.getPath('userData'), 'images');
 
   // Handle patina-img:// protocol
-  protocol.handle('patina-img', (request) => {
+  protocol.handle('patina-img', async (request) => {
     const url = request.url.replace('patina-img://', '');
-    // Decode URI component to handle spaces and special chars
     const decodedUrl = decodeURIComponent(url);
-    
-    // Path sanitization: Prevent directory traversal
     const normalizedPath = path.normalize(decodedUrl).replace(/^(\.\.[\/\\])+/, '');
     const fullPath = path.join(imageRoot, normalizedPath);
 
-    // Ensure the resolved path is still within the image root (extra safety)
     if (!fullPath.startsWith(imageRoot)) {
       return new Response('Access Denied', { status: 403 });
     }
 
-    // Use fs to read file and return as Response (more reliable than file:// URL)
     try {
-      const fileBuffer = fs.readFileSync(fullPath);
-      const mimeType = path.extname(fullPath).toLowerCase().replace('.jpg', 'jpeg').replace('.jpeg', 'jpeg').replace('.png', 'png').replace('.webp', 'webp');
+      const fileBuffer = await fs.promises.readFile(fullPath);
+      const ext = path.extname(fullPath).toLowerCase();
+      const mimeMap: Record<string, string> = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.webp': 'image/webp'
+      };
+      const mimeType = mimeMap[ext] || 'application/octet-stream';
       return new Response(fileBuffer, {
-        headers: { 'Content-Type': `image/${mimeType}` }
+        headers: { 'Content-Type': mimeType }
       });
-    } catch (e) {
+    } catch {
       return new Response('Image not found', { status: 404 });
     }
   });

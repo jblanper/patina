@@ -4,7 +4,7 @@ import { NewCoin } from '../../common/types';
 interface LedgerFormProps {
   formData: NewCoin;
   errors: Record<string, string>;
-  updateField: (field: keyof NewCoin, value: any) => void;
+  updateField: (field: keyof NewCoin, value: string | number | null | boolean) => void;
 }
 
 export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, updateField }) => {
@@ -23,6 +23,19 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             onChange={(e) => updateField('title', e.target.value)}
           />
           {errors.title && <span className="error-hint">{errors.title}</span>}
+        </div>
+        
+        <div className="subtitle-item">
+          <span className="subtitle-label">Era</span>
+          <select 
+            className="input-metric"
+            value={formData.era}
+            onChange={(e) => updateField('era', e.target.value as 'Ancient' | 'Medieval' | 'Modern')}
+          >
+            <option value="Ancient">Ancient</option>
+            <option value="Medieval">Medieval</option>
+            <option value="Modern">Modern</option>
+          </select>
         </div>
         
         <div className="subtitle-stack">
@@ -44,6 +57,26 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
               placeholder="e.g. 440 BC"
               value={formData.year_display || ''}
               onChange={(e) => updateField('year_display', e.target.value)}
+            />
+          </div>
+          <div className="subtitle-item">
+            <span className="subtitle-label">Issuer</span>
+            <input
+              type="text"
+              className="input-sub"
+              placeholder="e.g. Probus"
+              value={formData.issuer || ''}
+              onChange={(e) => updateField('issuer', e.target.value)}
+            />
+          </div>
+          <div className="subtitle-item">
+            <span className="subtitle-label">Denomination</span>
+            <input
+              type="text"
+              className="input-sub"
+              placeholder="e.g. Antoninianus"
+              value={formData.denomination || ''}
+              onChange={(e) => updateField('denomination', e.target.value)}
             />
           </div>
           <div className="subtitle-item">
@@ -166,8 +199,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
       <div className="numismatic-section">
         <span className="section-label">Curator's Note</span>
         <textarea
-          className="input-block"
-          style={{ height: '180px' }}
+          className="input-block input-block-tall"
           placeholder="Record the historical significance or unique narrative of this object..."
           value={formData.story || ''}
           onChange={(e) => updateField('story', e.target.value)}
@@ -179,8 +211,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         <span className="section-label">Provenance</span>
         <input
           type="text"
-          className="input-metric"
-          style={{ width: '100%', color: 'var(--text-ink)' }}
+          className="input-metric provenance-input"
           placeholder="e.g. Ex. BCD Collection; Purchased 2024"
           value={formData.provenance || ''}
           onChange={(e) => updateField('provenance', e.target.value)}
