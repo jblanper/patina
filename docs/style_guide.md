@@ -112,9 +112,18 @@ Maintain a strict horizontal breath around the central divider:
 - **Behavior:** Debounced (300ms) to maintain a calm interface.
 - **Scope:** Search across Title, Issuer, Denomination, Provenance, and Catalog Reference.
 
+### Order By (Single-Select Sort)
+The sidebar's first group. Controls the sort order of the Cabinet gallery.
+- **Options:** Year (`year_numeric`), Title (`title`), Acquired (`purchase_date`). Default: Year.
+- **Direction toggle:** Two-segment Asc/Desc button pair (`.sort-dir-toggle` / `.dir-btn`). Active segment uses `--accent-manuscript` background fill; inactive uses muted text.
+- **Radio indicator:** Single-select rows use `.filter-radio` — a 14×14px ring (1px hairline border, 50% radius) with a 6×6px `--accent-manuscript` dot on active state. Use `aria-pressed` on direction buttons, not `role="radio"`.
+- **Reset behaviour:** `clearFilters` restores sort to `year_numeric / ascending`. Sort is a presentation preference, not a filter, but it is reset alongside filters for a clean slate.
+- **`SORT_OPTIONS` constant:** Must be defined at module level (outside the component) to prevent re-allocation on each render.
+
 ### Archival Filters (Multi-Select)
 - **Eras:** Ancient, Medieval, Modern.
-- **Metals:** Dynamically generated from the collection (AU, AR, AE, EL, BI).
-- **Sort:** Default to `year_numeric` to preserve the chronological integrity of the archive.
+- **Metals:** Dynamically generated from the collection.
+- **Grade:** Dynamically generated from the collection (free-text values from `CoinSchema.grade`). Empty state: "No grades recorded" (mirrors "No metals indexed" pattern).
+- **Sidebar order:** Order By → Era → Metals → Grade.
 
 > **Exception:** Filter controls use visible checkbox indicators (1px hairline border, accent fill on checked state) rather than pure "Archival Labels" text-only approach. This trade-off prioritizes user clarity for multi-select operations while maintaining the archival aesthetic through hairline borders and accent color states.

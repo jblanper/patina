@@ -43,7 +43,6 @@ const MOCK_COINS: Coin[] = [
     grade: 'Choice VF',
     metal: 'Silver',
     year_numeric: 210,
-    purchase_date: null,
   }
 ];
 
@@ -196,6 +195,6 @@ describe('useCoins', () => {
 
     const dates = result.current.filteredCoins.map(c => c.purchase_date);
     const lastDate = dates[dates.length - 1];
-    expect(lastDate).toBeNull();
+    expect(lastDate).toBeUndefined();
   });
 });

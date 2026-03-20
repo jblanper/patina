@@ -1,7 +1,7 @@
 # Implementation Blueprint: Cabinet Sort Controls & Grade Filter
 
 **Date:** 2026-03-20
-**Status:** Verification
+**Status:** Completed
 **Reference:** `docs/blueprints/` — Cabinet UX enhancement; no parent phase. UI design approved via `docs/curating-ui/proposal_sidebar_sort_2026-03-20.html` (Path B selected).
 
 ---
@@ -431,14 +431,23 @@ Insert after the existing `.filter-item.disabled:hover` block (line ~285):
 ---
 
 ## 10. Post-Implementation Retrospective
-**Date:** —
-**Outcome:** —
+**Date:** 2026-03-20
+**Outcome:** Completed — all 5 implementation steps executed as designed, all 126 tests passing, no new TypeScript errors.
 
 ### Summary of Work
-- *(To be completed post-implementation)*
+- Added `grade` to `FilterStateSchema` in `validation.ts` (additive, safe).
+- Extended `useCoins.ts` with grade filter branch, `availableGrades` memo, and updated `DEFAULT_FILTERS`.
+- Built `PatinaSidebar.tsx` Order By and Grade filter groups exactly per Path B "The Ledger" design.
+- Passed `availableGrades` through `Cabinet.tsx` to `PatinaSidebar`.
+- Added `.filter-radio`, `.sort-dir-toggle`, `.dir-btn` CSS classes to `index.css`.
+- Created `PatinaSidebar.test.tsx` (8 tests) and extended `useCoins.test.ts` (5 new tests).
+- Moved validation tests to `src/common/__tests__/validation.test.ts` (colocated under `__tests__`).
+- Updated `docs/style_guide.md §5` with Order By and Grade filter patterns.
 
 ### Pain Points
-- *(To be completed post-implementation)*
+- `validation.test.ts` was initially placed at `src/common/validation.test.ts` (flat) and was moved to the proper colocated `src/common/__tests__/validation.test.ts` during Phase 6a — this created a misleading `D` entry in git status at the start of verification.
+- `MOCK_COINS` fixture used `purchase_date: null` for the missing-date coin, which conflicted with `Coin.purchase_date?: string` (optional but not nullable). The fix was to omit the field entirely (`undefined`), which correctly exercises the same sorting branch.
+- Pre-existing TypeScript error in `CoinDetail.test.tsx` (`deleteCoin` mock type mismatch) surfaced during type-check — confirmed as out-of-scope for this blueprint.
 
 ### Things to Consider
 - Phase 7b: Grade vocabulary normalisation (free-text → controlled PCGS/Sheldon values via vocabularies table).
