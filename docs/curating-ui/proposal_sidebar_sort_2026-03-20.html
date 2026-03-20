@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curatorial Proposal: Sidebar Sort Controls - Patina</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #6A6764;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: #EDEAE3;
+            color: var(--text-ink);
+            line-height: 1.6;
+            padding: clamp(2rem, 6vw, 4rem);
+        }
+
+        /* ── Proposal Shell ── */
+        .proposal-header {
+            max-width: 1100px;
+            margin: 0 auto 4rem;
+            border-bottom: 2px solid var(--text-ink);
+            padding-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .proposal-header h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+        .proposal-meta {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-manuscript);
+            text-align: right;
+        }
+
+        .proposal-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6rem;
+        }
+
+        .path-section { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            margin-bottom: 0.5rem;
+            display: block;
+            font-weight: 600;
+        }
+        .path-title {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        .rationale {
+            font-family: var(--font-serif);
+            font-size: 1.05rem;
+            font-style: italic;
+            color: var(--text-ink);
+            margin-bottom: 1.25rem;
+            max-width: 62ch;
+            line-height: 1.65;
+        }
+
+        /* ── Browser Frame ── */
+        .browser-frame {
+            background: var(--bg-manuscript);
+            border: 1px solid var(--border-hairline);
+            border-radius: 8px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .frame-header {
+            background: #E2DDD6;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: #CCC; }
+        .dot.red { background: #FF5F56; }
+        .dot.yellow { background: #FFBD2E; }
+        .dot.green { background: #27C93F; }
+        .address-bar {
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 4px;
+            flex: 1;
+            margin-left: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: center;
+            border: 1px solid var(--border-hairline);
+        }
+        .frame-content {
+            display: flex;
+            background: var(--bg-manuscript);
+            min-height: 520px;
+        }
+
+        /* ── Audit Block ── */
+        .audit-results {
+            background: white;
+            padding: 2rem 2.5rem;
+            border: 1px solid var(--border-hairline);
+            border-left: 4px solid var(--accent-manuscript);
+        }
+        .audit-results h3 {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            margin-bottom: 1.5rem;
+        }
+        .audit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem 2rem;
+        }
+        .audit-item strong {
+            display: block;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        .audit-item p { font-size: 0.9rem; line-height: 1.5; }
+        .pass { color: #2D6A2D; font-weight: 600; }
+        .note { color: var(--accent-manuscript); }
+
+        /* ══════════════════════════════════════════
+           SHARED APP STYLES (mirrors index.css)
+        ══════════════════════════════════════════ */
+        .app-layout {
+            display: flex;
+            gap: 0;
+            flex: 1;
+        }
+
+        /* ── Sidebar Base ── */
+        .patina-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border-right: 1px solid var(--border-hairline);
+            padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+            background: var(--bg-manuscript);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        .filter-label {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--accent-manuscript);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+        }
+
+        .filter-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .filter-item-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.4rem 0.6rem;
+            margin-left: -0.6rem;
+            border-left: 2px solid transparent;
+            transition: all 0.2s ease;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            color: var(--text-ink);
+            user-select: none;
+        }
+        .filter-item-label:hover {
+            background: var(--stone-pedestal);
+            color: var(--accent-manuscript);
+        }
+        .filter-item-label.active {
+            color: var(--accent-manuscript);
+            font-weight: 600;
+            border-left: 2px solid var(--accent-manuscript);
+            background: var(--stone-pedestal);
+        }
+
+        .filter-checkbox {
+            width: 14px; height: 14px;
+            border: 1px solid var(--border-hairline);
+            background: transparent;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .filter-item-label.active .filter-checkbox {
+            background: var(--accent-manuscript);
+            border-color: var(--accent-manuscript);
+        }
+        .filter-checkbox::after {
+            content: '';
+            width: 6px; height: 6px;
+            background: white;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+        .filter-item-label.active .filter-checkbox::after { opacity: 1; }
+
+        .filter-input {
+            position: absolute; opacity: 0; width: 0; height: 0;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .btn-minimal {
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--text-ink);
+            padding-bottom: 2px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            cursor: pointer;
+            color: var(--text-ink);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-minimal:hover { color: var(--accent-manuscript); border-color: var(--accent-manuscript); }
+        .btn-minimal:disabled { opacity: 0.3; cursor: default; }
+
+        /* ── Gallery stub ── */
+        .app-main {
+            flex: 1;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .gallery-stub {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            flex: 1;
+        }
+        .coin-card-stub {
+            background: var(--stone-pedestal);
+            border: 1px solid var(--border-hairline);
+            aspect-ratio: 3/4;
+            display: flex;
+            flex-direction: column;
+            padding: 0.75rem;
+            gap: 0.4rem;
+        }
+        .stub-img {
+            flex: 1;
+            background: #DDD9CF;
+            border-radius: 2px;
+        }
+        .stub-title { height: 10px; background: #C8C4BA; border-radius: 2px; width: 80%; }
+        .stub-meta { height: 8px; background: #DDD9CF; border-radius: 2px; width: 55%; }
+        .cabinet-toolbar-stub {
+            display: flex; gap: 0.5rem;
+        }
+        .btn-stub {
+            height: 28px;
+            background: var(--text-ink);
+            opacity: 0.15;
+            flex: 1;
+        }
+        .count-stub {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* ══════════════════════════════════════════
+           PATH A — THE MINIMALIST
+           Single-row inline sort bar above Reset
+        ══════════════════════════════════════════ */
+
+        .sort-inline-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        .sort-inline-label {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--accent-manuscript);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            flex-shrink: 0;
+        }
+
+        .sort-field-cycle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-ink);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.15s ease;
+        }
+        .sort-field-cycle:hover { color: var(--accent-manuscript); }
+
+        .sort-field-name {
+            border-bottom: 1px solid var(--text-ink);
+            padding-bottom: 1px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+        .sort-field-cycle:hover .sort-field-name {
+            color: var(--accent-manuscript);
+            border-color: var(--accent-manuscript);
+        }
+
+        .sort-dir-btn-a {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-ink);
+            padding: 0 0.2rem;
+            line-height: 1;
+            transition: color 0.15s, transform 0.2s ease;
+            flex-shrink: 0;
+        }
+        .sort-dir-btn-a:hover { color: var(--accent-manuscript); }
+        .sort-dir-btn-a.desc { transform: scaleY(-1); }
+
+        /* ══════════════════════════════════════════
+           PATH B — THE LEDGER
+           Full filter-group with radio rows + toggle
+        ══════════════════════════════════════════ */
+
+        .filter-radio {
+            width: 14px; height: 14px;
+            border: 1px solid var(--border-hairline);
+            border-radius: 50%;
+            background: transparent;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .filter-item-label.active .filter-radio {
+            border-color: var(--accent-manuscript);
+        }
+        .filter-radio::after {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--accent-manuscript);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+        .filter-item-label.active .filter-radio::after { opacity: 1; }
+
+        .sort-dir-toggle {
+            display: flex;
+            gap: 0;
+            border: 1px solid var(--border-hairline);
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+        .dir-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 0.4rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.15s ease;
+            border-right: 1px solid var(--border-hairline);
+        }
+        .dir-btn:last-child { border-right: none; }
+        .dir-btn.active {
+            background: var(--accent-manuscript);
+            color: white;
+        }
+        .dir-btn:not(.active):hover {
+            background: var(--stone-pedestal);
+            color: var(--text-ink);
+        }
+
+        /* ══════════════════════════════════════════
+           PATH C — THE HYBRID
+           Chip row + direction arrow
+        ══════════════════════════════════════════ */
+
+        .sort-chips-row {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: nowrap;
+        }
+
+        .sort-chip {
+            flex: 1;
+            padding: 0.3rem 0.2rem;
+            border: 1px solid var(--border-hairline);
+            background: transparent;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            color: var(--text-muted);
+            text-align: center;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+        .sort-chip:hover {
+            border-color: var(--text-ink);
+            color: var(--text-ink);
+        }
+        .sort-chip.active {
+            background: var(--text-ink);
+            border-color: var(--text-ink);
+            color: var(--bg-manuscript);
+        }
+
+        .sort-dir-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.4rem;
+        }
+        .sort-dir-arrow-c {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 0;
+            transition: color 0.15s;
+        }
+        .sort-dir-arrow-c:hover { color: var(--accent-manuscript); }
+        .sort-dir-arrow-c .arrow-icon {
+            font-size: 1rem;
+            line-height: 1;
+            transition: transform 0.25s ease;
+            color: var(--text-ink);
+        }
+        .sort-dir-arrow-c.desc .arrow-icon { transform: rotate(180deg); }
+        .sort-dir-label-c { color: var(--text-ink); }
+
+    </style>
+</head>
+<body>
+
+<header class="proposal-header">
+    <h1>Proposal: Sidebar Sort Controls</h1>
+    <div class="proposal-meta">
+        Project: Patina // Ref: UI-SORT-001<br>
+        Date: 2026-03-20 // Component: PatinaSidebar
+    </div>
+</header>
+
+<main class="proposal-container">
+
+    <!-- ════════════════════════════════════
+         PATH A — THE MINIMALIST
+    ════════════════════════════════════ -->
+    <section class="path-section">
+        <div class="path-info">
+            <span class="tag">Archetype A</span>
+            <h2 class="path-title">The Minimalist — Inline Sort Bar</h2>
+            <p class="rationale">
+                A single compressed row that lives just above the Reset button. The current sort field cycles on click; the direction arrow flips independently. The archive speaks in whispers — sort is a utility, not a feature, and the sidebar should not dramatise it.
+            </p>
+        </div>
+
+        <div class="browser-frame">
+            <div class="frame-header">
+                <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                <div class="address-bar">patina://cabinet // Sort: Year ↑</div>
+            </div>
+            <div class="frame-content">
+                <div class="app-layout">
+
+                    <!-- SIDEBAR A -->
+                    <aside class="patina-sidebar">
+
+                        <div class="filter-group">
+                            <span class="filter-label">Eras</span>
+                            <ul class="filter-list">
+                                <li>
+                                    <label class="filter-item-label active" onclick="toggleFilterA(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>Ancient</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label" onclick="toggleFilterA(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>Medieval</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label" onclick="toggleFilterA(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>Modern</span>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="filter-group">
+                            <span class="filter-label">Metals</span>
+                            <ul class="filter-list">
+                                <li>
+                                    <label class="filter-item-label" onclick="toggleFilterA(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>AR</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label active" onclick="toggleFilterA(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>AE</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label" onclick="toggleFilterA(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>AU</span>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- SORT CONTROL A -->
+                        <div class="sort-inline-bar">
+                            <span class="sort-inline-label">Sort</span>
+                            <button class="sort-field-cycle" id="cycleA" onclick="cycleFieldA()">
+                                <span class="sort-field-name" id="fieldLabelA">Year</span>
+                            </button>
+                            <button class="sort-dir-btn-a" id="dirBtnA" onclick="toggleDirA()" title="Toggle direction">↑</button>
+                        </div>
+
+                        <div class="sidebar-footer">
+                            <button class="btn-minimal">Reset Archive View</button>
+                        </div>
+                    </aside>
+
+                    <!-- GALLERY STUB -->
+                    <main class="app-main">
+                        <div class="cabinet-toolbar-stub">
+                            <div class="btn-stub"></div><div class="btn-stub"></div><div class="btn-stub"></div>
+                        </div>
+                        <p class="count-stub">24 objects in the ledger.</p>
+                        <div class="gallery-stub">
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                        </div>
+                    </main>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="audit-results">
+            <h3>Curatorial Audit — Path A</h3>
+            <div class="audit-grid">
+                <div class="audit-item">
+                    <strong>Contrast (WCAG)</strong>
+                    <p><span class="pass">Pass AA</span> — Ink/Parchment 14.3:1. Accent/Parchment 4.7:1 (meets AA for large text).</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Sidebar Footprint</strong>
+                    <p>Adds ~36px to sidebar height. No layout impact; existing gap absorbs it cleanly.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Discoverability</strong>
+                    <p><span class="note">Moderate.</span> The cycle affordance is subtle — new users may not recognise the field label as clickable. Mitigated by the underline treatment.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Archival Tone</strong>
+                    <p>Excellent. Mono typography throughout. Zero visual noise added to the sidebar.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Interaction Model</strong>
+                    <p>Click label → cycles Year → Title → Acquired → Year. Click arrow → flips ↑/↓. Two independent targets.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Focus / Accessibility</strong>
+                    <p>Both buttons are keyboard-focusable. Tab order: field cycle → direction → Reset.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════
+         PATH B — THE LEDGER
+    ════════════════════════════════════ -->
+    <section class="path-section">
+        <div class="path-info">
+            <span class="tag">Archetype B</span>
+            <h2 class="path-title">The Ledger — Radio Rows + Direction Toggle</h2>
+            <p class="rationale">
+                A dedicated "Order By" filter-group section that mirrors the Era and Metal blocks precisely — same rhythm, same label anatomy, but with circular radio indicators instead of square checkboxes to distinguish single-select semantics. Direction is surfaced as an explicit two-segment toggle beneath. Maximum legibility; the scholar's preference.
+            </p>
+        </div>
+
+        <div class="browser-frame">
+            <div class="frame-header">
+                <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                <div class="address-bar">patina://cabinet // Sort: Title ↓</div>
+            </div>
+            <div class="frame-content">
+                <div class="app-layout">
+
+                    <!-- SIDEBAR B -->
+                    <aside class="patina-sidebar">
+
+                        <div class="filter-group">
+                            <span class="filter-label">Eras</span>
+                            <ul class="filter-list">
+                                <li>
+                                    <label class="filter-item-label active" onclick="toggleFilterB(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>Ancient</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label" onclick="toggleFilterB(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>Medieval</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label" onclick="toggleFilterB(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>Modern</span>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="filter-group">
+                            <span class="filter-label">Metals</span>
+                            <ul class="filter-list">
+                                <li>
+                                    <label class="filter-item-label" onclick="toggleFilterB(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>AR</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label active" onclick="toggleFilterB(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>AE</span>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- SORT CONTROL B -->
+                        <div class="filter-group">
+                            <span class="filter-label">Order By</span>
+                            <ul class="filter-list" id="radioListB">
+                                <li>
+                                    <label class="filter-item-label" onclick="selectSortB(this, 'year')">
+                                        <span class="filter-radio"></span>
+                                        <span>Year</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label active" onclick="selectSortB(this, 'title')">
+                                        <span class="filter-radio"></span>
+                                        <span>Title</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label" onclick="selectSortB(this, 'acquired')">
+                                        <span class="filter-radio"></span>
+                                        <span>Acquired</span>
+                                    </label>
+                                </li>
+                            </ul>
+                            <div class="sort-dir-toggle">
+                                <button class="dir-btn" id="dirAscB" onclick="setDirB('asc')">↑ Asc</button>
+                                <button class="dir-btn active" id="dirDescB" onclick="setDirB('desc')">↓ Desc</button>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-footer">
+                            <button class="btn-minimal">Reset Archive View</button>
+                        </div>
+                    </aside>
+
+                    <!-- GALLERY STUB -->
+                    <main class="app-main">
+                        <div class="cabinet-toolbar-stub">
+                            <div class="btn-stub"></div><div class="btn-stub"></div><div class="btn-stub"></div>
+                        </div>
+                        <p class="count-stub">24 objects in the ledger.</p>
+                        <div class="gallery-stub">
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                        </div>
+                    </main>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="audit-results">
+            <h3>Curatorial Audit — Path B</h3>
+            <div class="audit-grid">
+                <div class="audit-item">
+                    <strong>Contrast (WCAG)</strong>
+                    <p><span class="pass">Pass AA</span> — Active dir-btn: white/Sienna 4.7:1. Radio dot: Sienna on Parchment clear at 4.7:1.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Sidebar Footprint</strong>
+                    <p>Adds ~130px. Sidebar may require scroll on smaller windows. Most desktop heights handle this without issue.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Discoverability</strong>
+                    <p><span class="pass">Excellent.</span> Mirrors existing filter groups exactly — zero new interaction model to learn. Asc/Desc labels are explicit.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Archival Tone</strong>
+                    <p>Strong. Radio circles maintain visual harmony with checkboxes while signalling single-select semantics correctly.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Interaction Model</strong>
+                    <p>Click row to select field (radio). Click segment to choose direction (toggle). Familiar, explicit, zero ambiguity.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Focus / Accessibility</strong>
+                    <p>All rows and buttons keyboard-focusable. Direction toggle segments are individually tab-able with clear active state.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════
+         PATH C — THE HYBRID
+    ════════════════════════════════════ -->
+    <section class="path-section">
+        <div class="path-info">
+            <span class="tag">Archetype C</span>
+            <h2 class="path-title">The Hybrid — Chip Row + Rotating Arrow</h2>
+            <p class="rationale">
+                Three compact field chips sit in a single horizontal row, capped by a single direction arrow that rotates 180° on toggle. This path occupies the smallest possible vertical footprint while keeping all three sort fields simultaneously visible. The ink-filled active chip uses the darkest palette token for maximum legibility — a deliberate departure from the accent colour to reserve Sienna for filter selections.
+            </p>
+        </div>
+
+        <div class="browser-frame">
+            <div class="frame-header">
+                <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                <div class="address-bar">patina://cabinet // Sort: Acquired ↑</div>
+            </div>
+            <div class="frame-content">
+                <div class="app-layout">
+
+                    <!-- SIDEBAR C -->
+                    <aside class="patina-sidebar">
+
+                        <div class="filter-group">
+                            <span class="filter-label">Eras</span>
+                            <ul class="filter-list">
+                                <li>
+                                    <label class="filter-item-label active" onclick="toggleFilterC(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>Ancient</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label" onclick="toggleFilterC(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>Medieval</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label" onclick="toggleFilterC(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>Modern</span>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="filter-group">
+                            <span class="filter-label">Metals</span>
+                            <ul class="filter-list">
+                                <li>
+                                    <label class="filter-item-label" onclick="toggleFilterC(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>AR</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="filter-item-label active" onclick="toggleFilterC(this)">
+                                        <span class="filter-checkbox"></span>
+                                        <span>AE</span>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- SORT CONTROL C -->
+                        <div class="filter-group">
+                            <span class="filter-label">Order</span>
+                            <div class="sort-chips-row">
+                                <button class="sort-chip" onclick="selectChipC(this, 'year')">Year</button>
+                                <button class="sort-chip" onclick="selectChipC(this, 'title')">Title</button>
+                                <button class="sort-chip active" onclick="selectChipC(this, 'acquired')">Acquired</button>
+                            </div>
+                            <div class="sort-dir-row">
+                                <button class="sort-dir-arrow-c" id="dirArrowC" onclick="toggleDirC()">
+                                    <span class="arrow-icon">↑</span>
+                                    <span class="sort-dir-label-c" id="dirLabelC">Ascending</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-footer">
+                            <button class="btn-minimal">Reset Archive View</button>
+                        </div>
+                    </aside>
+
+                    <!-- GALLERY STUB -->
+                    <main class="app-main">
+                        <div class="cabinet-toolbar-stub">
+                            <div class="btn-stub"></div><div class="btn-stub"></div><div class="btn-stub"></div>
+                        </div>
+                        <p class="count-stub">24 objects in the ledger.</p>
+                        <div class="gallery-stub">
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                            <div class="coin-card-stub"><div class="stub-img"></div><div class="stub-title"></div><div class="stub-meta"></div></div>
+                        </div>
+                    </main>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="audit-results">
+            <h3>Curatorial Audit — Path C</h3>
+            <div class="audit-grid">
+                <div class="audit-item">
+                    <strong>Contrast (WCAG)</strong>
+                    <p><span class="pass">Pass AA</span> — Active chip: Parchment on Ink 14.3:1. Inactive chip text on Parchment 4.6:1.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Sidebar Footprint</strong>
+                    <p>Smallest footprint of the three — adds ~80px. Chips fit in a single row at 280px with comfortable padding.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Discoverability</strong>
+                    <p><span class="note">Good.</span> All three options always visible. Arrow label is explicit (Ascending / Descending). Ink-filled active chip is unambiguous.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Archival Tone</strong>
+                    <p>Strong. Ink-on-parchment chip inversion echoes the physical stamp. Arrow rotation is the one animated element — used sparingly and purposefully.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Interaction Model</strong>
+                    <p>Click chip to select field (any). Click arrow/label to flip direction. One active chip at a time; always one active.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Focus / Accessibility</strong>
+                    <p>All chips and arrow button are keyboard-focusable. Active chip's high contrast satisfies focus-visible requirements without extra outline.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    /* ── Path A ── */
+    const fieldsA = ['Year', 'Title', 'Acquired'];
+    let fieldIdxA = 0;
+    let ascA = true;
+
+    function cycleFieldA() {
+        fieldIdxA = (fieldIdxA + 1) % fieldsA.length;
+        document.getElementById('fieldLabelA').textContent = fieldsA[fieldIdxA];
+    }
+    function toggleDirA() {
+        ascA = !ascA;
+        const btn = document.getElementById('dirBtnA');
+        btn.textContent = ascA ? '↑' : '↓';
+        btn.classList.toggle('desc', !ascA);
+    }
+    function toggleFilterA(el) {
+        el.classList.toggle('active');
+    }
+
+    /* ── Path B ── */
+    let dirB = 'desc';
+
+    function selectSortB(el, field) {
+        document.querySelectorAll('#radioListB .filter-item-label').forEach(l => l.classList.remove('active'));
+        el.classList.add('active');
+    }
+    function setDirB(dir) {
+        dirB = dir;
+        document.getElementById('dirAscB').classList.toggle('active', dir === 'asc');
+        document.getElementById('dirDescB').classList.toggle('active', dir === 'desc');
+    }
+    function toggleFilterB(el) {
+        el.classList.toggle('active');
+    }
+
+    /* ── Path C ── */
+    let ascC = true;
+
+    function selectChipC(el, field) {
+        el.closest('.sort-chips-row').querySelectorAll('.sort-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+    }
+    function toggleDirC() {
+        ascC = !ascC;
+        const btn = document.getElementById('dirArrowC');
+        btn.classList.toggle('desc', !ascC);
+        document.getElementById('dirLabelC').textContent = ascC ? 'Ascending' : 'Descending';
+    }
+    function toggleFilterC(el) {
+        el.classList.toggle('active');
+    }
+</script>
+</body>
+</html>

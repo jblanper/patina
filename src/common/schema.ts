@@ -55,6 +55,26 @@ export const SCHEMA: TableDefinition[] = [
       { name: 'created_at', type: 'DATETIME', constraints: 'DEFAULT CURRENT_TIMESTAMP' }
     ],
     extraSQL: 'FOREIGN KEY (coin_id) REFERENCES coins(id) ON DELETE CASCADE'
+  },
+  {
+    name: 'vocabularies',
+    columns: [
+      { name: 'id', type: 'INTEGER', constraints: 'PRIMARY KEY AUTOINCREMENT' },
+      { name: 'field', type: 'TEXT', constraints: 'NOT NULL' },
+      { name: 'value', type: 'TEXT', constraints: 'NOT NULL' },
+      { name: 'locale', type: 'TEXT', constraints: "DEFAULT 'en'" },
+      { name: 'is_builtin', type: 'INTEGER', constraints: 'DEFAULT 0' },
+      { name: 'usage_count', type: 'INTEGER', constraints: 'DEFAULT 0' },
+      { name: 'created_at', type: 'DATETIME', constraints: 'DEFAULT CURRENT_TIMESTAMP' }
+    ],
+    extraSQL: 'UNIQUE(field, value, locale)'
+  },
+  {
+    name: 'preferences',
+    columns: [
+      { name: 'key', type: 'TEXT', constraints: 'PRIMARY KEY' },
+      { name: 'value', type: 'TEXT', constraints: 'NOT NULL' }
+    ]
   }
 ];
 

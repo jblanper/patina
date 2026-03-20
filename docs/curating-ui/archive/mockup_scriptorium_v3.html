@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup: The Scriptorium v3 (Final Polish)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #7A7875;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --spacing-large: 4rem;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-manuscript);
+            color: var(--text-ink);
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 1. App Header (Mirrors CoinDetail) */
+        .app-header {
+            padding: 1rem var(--spacing-large);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-manuscript);
+            border-bottom: 1px solid var(--border-hairline);
+            z-index: 10;
+        }
+
+        .nav-back {
+            background: none; border: none;
+            font-family: var(--font-sans); font-size: 0.9rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); cursor: pointer;
+        }
+        .nav-back:hover { color: var(--accent-manuscript); }
+
+        .header-actions { display: flex; gap: 2rem; align-items: center; }
+
+        .btn-minimal {
+            background: none; border: none;
+            border-bottom: 1px solid var(--text-ink);
+            font-family: var(--font-mono); font-size: 0.75rem;
+            color: var(--text-ink); cursor: pointer;
+            padding-bottom: 2px;
+            text-transform: uppercase;
+        }
+
+        .btn-solid {
+            background: var(--text-ink); color: #fff;
+            padding: 0.7rem 2rem; border: none;
+            font-family: var(--font-mono); font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        /* 2. Ledger Layout (Grid matching CoinDetail) */
+        .ledger-layout {
+            display: grid;
+            grid-template-columns: 45% 55%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* 3. Left Folio (The Plate / Lens Interface) */
+        .left-folio {
+            background: var(--stone-pedestal);
+            border-right: 1px solid var(--border-hairline); /* Matches CoinDetail division */
+            padding: var(--spacing-large);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 6rem;
+        }
+
+        .lens-frame {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1/1;
+            background: #fff;
+            border: 1px dashed var(--border-hairline);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .lens-frame:hover { border-color: var(--accent-manuscript); }
+
+        .plate-caption {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* 4. Right Folio (The Record Form) */
+        .right-folio {
+            padding: var(--spacing-large);
+            overflow-y: auto;
+            padding-bottom: 10rem;
+            background-color: var(--bg-manuscript);
+        }
+
+        /* Folio Header (Mirrors CoinDetail typography) */
+        .folio-header { margin-bottom: 2.5rem; }
+        
+        .meta-line {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent-manuscript);
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        /* Title Input (Mirrors .folio-title 3rem) */
+        .input-h1 {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid transparent;
+            background: transparent;
+            font-family: var(--font-serif);
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-ink);
+            line-height: 1.1;
+            padding: 0;
+            margin-bottom: 0.5rem;
+            outline: none;
+        }
+        .input-h1:focus { border-bottom-color: var(--border-hairline); }
+
+        /* Subtitle Input (Mirrors .subtitle 1.2rem) */
+        .subtitle-grid {
+            display: flex; gap: 0.75rem; align-items: center;
+            font-family: var(--font-serif); font-size: 1.2rem; color: var(--text-muted);
+            font-style: italic;
+        }
+        .input-sub {
+            border: none; border-bottom: 1px dashed var(--border-hairline);
+            background: transparent;
+            font-family: inherit; font-size: inherit; color: inherit; font-style: inherit;
+            width: 160px; outline: none;
+        }
+        .input-sub:focus { border-bottom-style: solid; color: var(--text-ink); }
+
+        /* Metrics Grid (3 cols like CoinDetail) */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 2.5rem 0;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border-hairline);
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        .metric-item { display: flex; flex-direction: column; gap: 0.5rem; }
+        
+        .metric-label {
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .input-metric {
+            width: 100%;
+            border: none; border-bottom: 1px solid var(--border-hairline);
+            background: transparent;
+            font-family: var(--font-mono); font-size: 1rem; color: var(--accent-manuscript);
+            padding-bottom: 4px; outline: none;
+        }
+        .input-metric:focus { background: var(--stone-pedestal); border-bottom-color: var(--text-ink); }
+
+        /* Numismatic Sections (Reduced Spacing to 2.5rem) */
+        .numismatic-section { margin-bottom: 2.5rem; }
+        
+        .section-label {
+            display: block;
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-hairline);
+            padding-bottom: 0.5rem;
+            width: 100px;
+        }
+
+        .input-block {
+            width: 100%;
+            border: 1px solid transparent;
+            background: rgba(240, 237, 230, 0.4);
+            padding: 1rem;
+            font-family: var(--font-serif); font-size: 1.1rem;
+            resize: vertical; outline: none;
+            transition: all 0.2s;
+            line-height: 1.5;
+        }
+        .input-block:focus { background: #fff; border-color: var(--border-hairline); }
+
+        .input-legend {
+            width: 100%;
+            border: none; border-bottom: 1px dashed var(--border-hairline);
+            background: transparent;
+            font-family: var(--font-sans); font-weight: 600; text-transform: uppercase;
+            font-size: 0.9rem; letter-spacing: 1px;
+            margin-bottom: 1rem; outline: none;
+        }
+
+        /* Footer (Mirrors Ledger Footer) */
+        .ledger-footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            background-color: var(--stone-pedestal);
+            display: flex; gap: 3rem;
+            font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);
+        }
+        
+        .footer-item strong { color: var(--text-ink); margin-right: 0.5rem; }
+        .footer-input {
+            border: none; border-bottom: 1px dashed var(--border-hairline);
+            background: transparent;
+            font-family: inherit; font-size: inherit; color: var(--text-ink);
+            width: 140px; outline: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <button class="nav-back">← Cancel Archival Entry</button>
+        <div class="header-actions">
+            <button class="btn-minimal">Save Draft</button>
+            <button class="btn-solid">Index to Ledger</button>
+        </div>
+    </header>
+
+    <div class="ledger-layout">
+        
+        <!-- Left Folio: Plate Editor (Divisions mirror CoinDetail) -->
+        <div class="left-folio">
+            <div class="lens-frame">
+                <div style="font-size: 1.5rem; color: var(--text-muted);">📷</div>
+                <div style="font-family: var(--font-serif); color: var(--text-muted); margin-top:0.5rem;">Lens Bridging</div>
+            </div>
+            <div class="plate-caption">PLATE I // WAITING FOR SCRIPTORIUM SIGNAL</div>
+            
+            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <button class="btn-minimal" style="font-size: 0.65rem;">+ Add Reverse</button>
+                <button class="btn-minimal" style="font-size: 0.65rem;">+ Add Edge</button>
+            </div>
+        </div>
+
+        <!-- Right Folio: Record Editor -->
+        <div class="right-folio">
+            
+            <div class="folio-header">
+                <span class="meta-line">NEW LEDGER ENTRY // #1024</span>
+                <input type="text" class="input-h1" placeholder="Object Title" value="Athenian Owl Tetradrachm">
+                
+                <div class="subtitle-grid">
+                    Minted at <input type="text" class="input-sub" placeholder="e.g. Athens">
+                    // 
+                    <input type="text" class="input-sub" placeholder="e.g. 450 BC">
+                </div>
+            </div>
+
+            <!-- Technical Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <span class="metric-label">Weight (g)</span>
+                    <input type="text" class="input-metric" value="17.20">
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Diameter (mm)</span>
+                    <input type="text" class="input-metric" value="24.5">
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Die Axis (h)</span>
+                    <input type="number" class="input-metric" value="9">
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Material</span>
+                    <input type="text" class="input-metric" value="Silver (AR)">
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Fineness</span>
+                    <input type="text" class="input-metric" placeholder="e.g. .980">
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Grade</span>
+                    <input type="text" class="input-metric" value="Choice XF">
+                </div>
+            </div>
+
+            <!-- Numismatic Data -->
+            <div class="numismatic-section">
+                <span class="section-label">Obverse</span>
+                <input type="text" class="input-legend" placeholder="LEGEND (e.g. IMP CAES HADRIANVS AVG)">
+                <textarea class="input-block" placeholder="Describe the motif..."></textarea>
+            </div>
+
+            <div class="numismatic-section">
+                <span class="section-label">Reverse</span>
+                <input type="text" class="input-legend" placeholder="REVERSE LEGEND (e.g. AOE)">
+                <textarea class="input-block" placeholder="Describe the reverse symbols..."></textarea>
+            </div>
+
+            <!-- Curator's Note -->
+            <div class="numismatic-section">
+                <span class="section-label">Curator's Note</span>
+                <textarea class="input-block" style="min-height: 180px;" placeholder="Historical context or unique narrative..."></textarea>
+            </div>
+
+            <!-- Provenance -->
+            <div class="numismatic-section">
+                <span class="section-label">Provenance</span>
+                <input type="text" class="input-metric" style="width: 100%; color: var(--text-ink);" placeholder="e.g. Ex. BCD Collection; Purchased 2024">
+            </div>
+
+            <!-- Acquisition Footer (Mirrors Ledger Footer style) -->
+            <footer class="ledger-footer">
+                <div class="footer-item">
+                    <strong>Acquired:</strong> 
+                    <input type="date" class="footer-input">
+                </div>
+                <div class="footer-item">
+                    <strong>Source:</strong> 
+                    <input type="text" class="footer-input" placeholder="e.g. CNG">
+                </div>
+                <div class="footer-item">
+                    <strong>Cost:</strong> 
+                    <input type="text" class="footer-input" placeholder="00.00">
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+</body>
+</html>

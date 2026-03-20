@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup: The Scriptorium v2 (Refined Desk)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #7A7875;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --spacing-large: 4rem;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-manuscript);
+            color: var(--text-ink);
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 1. App Header */
+        .app-header {
+            padding: 1rem var(--spacing-large);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-manuscript);
+            border-bottom: 2px solid var(--text-ink);
+            z-index: 10;
+        }
+
+        .nav-back {
+            background: none; border: none;
+            font-family: var(--font-mono); font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); cursor: pointer;
+            transition: color 0.2s;
+        }
+        .nav-back:hover { color: var(--accent-manuscript); }
+
+        .header-actions { display: flex; gap: 2rem; align-items: center; }
+
+        .btn-minimal {
+            background: none; border: none;
+            border-bottom: 1px solid var(--text-ink);
+            font-family: var(--font-mono); font-size: 0.75rem;
+            color: var(--text-ink); cursor: pointer;
+            padding-bottom: 2px;
+            text-transform: uppercase;
+        }
+
+        .btn-solid {
+            background: var(--text-ink); color: #fff;
+            padding: 0.8rem 2rem; border: none;
+            font-family: var(--font-mono); font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-solid:hover { background: var(--accent-manuscript); }
+
+        /* 2. Ledger Layout */
+        .ledger-layout {
+            display: grid;
+            grid-template-columns: 45% 55%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* 3. Left Folio (The Plate / Lens Interface) */
+        .left-folio {
+            background: var(--stone-pedestal);
+            border-right: 1px solid var(--border-hairline);
+            padding: var(--spacing-large);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 6rem;
+        }
+
+        .lens-mount {
+            width: 100%;
+            max-width: 420px;
+            aspect-ratio: 1/1;
+            background: #fff;
+            border: 1px solid var(--border-hairline);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: transform 0.3s ease;
+        }
+
+        .lens-mount:hover { transform: translateY(-4px); }
+
+        .lens-instruction {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .lens-instruction h3 {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--text-ink);
+        }
+
+        .lens-instruction p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .qr-placeholder {
+            width: 180px; height: 180px;
+            border: 1px solid var(--border-hairline);
+            background: var(--bg-manuscript);
+            margin: 0 auto 1.5rem;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);
+        }
+
+        /* 4. Right Folio (The Record Form) */
+        .right-folio {
+            padding: var(--spacing-large);
+            overflow-y: auto;
+            padding-bottom: 10rem;
+            background-color: var(--bg-manuscript);
+        }
+
+        .folio-header { margin-bottom: 4rem; }
+        
+        .meta-tag {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent-manuscript);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Form Controls */
+        .field-group { margin-bottom: 2.5rem; position: relative; }
+        
+        .field-label {
+            display: block;
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .input-title {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid var(--border-hairline);
+            background: transparent;
+            font-family: var(--font-serif);
+            font-size: 3.2rem;
+            font-weight: 700;
+            color: var(--text-ink);
+            line-height: 1;
+            padding: 0.5rem 0;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .input-title:focus { border-bottom-color: var(--text-ink); background: rgba(0,0,0,0.01); }
+
+        .input-sub {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--border-hairline);
+            background: transparent;
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            font-style: italic;
+            color: var(--text-ink);
+            padding: 0.5rem 0;
+            outline: none;
+        }
+        .input-sub:focus { border-bottom-color: var(--accent-manuscript); }
+
+        /* Metrics Layout */
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            margin: 4rem 0;
+            padding: 2.5rem 0;
+            border-top: 1px solid var(--border-hairline);
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        .metric-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-metric {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--border-hairline);
+            background: transparent;
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            color: var(--accent-manuscript);
+            padding: 0.5rem 0;
+            outline: none;
+        }
+        .input-metric:focus { border-bottom-color: var(--text-ink); background: var(--stone-pedestal); }
+        .input-metric.has-error { border-bottom-color: var(--error-red); }
+
+        .error-hint {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--error-red);
+            margin-top: 0.4rem;
+            text-transform: uppercase;
+        }
+
+        /* Descriptive Blocks */
+        .description-section { margin-bottom: 3.5rem; }
+
+        .input-legend {
+            width: 100%;
+            border: none;
+            border-bottom: 1px dashed var(--border-hairline);
+            background: transparent;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+            outline: none;
+        }
+
+        .textarea-manuscript {
+            width: 100%;
+            border: 1px solid transparent;
+            background: rgba(240, 237, 230, 0.3); /* Soft stone tint */
+            padding: 1rem;
+            font-family: var(--font-serif);
+            font-size: 1.15rem;
+            min-height: 120px;
+            line-height: 1.5;
+            resize: vertical;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .textarea-manuscript:focus { background: #fff; border-color: var(--border-hairline); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+
+        /* Acquisition Details */
+        .acquisition-footer {
+            margin-top: 5rem;
+            padding: 2.5rem;
+            background: var(--stone-pedestal);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <button class="nav-back">← Discard Draft / Return</button>
+        <div class="header-actions">
+            <button class="btn-minimal">Save as Draft</button>
+            <button class="btn-solid">Permanently Archive</button>
+        </div>
+    </header>
+
+    <div class="ledger-layout">
+        
+        <!-- Left Folio: Interaction Sanctuary -->
+        <div class="left-folio">
+            <div class="lens-mount">
+                <div class="lens-instruction">
+                    <h3>The Lens</h3>
+                    <p>Establish a wireless bridge to your mobile camera for high-resolution archival capture.</p>
+                    
+                    <div class="qr-placeholder">
+                        [ QR CODE GENERATING... ]
+                    </div>
+                    
+                    <button class="btn-minimal" style="font-size: 0.65rem;">Or Browse Local Files</button>
+                </div>
+            </div>
+            
+            <div style="margin-top: 3rem; text-align: center;">
+                <span class="field-label" style="margin-bottom: 1rem;">Plate Sequence</span>
+                <div style="display: flex; gap: 1rem;">
+                    <div style="width: 60px; height: 60px; border: 1px solid var(--accent-manuscript); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-family: var(--font-mono);">OBV</div>
+                    <div style="width: 60px; height: 60px; border: 1px dashed var(--border-hairline); background: rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-family: var(--font-mono);">+ REV</div>
+                    <div style="width: 60px; height: 60px; border: 1px dashed var(--border-hairline); background: rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-family: var(--font-mono);">+ EDGE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Folio: Archival Entry -->
+        <div class="right-folio">
+            
+            <div class="folio-header">
+                <span class="meta-tag">Catalog Sequence // New Record</span>
+                <div class="field-group">
+                    <label class="field-label">Object Designation</label>
+                    <input type="text" class="input-title" placeholder="e.g. Athenian Owl Tetradrachm">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div class="field-group">
+                        <label class="field-label">Authority / Issuer</label>
+                        <input type="text" class="input-sub" placeholder="e.g. Athens">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Chronology (Year & Era)</label>
+                        <input type="text" class="input-sub" placeholder="e.g. 450 BC">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Metrics -->
+            <div class="metrics-container">
+                <div class="metric-field">
+                    <label class="field-label">Weight (g)</label>
+                    <input type="text" class="input-metric has-error" value="17.2">
+                    <span class="error-hint">ERR: 2-Decimal Precision Required (e.g. 17.20)</span>
+                </div>
+                <div class="metric-field">
+                    <label class="field-label">Diameter (mm)</label>
+                    <input type="text" class="input-metric" placeholder="00.0">
+                </div>
+                <div class="metric-field">
+                    <label class="field-label">Material / Metal</label>
+                    <input type="text" class="input-metric" placeholder="e.g. AR (Silver)">
+                </div>
+                <div class="metric-field">
+                    <label class="field-label">Die Axis (h)</label>
+                    <input type="text" class="input-metric" placeholder="1-12">
+                </div>
+                <div class="metric-field">
+                    <label class="field-label">Fineness</label>
+                    <input type="text" class="input-metric" placeholder="e.g. .925">
+                </div>
+                <div class="metric-field">
+                    <label class="field-label">Preservation Grade</label>
+                    <input type="text" class="input-metric" placeholder="e.g. Choice XF">
+                </div>
+            </div>
+
+            <!-- Numismatic Description -->
+            <div class="description-section">
+                <span class="meta-tag" style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-hairline); padding-bottom: 0.5rem; width: 100%;">Numismatic Description</span>
+                
+                <div class="field-group">
+                    <label class="field-label">Obverse Particulars</label>
+                    <input type="text" class="input-legend" placeholder="LEGEND (e.g. IMP CAES HADRIANVS AVG)">
+                    <textarea class="textarea-manuscript" placeholder="Describe the motif, portraiture, and style..."></textarea>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Reverse Particulars</label>
+                    <input type="text" class="input-legend" placeholder="LEGEND (e.g. AOE)">
+                    <textarea class="textarea-manuscript" placeholder="Describe the reverse motif, symbols, and mintmarks..."></textarea>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Catalog References</label>
+                    <input type="text" class="input-metric" style="width: 100%; font-family: var(--font-sans); color: var(--text-ink);" placeholder="e.g. RIC II 218; HGC 4, 1597">
+                </div>
+            </div>
+
+            <!-- Curator's Perspective -->
+            <div class="description-section">
+                <span class="meta-tag" style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-hairline); padding-bottom: 0.5rem; width: 100%;">Curator's Perspective</span>
+                
+                <div class="field-group">
+                    <label class="field-label">The Story (Historical Context)</label>
+                    <textarea class="textarea-manuscript" style="min-height: 200px;" placeholder="Record the historical significance or unique narrative of this specific object..."></textarea>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Provenance / Pedigree</label>
+                    <input type="text" class="input-metric" style="width: 100%; font-family: var(--font-sans); color: var(--text-ink);" placeholder="e.g. Ex. BCD Collection; Purchased from CNG 2024">
+                </div>
+            </div>
+
+            <!-- Acquisition Logic -->
+            <div class="acquisition-footer">
+                <div class="metric-field">
+                    <label class="field-label">Acquisition Date</label>
+                    <input type="date" class="input-metric" style="color: var(--text-ink);">
+                </div>
+                <div class="metric-field">
+                    <label class="field-label">Purchase Source</label>
+                    <input type="text" class="input-metric" style="color: var(--text-ink);" placeholder="e.g. Heritage Auctions">
+                </div>
+                <div class="metric-field">
+                    <label class="field-label">Cost (Private Record)</label>
+                    <input type="text" class="input-metric" style="color: var(--text-ink);" placeholder="00.00">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

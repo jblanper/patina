@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curatorial Refinement: Coin Detail & Scriptorium — Patina</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #7A7875;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --spacing-large: clamp(2rem, 5vw, 3rem);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: var(--font-sans);
+            background: #EDEAE4;
+            color: var(--text-ink);
+            line-height: 1.6;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* --- Presentation Wrapper --- */
+        .page-title {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            font-style: italic;
+            color: var(--text-ink);
+        }
+
+        .page-meta {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            margin-top: 0.25rem;
+        }
+
+        /* --- Curator Brief Card --- */
+        .curator-brief {
+            background: white;
+            border: 1px solid var(--border-hairline);
+            border-left: 4px solid var(--accent-manuscript);
+            padding: 2.5rem;
+        }
+
+        .brief-tag {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+
+        .brief-title {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .brief-body {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text-muted);
+            max-width: 70ch;
+            line-height: 1.7;
+        }
+
+        .finding-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-hairline);
+        }
+
+        .finding {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .finding-id {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.2rem 0.5rem;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .finding-id.critical { background: #B22222; color: white; }
+        .finding-id.high { background: var(--accent-manuscript); color: white; }
+        .finding-id.medium { background: var(--stone-pedestal); color: var(--text-ink); border: 1px solid var(--border-hairline); }
+        .finding-id.low { color: var(--text-muted); border: 1px solid var(--border-hairline); padding: 0.2rem 0.5rem; }
+
+        .finding-label {
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .finding-desc {
+            font-family: var(--font-sans);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        /* --- Browser Frame --- */
+        .browser-frame {
+            background: var(--bg-manuscript);
+            border: 1px solid var(--border-hairline);
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .frame-header {
+            background: #E0DDD6;
+            padding: 0.7rem 1rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.r { background: #FF5F56; }
+        .dot.y { background: #FFBD2E; }
+        .dot.g { background: #27C93F; }
+
+        .address-bar {
+            background: white;
+            padding: 0.2rem 1rem;
+            border-radius: 3px;
+            flex: 1;
+            margin-left: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: center;
+            border: 1px solid var(--border-hairline);
+        }
+
+        .frame-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-manuscript);
+            background: var(--stone-pedestal);
+            padding: 0.3rem 0.75rem;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        .frame-content {
+            flex: 1;
+            background: var(--bg-manuscript);
+            overflow: hidden;
+        }
+
+        /* ========== APP CSS EMULATION ========== */
+
+        .app-header {
+            padding: 1rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid var(--text-ink);
+            margin-bottom: 2rem;
+        }
+
+        .nav-back {
+            background: none; border: none;
+            font-family: var(--font-mono); font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); cursor: pointer;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .btn-minimal {
+            background: none; border: none;
+            border-bottom: 1px solid var(--text-ink);
+            padding-bottom: 3px;
+            font-family: var(--font-mono); font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; color: var(--text-ink);
+        }
+
+        /* NEW: Delete button hover signal */
+        .btn-delete {
+            background: none; border: none;
+            border-bottom: 1px solid var(--text-muted);
+            padding-bottom: 3px;
+            font-family: var(--font-mono); font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; color: var(--text-muted);
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .btn-delete:hover {
+            color: var(--error-red);
+            border-color: var(--error-red);
+        }
+
+        .btn-solid {
+            background: var(--text-ink); color: white;
+            padding: 0.75rem 2rem; border: none;
+            font-family: var(--font-mono); font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+        }
+
+        /* Ledger Layout */
+        .ledger-layout {
+            display: grid;
+            grid-template-columns: 42% 58%;
+            padding: 0 2.5rem 2rem;
+            gap: 0;
+        }
+
+        /* Left Folio */
+        .left-folio {
+            padding-right: 3rem;
+            border-right: 1px solid var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* REFINED: Plate frame with zoom affordance */
+        .plate-frame {
+            width: 100%;
+            max-width: 320px;
+            aspect-ratio: 1;
+            background: var(--stone-pedestal);
+            border: 1px solid var(--border-hairline);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            margin-bottom: 1rem;
+            position: relative;
+            cursor: zoom-in;
+            overflow: hidden;
+        }
+
+        .plate-frame::after {
+            content: '⌕';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(45, 41, 38, 0.18);
+            color: white;
+            font-size: 3rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-family: sans-serif;
+        }
+
+        .plate-frame:hover::after {
+            opacity: 1;
+        }
+
+        .coin-img-mock {
+            width: 78%;
+            height: 78%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #D8D3C5 0%, #B5B0A5 60%, #9A9590 100%);
+            filter: drop-shadow(6px 8px 15px rgba(0,0,0,0.15));
+        }
+
+        .plate-caption {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .thumbnail-strip {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .thumb {
+            width: 52px; height: 52px;
+            border: 1px solid var(--border-hairline);
+            background: var(--stone-pedestal);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+
+        .thumb.active { border-color: var(--accent-manuscript); }
+
+        .thumb-coin {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #D8D3C5 0%, #B5B0A5 100%);
+        }
+
+        /* Right Folio */
+        .right-folio {
+            padding-left: 3rem;
+        }
+
+        .folio-header {
+            border-bottom: 2px solid var(--text-ink);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .meta-line {
+            font-family: var(--font-mono);
+            color: var(--accent-manuscript);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .folio-title {
+            font-family: var(--font-serif);
+            font-size: 2.8rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* REFINED: Metrics grid with bottom border */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-hairline); /* NEW */
+        }
+
+        .metric-item { display: flex; flex-direction: column; }
+
+        .metric-label {
+            font-family: var(--font-sans);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.2rem;
+        }
+
+        .metric-value {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--text-ink);
+        }
+
+        /* Numismatic Section */
+        .numismatic-section { margin-bottom: 2rem; }
+
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent-manuscript);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            display: block;
+            border-bottom: 1px solid var(--border-hairline);
+            padding-bottom: 0.4rem;
+            width: fit-content;
+        }
+
+        .desc-legend {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-ink);
+            text-transform: uppercase;
+            background: var(--stone-pedestal);
+            padding: 0.2rem 0.5rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .desc-text {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-ink);
+            max-width: 60ch;
+        }
+
+        .curator-note {
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        /* REFINED: Provenance as separate section */
+        .provenance-section {
+            margin-bottom: 2rem;
+        }
+
+        .provenance-note {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        /* REFINED: Footer — mono throughout */
+        .ledger-footer {
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-hairline);
+            display: flex;
+            gap: 2rem;
+            justify-content: space-between;
+            font-family: var(--font-mono); /* UNIFIED */
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .footer-item { min-width: 0; }
+        .footer-item strong {
+            text-transform: uppercase;
+            color: var(--text-ink);
+            margin-right: 0.4rem;
+        }
+        .cost-item { text-align: right; }
+
+        /* Annotation bubbles */
+        .annotate {
+            position: relative;
+            display: inline-block;
+        }
+
+        .annotate::before {
+            content: attr(data-note);
+            position: absolute;
+            left: calc(100% + 1rem);
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent-manuscript);
+            color: white;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            padding: 0.2rem 0.5rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* ========== SCRIPTORIUM SECTION ========== */
+
+        .scriptorium-header {
+            padding: 1rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid var(--text-ink);
+            margin-bottom: 2rem;
+        }
+
+        .draft-status {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ledger-layout-scriptorium {
+            display: grid;
+            grid-template-columns: 42% 58%;
+            padding: 0 2.5rem 2rem;
+        }
+
+        .left-folio-scriptorium {
+            padding-right: 3rem;
+            border-right: 1px solid var(--border-hairline);
+        }
+
+        .plate-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; /* REFINED: was 3rem */
+        }
+
+        .plate-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            opacity: 0.6;
+        }
+
+        /* REFINED: First slot full opacity (obverse primacy) */
+        .plate-slot:first-child {
+            opacity: 1;
+        }
+
+        .plate-frame-edit {
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--stone-pedestal);
+            border: 1px dashed var(--text-muted); /* REFINED: was border-hairline */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .plate-slot:first-child .plate-frame-edit {
+            border-color: var(--accent-manuscript);
+            border-style: solid;
+        }
+
+        .plate-icon {
+            font-size: 1.8rem;
+            color: var(--text-muted);
+        }
+
+        .btn-lens-primary {
+            background: var(--text-ink); color: white;
+            padding: 0.6rem 1rem; border: none;
+            font-family: var(--font-mono); font-size: 0.65rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; width: 100%;
+        }
+
+        .btn-lens-minimal {
+            background: none; border: none;
+            color: var(--text-muted);
+            font-family: var(--font-serif); font-style: italic;
+            font-size: 0.85rem; cursor: pointer;
+        }
+
+        .plate-caption-edit {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .right-folio-scriptorium {
+            padding-left: 3rem;
+        }
+
+        /* REFINED: Meta line with proper fallbacks */
+        .meta-line-new {
+            font-family: var(--font-mono);
+            color: var(--accent-manuscript);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .input-h1-mock {
+            font-family: var(--font-serif);
+            font-size: 2.8rem;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-hairline);
+            padding-bottom: 0.25rem;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        .folio-header-form {
+            border-bottom: 2px solid var(--text-ink);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .subtitle-stack {
+            display: grid;
+            grid-template-columns: 130px 1fr; /* REFINED: was 100px */
+            gap: 0.5rem 1.5rem;
+        }
+
+        .subtitle-label {
+            font-family: var(--font-sans);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .input-sub-mock {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--text-muted);
+            border-bottom: 1px dashed var(--border-hairline);
+            padding-bottom: 2px;
+            background: transparent;
+        }
+
+        /* REFINED: Footer as metrics-grid */
+        .footer-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-hairline); /* REFINED: border-top added */
+            margin-top: 1.5rem;
+        }
+
+        .input-metric-mock {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--accent-manuscript);
+            border-bottom: 1px solid var(--border-hairline);
+            padding-bottom: 2px;
+            background: transparent;
+            margin-top: 0.2rem;
+        }
+
+        /* Section divider labels */
+        .section-divider {
+            height: 2.5rem;
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Diff callouts */
+        .diff-callout {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--accent-manuscript);
+            color: white;
+            padding: 0.15rem 0.4rem;
+            vertical-align: middle;
+            margin-left: 0.5rem;
+        }
+
+        .diff-callout.new { background: #2D6A4F; }
+
+        /* Page sections */
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-h2 {
+            font-family: var(--font-serif);
+            font-size: 1.6rem;
+            font-style: italic;
+        }
+
+        .section-page {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Page Header -->
+    <div>
+        <p class="page-meta">Curatorial Refinement · 2026-03-20 · Manuscript Hybrid v3.3</p>
+        <h1 class="page-title">Coin Detail &amp; Scriptorium — Surgical Refinements</h1>
+    </div>
+
+    <!-- Curator Brief -->
+    <div class="curator-brief">
+        <span class="brief-tag">Audit Summary</span>
+        <h2 class="brief-title">Eleven findings across two pages. Five high-priority corrections.</h2>
+        <p class="brief-body">Both pages demonstrate a coherent archival identity. The refinements below address zone separation failures, a hidden interaction affordance, destructive action ordering, and a form pattern inconsistency in the Scriptorium footer. No structural overhaul is required — these are surgical corrections that materially improve clarity and safety.</p>
+
+        <div class="finding-grid">
+            <div class="finding">
+                <span class="finding-id critical">CD-C1 · Critical</span>
+                <span class="finding-label">Zoom affordance hidden</span>
+                <span class="finding-desc">Plate frame click-to-zoom is CSS-cursor-only. No hover overlay reveals the interaction.</span>
+            </div>
+            <div class="finding">
+                <span class="finding-id high">CD-H1 · High</span>
+                <span class="finding-label">Delete precedes Edit</span>
+                <span class="finding-desc">Destructive action appears first in the header. Both use identical btn-minimal styling.</span>
+            </div>
+            <div class="finding">
+                <span class="finding-id high">CD-H2 · High</span>
+                <span class="finding-label">No metrics zone border</span>
+                <span class="finding-desc">Metrics grid transitions to Obverse/Reverse descriptions without a hairline divider.</span>
+            </div>
+            <div class="finding">
+                <span class="finding-id high">CD-H3 · High</span>
+                <span class="finding-label">Hardcoded "PLATE V"</span>
+                <span class="finding-desc">Plate caption always reads "PLATE V" regardless of coin or image context.</span>
+            </div>
+            <div class="finding">
+                <span class="finding-id critical">SC-C1 · Critical</span>
+                <span class="finding-label">[AUTO-ISSUE] token visible</span>
+                <span class="finding-desc">Meta line shows square-bracket debug tokens when metal field is empty (every new coin).</span>
+            </div>
+            <div class="finding">
+                <span class="finding-id high">SC-H1 · High</span>
+                <span class="finding-label">Footer breaks form grammar</span>
+                <span class="finding-desc">Inline label/input pattern in footer contradicts the vertical label-above/input-below system used everywhere else.</span>
+            </div>
+            <div class="finding">
+                <span class="finding-id medium">SC-M2 · Medium</span>
+                <span class="finding-label">No obverse primacy</span>
+                <span class="finding-desc">All three plate slots render at equal opacity. Obverse should be primary.</span>
+            </div>
+            <div class="finding">
+                <span class="finding-id medium">SC-M3 · Medium</span>
+                <span class="finding-label">Subtitle column too narrow</span>
+                <span class="finding-desc">"DENOMINATION" at 100px column clips at 1.5px letter-spacing. Needs 130px.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== COIN DETAIL MOCKUP ===== -->
+    <div>
+        <div class="section-header">
+            <h2 class="section-h2">Coin Detail — Refined</h2>
+            <span class="section-page">patina://coin/42</span>
+        </div>
+    </div>
+
+    <div class="browser-frame">
+        <div class="frame-header">
+            <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+            <div class="address-bar">patina://coin/42 — Athens Tetradrachm</div>
+        </div>
+        <div class="frame-label">COIN DETAIL · REFINEMENTS APPLIED: CD-C1, CD-H1, CD-H2, CD-H3, CD-M1, CD-M2</div>
+        <div class="frame-content">
+
+            <div class="app-header">
+                <button class="nav-back">← Close Ledger Entry</button>
+                <!-- CD-H1: Edit first, Delete second. Delete demoted to muted color. -->
+                <div class="header-actions">
+                    <button class="btn-minimal">Edit Record</button>
+                    <button class="btn-delete">Delete Record</button>
+                    <!-- Hover this to see the error-red signal -->
+                </div>
+            </div>
+
+            <div class="ledger-layout">
+                <!-- Left Folio -->
+                <div class="left-folio">
+                    <!-- CD-C1: Plate frame with hover zoom overlay (hover to reveal) -->
+                    <div class="plate-frame" title="Hover to reveal zoom affordance">
+                        <div class="coin-img-mock"></div>
+                    </div>
+                    <!-- CD-H3: Caption without hardcoded PLATE V -->
+                    <div class="plate-caption">OBVERSE // 2:1 SCALE</div>
+                    <div class="thumbnail-strip">
+                        <div class="thumb active"><div class="thumb-coin"></div></div>
+                        <div class="thumb"><div class="thumb-coin" style="background: radial-gradient(circle at 35% 35%, #C8C3B5 0%, #A5A09A 100%);"></div></div>
+                    </div>
+                </div>
+
+                <!-- Right Folio -->
+                <div class="right-folio">
+                    <div class="folio-header">
+                        <span class="meta-line">Entry #042 // Ancient // Athens</span>
+                        <h1 class="folio-title">Athens Tetradrachm</h1>
+                        <div class="subtitle">Minted at Athens // 440 BC // HGC 4, 1597</div>
+                    </div>
+
+                    <!-- CD-H2: Metrics grid now has border-bottom -->
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Weight</span>
+                            <span class="metric-value">17.20 g</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Diameter</span>
+                            <span class="metric-value">24.5 mm</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Die Axis</span>
+                            <span class="metric-value">9h</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Material</span>
+                            <span class="metric-value">Silver</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Fineness</span>
+                            <span class="metric-value">.999</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Grade</span>
+                            <span class="metric-value">Choice XF</span>
+                        </div>
+                    </div>
+                    <!-- ↑ border-bottom: 1px solid var(--border-hairline) now applied -->
+
+                    <div class="numismatic-section">
+                        <span class="section-label">Obverse</span>
+                        <div>
+                            <p class="desc-text">Head of Athena right, wearing crested Attic helmet decorated with three olive leaves and spiral palmette.</p>
+                        </div>
+                    </div>
+
+                    <div class="numismatic-section">
+                        <span class="section-label">Reverse</span>
+                        <div>
+                            <span class="desc-legend">AOE</span>
+                            <p class="desc-text">Owl standing right, head facing, olive sprig and crescent to left; all within incuse square.</p>
+                        </div>
+                    </div>
+
+                    <!-- CD-M1: Curator's Note is its own section -->
+                    <div class="numismatic-section">
+                        <span class="section-label">Curator's Note</span>
+                        <p class="desc-text curator-note">"The classic 'Owl of Athens', widely circulated throughout the ancient Mediterranean world."</p>
+                    </div>
+
+                    <!-- CD-M1: Provenance is now its own separate section -->
+                    <div class="provenance-section">
+                        <span class="section-label">Provenance</span>
+                        <div class="provenance-note">Ex. Stack's Bowers, Jan 2024</div>
+                    </div>
+
+                    <!-- CD-M2: Footer now uses font-mono throughout -->
+                    <div class="ledger-footer">
+                        <div class="footer-item">
+                            <strong>Acquired:</strong> 2024-01-15 // Stack's Bowers
+                        </div>
+                        <div class="footer-item cost-item">
+                            <strong>Cost:</strong> $1,500.00
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTORIUM MOCKUP ===== -->
+    <div>
+        <div class="section-header" style="margin-top: 1rem;">
+            <h2 class="section-h2">Scriptorium (Add) — Refined</h2>
+            <span class="section-page">patina://scriptorium/add</span>
+        </div>
+    </div>
+
+    <div class="browser-frame">
+        <div class="frame-header">
+            <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+            <div class="address-bar">patina://scriptorium/add — New Entry</div>
+        </div>
+        <div class="frame-label">SCRIPTORIUM · REFINEMENTS APPLIED: SC-C1, SC-H1, SC-H2, SC-M1, SC-M2, SC-M3, SC-L1, SC-L2</div>
+        <div class="frame-content">
+
+            <div class="scriptorium-header">
+                <button class="nav-back">← Close Ledger Entry</button>
+                <div class="header-actions">
+                    <span class="draft-status">Draft Preserved</span>
+                    <button class="btn-solid">Index to Ledger</button>
+                </div>
+            </div>
+
+            <div class="ledger-layout-scriptorium">
+                <!-- Left Folio: Plate Editor -->
+                <div class="left-folio-scriptorium">
+                    <!-- SC-M1: gap reduced to 2rem -->
+                    <div class="plate-stack">
+                        <!-- SC-M2: First slot full opacity (obverse primacy), solid accent border -->
+                        <div class="plate-slot" style="opacity: 1;">
+                            <div class="plate-frame-edit">
+                                <span class="plate-icon">📷</span>
+                                <button class="btn-lens-primary">Establish Wireless Bridge</button>
+                                <button class="btn-lens-minimal">Import from Digital Archive</button>
+                            </div>
+                            <span class="plate-caption-edit">Plate I // Obverse // Recto</span>
+                        </div>
+                        <!-- SC-L2: dashed border now uses text-muted -->
+                        <div class="plate-slot" style="opacity: 0.6;">
+                            <div class="plate-frame-edit">
+                                <span class="plate-icon">📷</span>
+                                <button class="btn-lens-primary">Establish Wireless Bridge</button>
+                                <button class="btn-lens-minimal">Import from Digital Archive</button>
+                            </div>
+                            <span class="plate-caption-edit">Plate II // Reverse // Verso</span>
+                        </div>
+                        <div class="plate-slot" style="opacity: 0.6;">
+                            <div class="plate-frame-edit">
+                                <span class="plate-icon">📷</span>
+                                <button class="btn-lens-primary">Establish Wireless Bridge</button>
+                                <button class="btn-lens-minimal">Import from Digital Archive</button>
+                            </div>
+                            <span class="plate-caption-edit">Plate III // Edge</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Folio: LedgerForm -->
+                <div class="right-folio-scriptorium">
+
+                    <div class="folio-header-form">
+                        <!-- SC-C1: em-dash fallback, #NEW for new entries -->
+                        <span class="meta-line-new">Entry #New // Ancient // —</span>
+                        <div class="input-h1-mock">Designation</div>
+
+                        <!-- SC-M3: subtitle label column widened to 130px -->
+                        <div class="subtitle-stack">
+                            <span class="subtitle-label">Era</span>
+                            <div class="input-sub-mock">Ancient</div>
+
+                            <span class="subtitle-label">Minted at</span>
+                            <div class="input-sub-mock" style="color: var(--border-hairline);">City / Mint</div>
+
+                            <span class="subtitle-label">Year</span>
+                            <div class="input-sub-mock" style="color: var(--border-hairline);">e.g. 440 BC</div>
+
+                            <span class="subtitle-label">Issuer</span>
+                            <div class="input-sub-mock" style="color: var(--border-hairline);">e.g. Probus</div>
+
+                            <span class="subtitle-label">Denomination</span>
+                            <div class="input-sub-mock" style="color: var(--border-hairline);">e.g. Antoninianus</div>
+
+                            <span class="subtitle-label">Reference</span>
+                            <div class="input-sub-mock" style="color: var(--border-hairline);">e.g. RIC II 218</div>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Grid -->
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Weight</span>
+                            <div class="input-metric-mock">00.00 g</div>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Diameter</span>
+                            <div class="input-metric-mock">00.0 mm</div>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Die Axis</span>
+                            <div class="input-metric-mock">e.g. 9h</div>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Material</span>
+                            <div class="input-metric-mock">e.g. AR (Silver)</div>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Fineness</span>
+                            <div class="input-metric-mock">e.g. .999</div>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Grade</span>
+                            <div class="input-metric-mock">e.g. Choice XF</div>
+                        </div>
+                    </div>
+
+                    <!-- Numismatic sections condensed for mockup -->
+                    <div class="numismatic-section" style="margin-bottom: 1.5rem;">
+                        <span class="section-label">Obverse</span>
+                        <div style="background: var(--stone-pedestal); padding: 0.5rem 0.75rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem; display: inline-block;">LEGEND (e.g. IMP CAES HADRIANVS)</div>
+                        <div style="background: rgba(240,237,230,0.4); padding: 0.75rem 1rem; font-family: var(--font-serif); font-size: 1rem; color: var(--text-muted); font-style: italic;">Describe the obverse motif, portraiture, and style...</div>
+                    </div>
+
+                    <div class="numismatic-section" style="margin-bottom: 1.5rem;">
+                        <span class="section-label">Reverse</span>
+                        <div style="background: var(--stone-pedestal); padding: 0.5rem 0.75rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem; display: inline-block;">LEGEND (e.g. AOE)</div>
+                        <div style="background: rgba(240,237,230,0.4); padding: 0.75rem 1rem; font-family: var(--font-serif); font-size: 1rem; color: var(--text-muted); font-style: italic;">Describe the reverse symbols, deity, and context...</div>
+                    </div>
+
+                    <!-- SC-H1: Footer as metrics-grid. SC-L1: border-top added. -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <span class="section-label">Provenance</span>
+                        <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); border-bottom: 1px solid var(--border-hairline); padding-bottom: 2px;">e.g. Ex. BCD Collection; Purchased 2024</div>
+                    </div>
+
+                    <!-- SC-H1 + SC-L1: Footer becomes metrics-grid with border-top -->
+                    <div class="footer-metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Acquired</span>
+                            <div class="input-metric-mock">YYYY-MM-DD</div>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Source</span>
+                            <div class="input-metric-mock">e.g. CNG Auctions</div>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Cost</span>
+                            <div class="input-metric-mock">0.00</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Change summary -->
+    <div class="curator-brief" style="border-left-color: #2D6A4F;">
+        <span class="brief-tag" style="color: #2D6A4F;">Implementation Notes</span>
+        <h2 class="brief-title">Minimal-touch CSS &amp; JSX changes — no new components required.</h2>
+        <p class="brief-body">All refinements are achievable through targeted edits to <code>index.css</code>, <code>CoinDetail.tsx</code>, and <code>LedgerForm.tsx</code>. The footer grid conversion (SC-H1) requires replacing the <code>&lt;footer&gt;</code> structure in LedgerForm — the existing <code>.metrics-grid</code> class can be reused directly. No new abstractions or components are needed.</p>
+        <div class="finding-grid" style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-hairline);">
+            <div class="finding">
+                <span class="finding-id medium">CSS Only</span>
+                <span class="finding-label">CD-H2, CD-H3, CD-M2, SC-M1, SC-M2, SC-M3, SC-L1, SC-L2</span>
+                <span class="finding-desc">Pure index.css changes. No JSX modification.</span>
+            </div>
+            <div class="finding">
+                <span class="finding-id medium">JSX + CSS</span>
+                <span class="finding-label">CD-C1, CD-H1, CD-M1, SC-C1, SC-H1, SC-H2</span>
+                <span class="finding-desc">Small JSX edits with corresponding CSS additions.</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

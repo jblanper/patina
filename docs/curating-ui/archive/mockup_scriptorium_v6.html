@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup: The Scriptorium v6 (Master Scriptorium)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #7A7875;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --spacing-large: 4rem;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-manuscript);
+            color: var(--text-ink);
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 1. App Header */
+        .app-header {
+            padding: 1.5rem var(--spacing-large);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-manuscript);
+            position: relative;
+        }
+
+        .app-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: var(--spacing-large);
+            right: var(--spacing-large);
+            height: 1px;
+            background: var(--border-hairline);
+        }
+
+        .nav-back {
+            background: none; border: none;
+            font-family: var(--font-sans); font-size: 0.75rem;
+            text-transform: uppercase; letter-spacing: 2px;
+            color: var(--text-muted); cursor: pointer;
+        }
+        .nav-back:hover { color: var(--accent-manuscript); }
+
+        .header-actions { display: flex; gap: 2rem; align-items: center; }
+
+        .btn-minimal {
+            background: none; border: none;
+            border-bottom: 1px solid var(--text-ink);
+            font-family: var(--font-mono); font-size: 0.75rem;
+            color: var(--text-ink); cursor: pointer;
+            padding-bottom: 2px;
+            text-transform: uppercase;
+        }
+
+        .btn-solid {
+            background: var(--text-ink); color: #fff;
+            padding: 0.6rem 2rem; border: none;
+            font-family: var(--font-mono); font-size: 0.75rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        /* 2. Ledger Layout */
+        .ledger-layout {
+            display: grid;
+            grid-template-columns: 45% 55%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ledger-layout::before {
+            content: '';
+            position: absolute;
+            left: 45%;
+            top: 4rem;
+            bottom: 4rem;
+            width: 1px;
+            background: var(--border-hairline);
+            z-index: 5;
+        }
+
+        /* 3. Left Folio (Plate Editor & Lens CTAs) */
+        .left-folio {
+            background: var(--bg-manuscript);
+            padding: var(--spacing-large);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 6rem;
+        }
+
+        .plate-frame-edit {
+            width: 100%;
+            max-width: 450px;
+            aspect-ratio: 1/1;
+            background: var(--stone-pedestal);
+            border: 1px dashed var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .lens-cta-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .btn-lens-primary {
+            background: var(--text-ink);
+            color: #fff;
+            border: none;
+            padding: 1rem 2rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .btn-lens-primary:hover { transform: translateY(-2px); background: var(--accent-manuscript); }
+
+        .btn-lens-minimal {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid transparent;
+        }
+        .btn-lens-minimal:hover { color: var(--text-ink); border-bottom-color: var(--border-hairline); }
+
+        .plate-caption {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 1.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* 4. Right Folio */
+        .right-folio {
+            padding: var(--spacing-large);
+            overflow-y: auto;
+            padding-bottom: 12rem;
+            background: var(--bg-manuscript);
+        }
+
+        .folio-header { margin-bottom: 2.5rem; }
+        
+        .meta-line {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent-manuscript);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-h1 {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--border-hairline);
+            background: transparent;
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            font-weight: 600;
+            color: var(--text-ink);
+            line-height: 1;
+            padding: 0;
+            margin-bottom: 0.5rem;
+            outline: none;
+        }
+        .input-h1:focus { border-bottom-color: var(--text-ink); }
+
+        /* Subtitle Alignment (Fixing "Minted at") */
+        .subtitle-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .subtitle-item {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+        }
+
+        .subtitle-label {
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+            min-width: 100px;
+        }
+
+        .input-sub {
+            border: none; border-bottom: 1px dashed var(--border-hairline);
+            background: transparent;
+            font-family: var(--font-serif); font-size: 1.4rem; color: var(--text-muted); font-style: italic;
+            width: 100%; max-width: 400px; outline: none;
+        }
+        .input-sub:focus { border-bottom-style: solid; color: var(--text-ink); }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 0;
+            padding: 2.5rem 0;
+            border-top: 2px solid var(--text-ink);
+            border-bottom: none;
+        }
+
+        .metric-item { display: flex; flex-direction: column; gap: 0.5rem; }
+        
+        .metric-label {
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .input-metric {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--border-hairline);
+            background: transparent;
+            font-family: var(--font-mono); font-size: 1rem; color: var(--accent-manuscript);
+            outline: none;
+            padding: 0.25rem 0;
+        }
+        .input-metric:focus { background: var(--stone-pedestal); border-bottom-color: var(--text-ink); }
+
+        /* Numismatic Sections */
+        .numismatic-section { margin-bottom: 3rem; }
+        
+        .section-label {
+            display: block;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-block {
+            width: 100%;
+            border: 1px solid transparent;
+            background: rgba(240, 237, 230, 0.4);
+            padding: 1rem;
+            font-family: var(--font-serif); font-size: 1.2rem;
+            resize: vertical; outline: none;
+            line-height: 1.6;
+            transition: all 0.2s;
+        }
+        .input-block:focus { background: #fff; border-color: var(--border-hairline); }
+
+        .input-legend {
+            font-family: var(--font-mono);
+            font-weight: 500;
+            background: var(--stone-pedestal);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            border: none;
+            border-bottom: 1px dashed var(--border-hairline);
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            width: 250px;
+            outline: none;
+        }
+
+        /* Footer */
+        .ledger-footer {
+            margin-top: 4rem;
+            padding: 2.5rem;
+            background-color: var(--stone-pedestal);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);
+        }
+        
+        .footer-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .footer-item strong { 
+            color: var(--text-ink); 
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        .footer-input {
+            border: none; border-bottom: 1px dashed var(--border-hairline);
+            background: transparent;
+            font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-ink);
+            width: 100%; outline: none;
+            padding-bottom: 2px;
+        }
+        .footer-input:focus { border-bottom-style: solid; border-bottom-color: var(--text-ink); }
+
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <button class="nav-back">← Close Ledger Entry</button>
+        <div class="header-actions">
+            <button class="btn-minimal">Save Draft</button>
+            <button class="btn-solid">Index to Ledger</button>
+        </div>
+    </header>
+
+    <div class="ledger-layout">
+        
+        <!-- Left Folio -->
+        <div class="left-folio">
+            <div class="plate-frame-edit">
+                <div class="lens-cta-stack">
+                    <div style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 0.5rem;">📷</div>
+                    <button class="btn-lens-primary">Establish Wireless Bridge</button>
+                    <button class="btn-lens-minimal">Import from Digital Archive</button>
+                </div>
+            </div>
+            <div class="plate-caption">PLATE I // WAITING FOR SCRIPTORIUM SIGNAL</div>
+        </div>
+
+        <!-- Right Folio -->
+        <div class="right-folio">
+            
+            <div class="folio-header">
+                <span class="meta-line">ENTRY #001 // [AUTO-ERA] // [AUTO-ISSUE]</span>
+                <input type="text" class="input-h1" placeholder="Designation">
+                
+                <div class="subtitle-stack">
+                    <div class="subtitle-item">
+                        <span class="subtitle-label">Minted at</span>
+                        <input type="text" class="input-sub" placeholder="City / Mint">
+                    </div>
+                    <div class="subtitle-item">
+                        <span class="subtitle-label">Year</span>
+                        <input type="text" class="input-sub" placeholder="e.g. 440 BC">
+                    </div>
+                    <div class="subtitle-item">
+                        <span class="subtitle-label">Reference</span>
+                        <input type="text" class="input-sub" placeholder="e.g. RIC II 218">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <span class="metric-label">Weight</span>
+                    <input type="text" class="input-metric" placeholder="00.00 g">
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Diameter</span>
+                    <input type="text" class="input-metric" placeholder="00.0 mm">
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Die Axis</span>
+                    <input type="text" class="input-metric" placeholder="e.g. 9h">
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Material</span>
+                    <input type="text" class="input-metric" placeholder="e.g. AR (Silver)">
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Fineness</span>
+                    <input type="text" class="input-metric" placeholder="e.g. .999">
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Grade</span>
+                    <input type="text" class="input-metric" placeholder="e.g. Choice XF">
+                </div>
+            </div>
+
+            <!-- Numismatic Data -->
+            <div class="numismatic-section" style="margin-top: 3rem;">
+                <span class="section-label">Obverse</span>
+                <input type="text" class="input-legend" placeholder="LEGEND (e.g. IMP CAES HADRIANVS)">
+                <textarea class="input-block" placeholder="Describe the obverse motif, portraiture, and style..."></textarea>
+            </div>
+
+            <div class="numismatic-section">
+                <span class="section-label">Reverse</span>
+                <input type="text" class="input-legend" placeholder="LEGEND (e.g. AOE)">
+                <textarea class="input-block" placeholder="Describe the reverse symbols, deity, and context..."></textarea>
+            </div>
+
+            <!-- Curator's Note -->
+            <div class="numismatic-section">
+                <span class="section-label">Curator's Note</span>
+                <textarea class="input-block" style="height: 180px;" placeholder="Record the historical significance or unique narrative of this object..."></textarea>
+            </div>
+
+            <!-- Provenance -->
+            <div class="numismatic-section">
+                <span class="section-label">Provenance</span>
+                <input type="text" class="input-metric" style="width: 100%; color: var(--text-ink);" placeholder="e.g. Ex. BCD Collection; Purchased 2024">
+            </div>
+
+            <!-- Acquisition Footer -->
+            <footer class="ledger-footer">
+                <div class="footer-item">
+                    <strong>Acquired:</strong> 
+                    <input type="text" class="footer-input" placeholder="YYYY-MM-DD">
+                </div>
+                <div class="footer-item">
+                    <strong>Source:</strong> 
+                    <input type="text" class="footer-input" placeholder="e.g. CNG Auctions">
+                </div>
+                <div class="footer-item">
+                    <strong>Cost:</strong> 
+                    <input type="text" class="footer-input" placeholder="0.00">
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+</body>
+</html>

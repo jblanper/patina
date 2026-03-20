@@ -24,7 +24,7 @@ export const CoinSchema = z.object({
   denomination: z.string().optional().nullable(),
   year_display: z.string().optional().nullable(),
   year_numeric: z.number().int().optional().nullable(),
-  era: z.enum(['Ancient', 'Medieval', 'Modern']),
+  era: z.string().min(1),
   mint: z.string().optional().nullable(),
   metal: z.string().optional().nullable(),
   fineness: z.string().optional().nullable(),
@@ -60,7 +60,7 @@ export const NewCoinSchema = CoinSchema.omit({
  * FilterState Schema
  */
 export const FilterStateSchema = z.object({
-  era: z.array(z.enum(['Ancient', 'Medieval', 'Modern'])),
+  era: z.array(z.string()),
   metal: z.array(z.string()),
   searchTerm: z.string(),
   sortBy: z.string().nullable(),
@@ -90,6 +90,54 @@ export const ExportOptionsSchema = z.object({
     .refine(val => !val || path.isAbsolute(val), "Must be absolute path"),
   includeImages: z.boolean().default(true),
   includeCsv: z.boolean().default(true),
+}).strict();
+
+/**
+ * Vocabulary Schemas
+ */
+export const ALLOWED_VOCAB_FIELDS = [
+  'metal',
+  'denomination',
+  'grade',
+  'era',
+  'die_axis',
+  'mint',
+] as const;
+
+export type VocabField = typeof ALLOWED_VOCAB_FIELDS[number];
+
+export const VocabGetSchema = z.object({
+  field: z.enum(ALLOWED_VOCAB_FIELDS),
+}).strict();
+
+export const VocabAddSchema = z.object({
+  field: z.enum(ALLOWED_VOCAB_FIELDS),
+  value: z
+    .string()
+    .trim()
+    .min(1, 'Vocabulary value cannot be empty')
+    .max(200, 'Vocabulary value must be 200 characters or fewer')
+    .regex(
+      /^[\p{L}\p{N}\s\-'().,:&]+$/u,
+      'Value contains disallowed characters',
+    ),
+  locale: z.string().length(2).regex(/^[a-z]{2}$/).optional().default('en'),
+}).strict();
+
+export const VocabSearchSchema = z.object({
+  field: z.enum(ALLOWED_VOCAB_FIELDS),
+  query: z
+    .string()
+    .max(100, 'Search query must be 100 characters or fewer'),
+}).strict();
+
+export const VocabIncrementSchema = z.object({
+  field: z.enum(ALLOWED_VOCAB_FIELDS),
+  value: z.string().min(1).max(200),
+}).strict();
+
+export const VocabResetSchema = z.object({
+  field: z.enum(ALLOWED_VOCAB_FIELDS).optional(),
 }).strict();
 
 /**

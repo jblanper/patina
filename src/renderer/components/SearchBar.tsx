@@ -14,7 +14,6 @@ interface SearchBarProps {
 export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, placeholder }) => {
   return (
     <div className="search-bar-container">
-      <label className="type-meta search-label">Search the Ledger</label>
       <input
         type="text"
         className="search-input"

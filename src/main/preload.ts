@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { NewCoin, NewCoinImage } from '../common/types';
+import type { VocabField } from '../common/validation';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   ping: () => ipcRenderer.invoke('ping'),
@@ -23,4 +24,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Export API
   exportToZip: (options: { includeImages?: boolean; includeCsv?: boolean }) => ipcRenderer.invoke('export:toZip', options),
   exportToPdf: () => ipcRenderer.invoke('export:toPdf'),
+
+  // Vocabulary API
+  getVocab: (field: VocabField): Promise<string[]> =>
+    ipcRenderer.invoke('vocab:get', { field }),
+
+  addVocabEntry: (field: VocabField, value: string): Promise<void> =>
+    ipcRenderer.invoke('vocab:add', { field, value }),
+
+  searchVocab: (field: VocabField, query: string): Promise<string[]> =>
+    ipcRenderer.invoke('vocab:search', { field, query }),
+
+  incrementVocabUsage: (field: VocabField, value: string): Promise<void> =>
+    ipcRenderer.invoke('vocab:increment', { field, value }),
+
+  resetVocab: (field?: VocabField): Promise<void> =>
+    ipcRenderer.invoke('vocab:reset', { field }),
 });

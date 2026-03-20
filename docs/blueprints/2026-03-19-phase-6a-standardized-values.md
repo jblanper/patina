@@ -1,7 +1,7 @@
 # Implementation Blueprint: Phase 6 - Standardized Values with Autocomplete
 
 **Date:** 2026-03-19
-**Status:** Approved
+**Status:** Verification
 **Reference:** `docs/technical_plan.md`
 
 ## 1. Objective
@@ -237,10 +237,11 @@ interface AutocompleteFieldProps {
 1. Display as regular input with dropdown chevron icon
 2. On click/ArrowDown: Show dropdown with all options for that field sorted by `usage_count` desc
 3. User can type to filter (case-insensitive partial match)
-4. Selecting an option increments `usage_count`
+4. Selecting an option calls `vocab:increment` to increment `usage_count` (fire-and-forget; updated sort order takes effect on next dropdown open, not immediately)
 5. "Add new value" option appears at bottom if user types a non-existent value
 6. New values saved with `is_builtin = 0`
 7. Duplicate detection is case-insensitive with display-case preservation
+8. A "Reset to defaults" link appears at the bottom of the dropdown when user-added entries (`is_builtin = 0`) exist for that field; clicking it calls `vocab:reset` for that field
 
 **Visual Design:**
 - See §7 (UI Assessment) for full specification
@@ -252,6 +253,8 @@ interface AutocompleteFieldProps {
 | `vocab:get` | Get all values for a field | `ipcMain.handle` |
 | `vocab:add` | Add new vocabulary value | `ipcMain.handle` |
 | `vocab:search` | Search values (for autocomplete) | `ipcMain.handle` |
+| `vocab:increment` | Increment `usage_count` for a selected value | `ipcMain.handle` |
+| `vocab:reset` | Delete user-added entries and restore seeded `usage_count` values; scoped to one field or all fields | `ipcMain.handle` |
 
 > **Note:** `vocab:seed` is **not** an IPC handler. Seeding is called internally from `app.whenReady()` in `src/main/index.ts` before `createWindow()`. The Renderer cannot trigger seeding.
 
@@ -265,17 +268,30 @@ interface AutocompleteFieldProps {
 2. **CoinSchema Migration (`src/common/validation.ts`)**
    - Change `era: z.enum(['Ancient', 'Medieval', 'Modern'])` to `era: z.string().min(1)`
    - The vocabulary system manages valid era values via `ALLOWED_VOCAB_FIELDS` whitelist
-   - Add `ALLOWED_VOCAB_FIELDS`, `VocabGetSchema`, `VocabAddSchema`, `VocabSearchSchema` (see §5)
+   - Add `ALLOWED_VOCAB_FIELDS`, `VocabGetSchema`, `VocabAddSchema`, `VocabSearchSchema`, `VocabIncrementSchema`, `VocabResetSchema` (see §5)
 
 3. **Backend (`src/main/`)**
-   - Add `getVocabularies()`, `addVocabulary()`, `searchVocabularies()`, `seedVocabularies()` to `db.ts`
-   - Add `vocab:get`, `vocab:add`, `vocab:search` IPC handlers in `index.ts` with Zod validation
+   - Add `getVocabularies()`, `addVocabulary()`, `searchVocabularies()`, `incrementVocabularyUsage()`, `resetVocabularies()`, `seedVocabularies()` to `db.ts`
+   - Add `vocab:get`, `vocab:add`, `vocab:search`, `vocab:increment`, `vocab:reset` IPC handlers in `index.ts` with Zod validation
    - Call `dbService.seedVocabularies()` from `app.whenReady()` before `createWindow()`
+   - `seedVocabularies()` logic: (1) read `vocab_seeded_version` from `preferences`; (2) if it matches `CURRENT_SEED_VERSION` constant (e.g. `'6a.1'`), return early; (3) run `INSERT OR IGNORE INTO vocabularies ...` for each seeded entry — the `UNIQUE(field, value, locale)` constraint silently skips existing rows, preserving user-modified `usage_count` values and user-added entries; (4) update `preferences` with new version
+   - `resetVocabularies(field?: VocabField)`: (1) `DELETE FROM vocabularies WHERE is_builtin = 0` (scoped to field if provided); (2) `UPDATE vocabularies SET usage_count = <seeded_default> WHERE field = ? AND value = ?` for each affected builtin entry
    - Add vocab methods to `preload.ts` contextBridge (see §5.5)
 
 4. **Frontend (`src/renderer/`)**
    - Create `AutocompleteField.tsx` component
-   - Create `useVocabularies.ts` hook
+   - Create `useVocabularies.ts` hook with the following interface:
+     ```typescript
+     // useVocabularies(field: VocabField): UseVocabulariesReturn
+     interface UseVocabulariesReturn {
+       options: string[];                         // values only, sorted by usage_count desc
+       isLoading: boolean;
+       error: string | null;
+       addVocabulary: (value: string) => Promise<void>;   // returns void; hook refetches after success
+       incrementUsage: (value: string) => void;   // fire-and-forget; does not block UI
+       resetVocabularies: () => Promise<void>;    // field is bound from hook param
+     }
+     ```
    - Update `LedgerForm.tsx` to use `AutocompleteField` for: `metal`, `denomination`, `grade`, `era`, `die_axis`, `mint`
 
 5. **Types (`src/common/types.ts`)**
@@ -357,6 +373,7 @@ export const VocabAddSchema = z.object({
   field: z.enum(ALLOWED_VOCAB_FIELDS),
   value: z
     .string()
+    .trim()                                    // strips leading/trailing whitespace before validation
     .min(1, 'Vocabulary value cannot be empty')
     .max(200, 'Vocabulary value must be 200 characters or fewer')
     .regex(
@@ -366,12 +383,27 @@ export const VocabAddSchema = z.object({
   locale: z.string().length(2).regex(/^[a-z]{2}$/).optional().default('en'),
 }).strict();
 
+// Note: .trim() is a Zod transform — the parsed output value is the trimmed string.
+// IPC handlers must use result.data.value (the parsed output), not the raw input.
+
 // vocab:search — prefix/substring search across a single vocabulary field
 export const VocabSearchSchema = z.object({
   field: z.enum(ALLOWED_VOCAB_FIELDS),
   query: z
     .string()
     .max(100, 'Search query must be 100 characters or fewer'),
+}).strict();
+
+// vocab:increment — increment usage_count for a selected existing value
+export const VocabIncrementSchema = z.object({
+  field: z.enum(ALLOWED_VOCAB_FIELDS),
+  value: z.string().min(1).max(200),
+}).strict();
+
+// vocab:reset — delete user-added entries and restore seeded usage_count values
+// field is optional: omit to reset all fields, provide to scope to one field
+export const VocabResetSchema = z.object({
+  field: z.enum(ALLOWED_VOCAB_FIELDS).optional(),
 }).strict();
 ```
 
@@ -431,31 +463,39 @@ import type { VocabField } from '../common/validation';
   getVocab: (field: VocabField) =>
     ipcRenderer.invoke('vocab:get', { field }),
 
-  addVocabEntry: (field: VocabField, value: string) =>
+  addVocabEntry: (field: VocabField, value: string): Promise<void> =>
     ipcRenderer.invoke('vocab:add', { field, value }),
 
   searchVocab: (field: VocabField, query: string) =>
     ipcRenderer.invoke('vocab:search', { field, query }),
+
+  incrementVocabUsage: (field: VocabField, value: string): Promise<void> =>
+    ipcRenderer.invoke('vocab:increment', { field, value }),
+
+  resetVocab: (field?: VocabField): Promise<void> =>
+    ipcRenderer.invoke('vocab:reset', { field }),
 ```
 
-**Notes:** Arguments are passed as single object payloads to match `.strict()` schema expectations. The `locale` parameter is omitted from the preload signature for Phase 6a — the main process applies `default('en')` from `VocabAddSchema`. `ALLOWED_VOCAB_FIELDS` can be imported directly by the Renderer from `src/common/validation.ts` without an IPC round-trip.
+**Notes:** Arguments are passed as single object payloads to match `.strict()` schema expectations. The `locale` parameter is omitted from the preload signature for Phase 6a — the main process applies `default('en')` from `VocabAddSchema`. `ALLOWED_VOCAB_FIELDS` can be imported directly by the Renderer from `src/common/validation.ts` without an IPC round-trip. `addVocabEntry` returns `Promise<void>` — the hook is responsible for refetching the updated list after a successful add.
 
 ### 5.6 IPC Surface Summary
 
 | Handler | Schema | Registered in main | Exposed in preload |
 |---|---|---|---|
 | `vocab:get` | `VocabGetSchema` | `ipcMain.handle` | `getVocab(field)` |
-| `vocab:add` | `VocabAddSchema` | `ipcMain.handle` | `addVocabEntry(field, value)` |
+| `vocab:add` | `VocabAddSchema` | `ipcMain.handle` | `addVocabEntry(field, value): Promise<void>` |
 | `vocab:search` | `VocabSearchSchema` | `ipcMain.handle` | `searchVocab(field, query)` |
+| `vocab:increment` | `VocabIncrementSchema` | `ipcMain.handle` | `incrementVocabUsage(field, value): Promise<void>` |
+| `vocab:reset` | `VocabResetSchema` | `ipcMain.handle` | `resetVocab(field?): Promise<void>` |
 | `vocab:seed` | N/A — internal only | Not registered | Not exposed |
 
 ### Action Items:
-- [ ] Add `ALLOWED_VOCAB_FIELDS`, `VocabField`, and Zod schemas to `src/common/validation.ts`
-- [ ] Add vocabulary methods to `src/main/db.ts` with parameterized queries + runtime allowlist guard
-- [ ] Add vocab IPC handlers to `src/main/index.ts` with `.strict()` validation
-- [ ] Add vocab methods to `src/main/preload.ts` with typed interfaces
-- [ ] Call `dbService.seedVocabularies()` from `app.whenReady()` — not via IPC
-- [ ] Add unit tests for Zod schema validation in `src/common/validation.test.ts`
+- [ ] Add `ALLOWED_VOCAB_FIELDS`, `VocabField`, and all Zod schemas (`VocabGetSchema`, `VocabAddSchema`, `VocabSearchSchema`, `VocabIncrementSchema`, `VocabResetSchema`) to `src/common/validation.ts`
+- [ ] Add vocabulary methods to `src/main/db.ts` with parameterized queries + runtime allowlist guard: `getVocabularies`, `addVocabulary`, `searchVocabularies`, `incrementVocabularyUsage`, `resetVocabularies`, `seedVocabularies`
+- [ ] Add all vocab IPC handlers to `src/main/index.ts` with `.strict()` validation (`vocab:get`, `vocab:add`, `vocab:search`, `vocab:increment`, `vocab:reset`)
+- [ ] Add all vocab methods to `src/main/preload.ts` with typed interfaces
+- [ ] Call `dbService.seedVocabularies()` from `app.whenReady()` — not via IPC; use `INSERT OR IGNORE` + `CURRENT_SEED_VERSION` guard (see §2F step 3)
+- [ ] Add unit tests for all Zod schema validation in `src/common/validation.test.ts`
 
 ---
 
@@ -515,7 +555,12 @@ src/common/validation.test.ts                        ← extend existing file, d
 - TC-AC-22: `aria-controls` links input to listbox `id`
 - TC-AC-23: `aria-activedescendant` tracks keyboard-focused option `id`
 
+**Scroll Close**
+- TC-AC-24: Dispatching a `scroll` event on the nearest scrollable ancestor while the dropdown is open causes the dropdown to close (assert `aria-expanded="false"`)
+
 ### 6.3 useVocabularies Test Cases
+
+**Hook interface:** `useVocabularies(field: VocabField)` returns `{ options: string[], isLoading: boolean, error: string | null, addVocabulary, incrementUsage, resetVocabularies }`. `addVocabulary` returns `Promise<void>` — the hook refetches the full list after a successful add. `incrementUsage` is fire-and-forget (no await, no state update). `resetVocabularies` returns `Promise<void>` and refetches after success.
 
 **Initial Load**
 - TC-UV-01: Loads vocabularies for a field on mount; `isLoading` true then false
@@ -526,18 +571,27 @@ src/common/validation.test.ts                        ← extend existing file, d
 - TC-UV-04: Fetches independently for different field names (call count = 2)
 
 **addVocabulary**
-- TC-UV-05: Calls `electronAPI.addVocabEntry` with correct `{ field, value }`
+- TC-UV-05: Calls `electronAPI.addVocabEntry` with correct `{ field, value }`; resolves `Promise<void>`
 - TC-UV-06: Triggers a refresh of the vocabulary list after successful add
 - TC-UV-07: Does not mutate state optimistically before API resolves (use deferred promise)
 
+**incrementUsage**
+- TC-UV-08: Calls `electronAPI.incrementVocabUsage` with `{ field, value }` when `incrementUsage` is invoked
+- TC-UV-09: Does not update `options` state or trigger a re-fetch (fire-and-forget)
+
 **searchVocabularies**
-- TC-UV-08: Calls `electronAPI.searchVocab` with `{ field, query }` and returns result
-- TC-UV-09: Empty string query returns all vocabularies
+- TC-UV-10: Calls `electronAPI.searchVocab` with `{ field, query }` and returns result
+- TC-UV-11: Empty string query returns all vocabularies
+
+**resetVocabularies**
+- TC-UV-12: Calls `electronAPI.resetVocab` with `{ field }` (the field bound to the hook)
+- TC-UV-13: Triggers a refresh of the vocabulary list after successful reset
+- TC-UV-14: Sets `error` and leaves list unchanged when `resetVocab` rejects
 
 **Error Handling**
-- TC-UV-10: Sets `error` and clears `isLoading` when `getVocab` rejects
-- TC-UV-11: Sets `error` and leaves list unchanged when `addVocabEntry` rejects
-- TC-UV-12: Clears `error` on successful re-fetch after previous error
+- TC-UV-15: Sets `error` and clears `isLoading` when `getVocab` rejects
+- TC-UV-16: Sets `error` and leaves list unchanged when `addVocabEntry` rejects
+- TC-UV-17: Clears `error` on successful re-fetch after previous error
 
 ### 6.4 Zod Schema Test Cases (100% branch coverage mandate)
 
@@ -555,15 +609,28 @@ src/common/validation.test.ts                        ← extend existing file, d
 - TC-VS-09: Value at 201 chars rejected; issue path `['value']`
 - TC-VS-10: Invalid field name rejected; issue path `['field']`
 - TC-VS-11: Extra properties rejected; issue code `'unrecognized_keys'`
-- TC-VS-12: Whitespace-only value rejected (requires `.trim().min(1)` or equivalent)
+- TC-VS-12: Whitespace-only value rejected — `.trim()` reduces `"   "` to `""`, then `.min(1)` rejects it; issue path `['value']`
+- TC-VS-13: Value with leading/trailing spaces is accepted and output is trimmed (`"  Silver  "` → parsed `value` is `"Silver"`)
 
 **VocabSearchSchema**
-- TC-VS-13: Valid `{ field, query }` passes
-- TC-VS-14: Empty query string passes (valid "return all" signal)
-- TC-VS-15: Query at exactly 100 chars passes (boundary)
-- TC-VS-16: Query at 101 chars rejected; issue path `['query']`
-- TC-VS-17: Invalid field name rejected
-- TC-VS-18: Extra properties rejected; issue code `'unrecognized_keys'`
+- TC-VS-14: Valid `{ field, query }` passes
+- TC-VS-15: Empty query string passes (valid "return all" signal)
+- TC-VS-16: Query at exactly 100 chars passes (boundary)
+- TC-VS-17: Query at 101 chars rejected; issue path `['query']`
+- TC-VS-18: Invalid field name rejected
+- TC-VS-19: Extra properties rejected; issue code `'unrecognized_keys'`
+
+**VocabIncrementSchema**
+- TC-VS-20: Valid `{ field, value }` passes
+- TC-VS-21: Invalid field name rejected; issue path `['field']`
+- TC-VS-22: Empty value string rejected; issue path `['value']`
+- TC-VS-23: Extra properties rejected; issue code `'unrecognized_keys'`
+
+**VocabResetSchema**
+- TC-VS-24: `{}` passes (omitted field = full reset)
+- TC-VS-25: Valid `{ field }` passes (scoped reset)
+- TC-VS-26: Invalid field name rejected; issue path `['field']`
+- TC-VS-27: Extra properties rejected; issue code `'unrecognized_keys'`
 
 ### 6.5 Mocking Strategy
 
@@ -572,6 +639,8 @@ src/common/validation.test.ts                        ← extend existing file, d
 getVocab: vi.fn().mockResolvedValue([]),
 addVocabEntry: vi.fn().mockResolvedValue(undefined),
 searchVocab: vi.fn().mockResolvedValue([]),
+incrementVocabUsage: vi.fn().mockResolvedValue(undefined),
+resetVocab: vi.fn().mockResolvedValue(undefined),
 ```
 
 **Per-test overrides:** Use `mockResolvedValueOnce` for single-call cases; `mockRejectedValueOnce` for error cases. Run `vi.clearAllMocks()` in `beforeEach` (not `vi.resetAllMocks()` — that would wipe the global stubs).
@@ -587,9 +656,9 @@ const mockGetVocab = window.electronAPI.getVocab as ReturnType<typeof vi.fn>
 
 | Target | Mandate | Test Coverage |
 |---|---|---|
-| `src/common/validation.ts` | 100% branch | TC-VS-01 through TC-VS-18 cover all branches including all enum members, boundary values, missing fields, and extra keys |
-| `src/renderer/hooks/useVocabularies.ts` | 90% function | TC-UV-01 through TC-UV-12 exercise load, cache, add, search, refresh, and all error-state transitions |
-| `src/renderer/components/AutocompleteField.tsx` | 80% statement | TC-AC-01 through TC-AC-23 cover all render paths, interaction flows, keyboard branches, and ARIA logic |
+| `src/common/validation.ts` | 100% branch | TC-VS-01 through TC-VS-27 cover all branches including all enum members, boundary values, missing fields, extra keys, `.trim()` transform, and new increment/reset schemas |
+| `src/renderer/hooks/useVocabularies.ts` | 90% function | TC-UV-01 through TC-UV-17 exercise load, cache, add, increment, reset, search, refresh, and all error-state transitions |
+| `src/renderer/components/AutocompleteField.tsx` | 80% statement | TC-AC-01 through TC-AC-24 cover all render paths, interaction flows, keyboard branches, ARIA logic, and scroll-close behavior |
 
 ---
 
@@ -677,6 +746,9 @@ A minimal downward chevron rendered as an inline SVG, positioned `absolute; righ
 | Max height | `240px` — approximately 6 options at standard row height |
 | Overflow | `overflow-y: auto` |
 | Margin top | `4px` |
+| Z-index | `200` — required to render above all `.ledger-layout` elements; ensure no ancestor creates an unintentional stacking context |
+| Min width | `200px` — guarantees legibility at narrow breakpoints where `.subtitle-stack` collapses |
+| Transition | `opacity 0.15s ease` — static fade only; no slide animation |
 
 **Option item**
 
@@ -710,7 +782,7 @@ All classes in `src/renderer/styles/index.css` under `/* --- AutocompleteField -
 | `.autocomplete-input` | `<input>` | Standalone variant; inherits bottom-border pattern |
 | `.autocomplete-chevron` | SVG `<span>` | Absolute-positioned trigger icon |
 | `.autocomplete-chevron.open` | SVG when open | `transform: rotate(180deg)` |
-| `.autocomplete-dropdown` | `<ul>` listbox | Floating container; `display: none` by default |
+| `.autocomplete-dropdown` | `<ul>` listbox | Floating container; `display: none` by default; `z-index: 200`; `min-width: 200px`; `opacity 0.15s ease` transition |
 | `.autocomplete-dropdown.open` | `<ul>` when visible | `display: block` |
 | `.autocomplete-option` | `<li>` items | Default option row |
 | `.autocomplete-option--active` | `<li>` keyboard-focused | Left-border accent + stone-pedestal background |
@@ -735,6 +807,7 @@ The `.subtitle-stack` context overrides `.autocomplete-input` sizing to `1.4rem`
 | `Typing` | Filters options (case-insensitive). First match auto-highlighted. Add-New appears when no exact match exists. |
 | `Home` / `End` | Native cursor movement within input; does not navigate dropdown. |
 | `Tab` (open) | Closes dropdown without selecting. Advances focus to next form element. |
+| Scroll (nearest scrollable ancestor, open) | Closes dropdown without selecting. Attach listener on open; remove on close. |
 
 **Wrap behavior:** ArrowDown on the last regular option wraps to the first regular option — not to the Add-New option. The Add-New option is reachable only by continuing ArrowDown past the last regular option.
 
@@ -754,14 +827,39 @@ Compliance: **Confirmed.** Both pointer and keyboard paths require at most 2 dis
 
 ---
 
+#### 7.6 Reset to Defaults UI
+
+A "Reset to defaults" action is available per-field, accessible from within the dropdown itself.
+
+**Trigger:** A small `<button>` rendered as the last item in the dropdown listbox, separated from the option list by a `1px solid var(--border-hairline)` divider. Rendered only when `options` contains at least one user-added entry (`is_builtin = 0`). Since the component receives only `string[]` options, the parent (`LedgerForm`) is responsible for passing an `onReset?: () => void` prop and a `hasUserValues?: boolean` prop to control visibility.
+
+**Appearance:**
+
+| Property | Value |
+|---|---|
+| Font style | `italic` |
+| Color | `var(--text-muted)` — `#6A6764` |
+| Text | `Reset to defaults` |
+| Separator | `1px solid var(--border-hairline)` above the item |
+
+**Behavior:** Clicking calls `onReset()` (which maps to `useVocabularies.resetVocabularies()`), closes the dropdown, and triggers a list refresh. No confirmation dialog — the action is recoverable (any reset value can be re-added as a user entry).
+
+**`AutocompleteFieldProps` addition:**
+```typescript
+onReset?: () => void;      // if omitted, reset button is never rendered
+hasUserValues?: boolean;   // controls reset button visibility
+```
+
+---
+
 ### Review Notes & Suggestions:
 
 1. **Subtitle-stack placement:** The dropdown must break out of the grid flow via `position: absolute` anchored to the input, not the grid cell. Verify the dropdown does not clip at the `.subtitle-stack` grid boundary.
-2. **Z-index:** Set `z-index: 200` on `.autocomplete-dropdown`. Confirm nothing in `.ledger-layout` creates an unintentional stacking context.
-3. **Scroll close:** When the dropdown is open and the user scrolls the form, the dropdown should close (attach scroll listener to nearest scrollable ancestor).
+2. ~~**Z-index:**~~ Formalised as a requirement — see §7.2 and §7.3.
+3. ~~**Scroll close:**~~ Formalised as a requirement — see §7.4 (keyboard interaction table) and §6.2 TC-AC-24.
 4. **Placeholder:** Inherit `color: var(--text-muted); font-style: italic; opacity: 0.6` consistent with existing `.input-sub` placeholder treatment.
-5. **Minimum width:** Set `min-width: 200px` on `.autocomplete-dropdown` to guarantee legibility at narrow breakpoints where `.subtitle-stack` collapses.
-6. **Open transition:** Use `opacity 0.15s ease` — not a slide animation, which would feel anachronistic against the static archival aesthetic.
+5. ~~**Minimum width:**~~ Formalised as a requirement — see §7.2.
+6. ~~**Open transition:**~~ Formalised as a requirement — see §7.2.
 
 ---
 

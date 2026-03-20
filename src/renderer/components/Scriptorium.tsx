@@ -78,10 +78,11 @@ export const Scriptorium: React.FC = () => {
           images={formData.images} 
           onImageCaptured={updateImage} 
         />
-        <LedgerForm 
-          formData={formData} 
-          errors={errors} 
-          updateField={updateField} 
+        <LedgerForm
+          formData={formData}
+          errors={errors}
+          updateField={updateField}
+          coinId={coin?.id}
         />
       </div>
     </div>

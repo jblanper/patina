@@ -5,7 +5,7 @@ export interface Coin {
   denomination?: string;
   year_display?: string;
   year_numeric?: number;
-  era: 'Ancient' | 'Medieval' | 'Modern';
+  era: string;
   mint?: string;
   metal?: string;
   fineness?: string;
@@ -44,3 +44,15 @@ export interface CoinImage {
 
 export type NewCoin = Omit<Coin, 'id' | 'created_at'>;
 export type NewCoinImage = Omit<CoinImage, 'id' | 'created_at'>;
+
+export interface Vocabulary {
+  id: number;
+  field: string;
+  value: string;
+  locale: string;
+  is_builtin: boolean;
+  usage_count: number;
+  created_at: string;
+}
+
+export type VocabularyInput = Omit<Vocabulary, 'id' | 'created_at'>;

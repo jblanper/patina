@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Scriptorium } from '../Scriptorium';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import * as useCoinHook from '../../hooks/useCoin';
 
 // Mock hooks
 vi.mock('../../hooks/useCoin', () => ({
@@ -53,7 +54,7 @@ describe('Scriptorium', () => {
   });
 
   it('navigates back on close button click', () => {
-    const { container } = render(
+    render(
       <MemoryRouter initialEntries={['/scriptorium/add']}>
         <Routes>
           <Route path="/scriptorium/add" element={<Scriptorium />} />
@@ -64,5 +65,24 @@ describe('Scriptorium', () => {
     const backButton = screen.getByText(/Close Ledger Entry/i);
     fireEvent.click(backButton);
     // Navigation is mocked by MemoryRouter, we just check if it was clickable
+  });
+
+  it('shows zero-padded coin ID in meta line when editing an existing coin', () => {
+    vi.mocked(useCoinHook.useCoin).mockReturnValue({
+      coin: { id: 42, title: 'Test', era: 'Ancient', metal: 'Gold', images: {} } as any,
+      images: [],
+      isLoading: false,
+      error: null,
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/scriptorium/edit/42']}>
+        <Routes>
+          <Route path="/scriptorium/edit/:id" element={<Scriptorium />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/ENTRY #042/)).toBeInTheDocument();
   });
 });

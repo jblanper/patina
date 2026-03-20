@@ -1,18 +1,29 @@
 import React from 'react';
 import { NewCoin } from '../../common/types';
+import { AutocompleteField } from './AutocompleteField';
+import { useVocabularies } from '../hooks/useVocabularies';
 
 interface LedgerFormProps {
   formData: NewCoin;
   errors: Record<string, string>;
   updateField: (field: keyof NewCoin, value: string | number | null | boolean) => void;
+  coinId?: number;
 }
 
-export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, updateField }) => {
+export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, updateField, coinId }) => {
+  const entryLabel = coinId ? `#${String(coinId).padStart(3, '0')}` : '#NEW';
+
+  const eraVocab = useVocabularies('era');
+  const mintVocab = useVocabularies('mint');
+  const denominationVocab = useVocabularies('denomination');
+  const metalVocab = useVocabularies('metal');
+  const dieAxisVocab = useVocabularies('die_axis');
+  const gradeVocab = useVocabularies('grade');
   return (
     <div className="right-folio">
       <div className="folio-header">
         <span className="meta-line">
-          ENTRY #001 // {formData.era?.toUpperCase() || '[AUTO-ERA]'} // {formData.metal?.toUpperCase() || '[AUTO-ISSUE]'}
+          ENTRY {entryLabel} // {formData.era?.toUpperCase() || 'ANCIENT'} // {formData.metal?.toUpperCase() || '—'}
         </span>
         <div className="input-group">
           <input
@@ -28,24 +39,28 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         <div className="subtitle-stack">
           <div className="subtitle-item">
             <span className="subtitle-label">Era</span>
-            <select 
-              className="input-sub"
-              value={formData.era}
-              onChange={(e) => updateField('era', e.target.value as 'Ancient' | 'Medieval' | 'Modern')}
-            >
-              <option value="Ancient">Ancient</option>
-              <option value="Medieval">Medieval</option>
-              <option value="Modern">Modern</option>
-            </select>
+            <AutocompleteField
+              field="era"
+              value={formData.era || ''}
+              onChange={(v) => updateField('era', v)}
+              onAddNew={(v) => { eraVocab.addVocabulary(v); updateField('era', v); }}
+              options={eraVocab.options}
+              placeholder="e.g. Roman Imperial"
+              onReset={eraVocab.resetVocabularies}
+              hasUserValues={false}
+            />
           </div>
           <div className="subtitle-item">
             <span className="subtitle-label">Minted at</span>
-            <input
-              type="text"
-              className="input-sub"
-              placeholder="City / Mint"
+            <AutocompleteField
+              field="mint"
               value={formData.mint || ''}
-              onChange={(e) => updateField('mint', e.target.value)}
+              onChange={(v) => updateField('mint', v)}
+              onAddNew={(v) => { mintVocab.addVocabulary(v); updateField('mint', v); }}
+              options={mintVocab.options}
+              placeholder="City / Mint"
+              onReset={mintVocab.resetVocabularies}
+              hasUserValues={false}
             />
           </div>
           <div className="subtitle-item">
@@ -70,12 +85,15 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
           </div>
           <div className="subtitle-item">
             <span className="subtitle-label">Denomination</span>
-            <input
-              type="text"
-              className="input-sub"
-              placeholder="e.g. Antoninianus"
+            <AutocompleteField
+              field="denomination"
               value={formData.denomination || ''}
-              onChange={(e) => updateField('denomination', e.target.value)}
+              onChange={(v) => updateField('denomination', v)}
+              onAddNew={(v) => { denominationVocab.addVocabulary(v); updateField('denomination', v); }}
+              options={denominationVocab.options}
+              placeholder="e.g. Antoninianus"
+              onReset={denominationVocab.resetVocabularies}
+              hasUserValues={false}
             />
           </div>
           <div className="subtitle-item">
@@ -119,22 +137,28 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         </div>
         <div className="metric-item">
           <span className="metric-label">Die Axis</span>
-          <input
-            type="text"
-            className="input-metric"
-            placeholder="e.g. 9h"
+          <AutocompleteField
+            field="die_axis"
             value={formData.die_axis || ''}
-            onChange={(e) => updateField('die_axis', e.target.value)}
+            onChange={(v) => updateField('die_axis', v)}
+            onAddNew={(v) => { dieAxisVocab.addVocabulary(v); updateField('die_axis', v); }}
+            options={dieAxisVocab.options}
+            placeholder="e.g. 6h"
+            onReset={dieAxisVocab.resetVocabularies}
+            hasUserValues={false}
           />
         </div>
         <div className="metric-item">
           <span className="metric-label">Material</span>
-          <input
-            type="text"
-            className="input-metric"
-            placeholder="e.g. AR (Silver)"
+          <AutocompleteField
+            field="metal"
             value={formData.metal || ''}
-            onChange={(e) => updateField('metal', e.target.value)}
+            onChange={(v) => updateField('metal', v)}
+            onAddNew={(v) => { metalVocab.addVocabulary(v); updateField('metal', v); }}
+            options={metalVocab.options}
+            placeholder="e.g. Silver"
+            onReset={metalVocab.resetVocabularies}
+            hasUserValues={false}
           />
         </div>
         <div className="metric-item">
@@ -149,12 +173,15 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         </div>
         <div className="metric-item">
           <span className="metric-label">Grade</span>
-          <input
-            type="text"
-            className="input-metric"
-            placeholder="e.g. Choice XF"
+          <AutocompleteField
+            field="grade"
             value={formData.grade || ''}
-            onChange={(e) => updateField('grade', e.target.value)}
+            onChange={(v) => updateField('grade', v)}
+            onAddNew={(v) => { gradeVocab.addVocabulary(v); updateField('grade', v); }}
+            options={gradeVocab.options}
+            placeholder="e.g. EF-40"
+            onReset={gradeVocab.resetVocabularies}
+            hasUserValues={false}
           />
         </div>
       </div>
@@ -219,35 +246,37 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
 
       {/* Acquisition Footer */}
       <footer className="ledger-footer">
-        <div className="footer-item">
-          <strong>Acquired:</strong>
-          <input
-            type="text"
-            className="footer-input"
-            placeholder="YYYY-MM-DD"
-            value={formData.purchase_date || ''}
-            onChange={(e) => updateField('purchase_date', e.target.value)}
-          />
-        </div>
-        <div className="footer-item">
-          <strong>Source:</strong>
-          <input
-            type="text"
-            className="footer-input"
-            placeholder="e.g. CNG Auctions"
-            value={formData.purchase_source || ''}
-            onChange={(e) => updateField('purchase_source', e.target.value)}
-          />
-        </div>
-        <div className="footer-item">
-          <strong>Cost:</strong>
-          <input
-            type="number"
-            className="footer-input"
-            placeholder="0.00"
-            value={formData.purchase_price || ''}
-            onChange={(e) => updateField('purchase_price', e.target.value ? parseFloat(e.target.value) : null)}
-          />
+        <div className="metrics-grid">
+          <div className="metric-item">
+            <span className="metric-label">Acquired</span>
+            <input
+              type="text"
+              className="input-metric"
+              placeholder="YYYY-MM-DD"
+              value={formData.purchase_date || ''}
+              onChange={(e) => updateField('purchase_date', e.target.value)}
+            />
+          </div>
+          <div className="metric-item">
+            <span className="metric-label">Source</span>
+            <input
+              type="text"
+              className="input-metric"
+              placeholder="e.g. CNG Auctions"
+              value={formData.purchase_source || ''}
+              onChange={(e) => updateField('purchase_source', e.target.value)}
+            />
+          </div>
+          <div className="metric-item">
+            <span className="metric-label">Cost</span>
+            <input
+              type="number"
+              className="input-metric"
+              placeholder="0.00"
+              value={formData.purchase_price || ''}
+              onChange={(e) => updateField('purchase_price', e.target.value ? parseFloat(e.target.value) : null)}
+            />
+          </div>
         </div>
       </footer>
     </div>

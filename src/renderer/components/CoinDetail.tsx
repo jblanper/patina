@@ -55,17 +55,11 @@ export const CoinDetail: React.FC = () => {
           ← Close Ledger Entry
         </button>
         <div className="header-actions">
-          <button 
-            onClick={() => setShowDeleteConfirm(true)} 
-            className="btn-minimal"
-          >
-            Delete Record
-          </button>
-          <button 
-            onClick={() => navigate(`/scriptorium/edit/${coin.id}`)} 
-            className="btn-minimal"
-          >
+          <button onClick={() => navigate(`/scriptorium/edit/${coin.id}`)} className="btn-minimal">
             Edit Record
+          </button>
+          <button onClick={() => setShowDeleteConfirm(true)} className="btn-delete">
+            Delete Record
           </button>
         </div>
       </header>
@@ -75,9 +69,9 @@ export const CoinDetail: React.FC = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h2>Confirm Deletion</h2>
             <p>Are you certain you wish to remove this record from the archive? This action cannot be undone.</p>
-            <div className="export-result">
-              <button className="btn-primary" onClick={handleDelete}>Delete</button>
+            <div className="modal-actions">
               <button className="btn-minimal" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleDelete}>Delete</button>
             </div>
           </div>
         </div>
@@ -98,7 +92,7 @@ export const CoinDetail: React.FC = () => {
             )}
           </div>
           <div className="plate-caption">
-            PLATE V // {mainImage?.label || 'OBVERSE'} // 2:1 SCALE
+            {(mainImage?.label || 'OBVERSE').toUpperCase()} // 2:1 SCALE
           </div>
           
           {images.length > 1 && (
@@ -199,23 +193,22 @@ export const CoinDetail: React.FC = () => {
           </div>
 
           {/* 3. Curator's Note */}
-          {(coin.story || coin.provenance) && (
+          {coin.story && (
             <div className="numismatic-section">
               <span className="section-label">Curator's Note</span>
-              {coin.story && (
-                <div className="desc-block">
-                  {coin.story.split('\n').map((para, i) => (
-                    <p key={i} className="desc-text curator-note">
-                      "{para}"
-                    </p>
-                  ))}
-                </div>
-              )}
-              {coin.provenance && (
-                <div className="provenance-note">
-                  PROVENANCE: {coin.provenance}
-                </div>
-              )}
+              <div className="desc-block">
+                {coin.story.split('\n').map((para, i) => (
+                  <p key={i} className="desc-text curator-note">"{para}"</p>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Provenance — separate section */}
+          {coin.provenance && (
+            <div className="numismatic-section">
+              <span className="section-label">Provenance</span>
+              <div className="provenance-note">{coin.provenance}</div>
             </div>
           )}
 

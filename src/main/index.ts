@@ -5,7 +5,7 @@ import { dbService } from './db';
 import { createLensServer } from './server';
 import { getLocalIp } from './ip';
 import { NewCoin, NewCoinImage } from '../common/types';
-import { ExportOptionsSchema } from '../common/validation';
+import { ExportOptionsSchema, VocabGetSchema, VocabAddSchema, VocabSearchSchema, VocabIncrementSchema, VocabResetSchema } from '../common/validation';
 import { exportToZip } from './export/zip';
 import { exportToPdf } from './export/pdf';
 
@@ -70,7 +70,18 @@ app.on('web-contents-created', (_, contents) => {
   });
 });
 
+function validateIpc<T>(schema: import('zod').ZodSchema<T>, data: unknown): T {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    const msg = result.error.issues.map(i => i.message).join(', ');
+    throw new Error(`Validation failed: ${msg}`);
+  }
+  return result.data;
+}
+
 app.whenReady().then(() => {
+  dbService.seedVocabularies();
+
   // Define image root path
   const isDev = !app.isPackaged;
   const imageRoot = isDev 
@@ -182,6 +193,32 @@ app.whenReady().then(() => {
     }
     
     return exportToPdf(result.filePath);
+  });
+
+  // Vocabulary IPC Handlers
+  ipcMain.handle('vocab:get', (_, data: unknown) => {
+    const { field } = validateIpc(VocabGetSchema, data);
+    return dbService.getVocabularies(field);
+  });
+
+  ipcMain.handle('vocab:add', (_, data: unknown) => {
+    const { field, value, locale } = validateIpc(VocabAddSchema, data);
+    dbService.addVocabulary(field, value, locale);
+  });
+
+  ipcMain.handle('vocab:search', (_, data: unknown) => {
+    const { field, query } = validateIpc(VocabSearchSchema, data);
+    return dbService.searchVocabularies(field, query);
+  });
+
+  ipcMain.handle('vocab:increment', (_, data: unknown) => {
+    const { field, value } = validateIpc(VocabIncrementSchema, data);
+    dbService.incrementVocabularyUsage(field, value);
+  });
+
+  ipcMain.handle('vocab:reset', (_, data: unknown) => {
+    const { field } = validateIpc(VocabResetSchema, data);
+    dbService.resetVocabularies(field);
   });
 
   ipcMain.handle('ping', () => 'pong');

@@ -3,12 +3,116 @@ import path from 'path';
 import fs from 'fs';
 import { app } from 'electron';
 import { z } from 'zod';
-import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage } from '../common/types';
-import { NewCoinSchema, NewCoinImageSchema } from '../common/validation';
+import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage, Vocabulary } from '../common/types';
+import { NewCoinSchema, NewCoinImageSchema, ALLOWED_VOCAB_FIELDS, VocabField } from '../common/validation';
 
 import { SCHEMA, generateSQL } from '../common/schema';
 
 const idSchema = z.number().int().positive();
+
+function getSeedEntries(): Array<{ field: string; value: string; locale: string; usage_count: number }> {
+  const en = 'en';
+  return [
+    // Metals
+    { field: 'metal', value: 'Gold', locale: en, usage_count: 40 },
+    { field: 'metal', value: 'Silver', locale: en, usage_count: 80 },
+    { field: 'metal', value: 'Bronze', locale: en, usage_count: 70 },
+    { field: 'metal', value: 'Copper', locale: en, usage_count: 30 },
+    { field: 'metal', value: 'Billon', locale: en, usage_count: 20 },
+    { field: 'metal', value: 'Electrum', locale: en, usage_count: 15 },
+    { field: 'metal', value: 'Orichalcum', locale: en, usage_count: 12 },
+    { field: 'metal', value: 'Potin', locale: en, usage_count: 10 },
+    { field: 'metal', value: 'Nickel', locale: en, usage_count: 8 },
+    { field: 'metal', value: 'Tumbaga', locale: en, usage_count: 5 },
+    { field: 'metal', value: 'Pewter', locale: en, usage_count: 4 },
+    // Denominations
+    { field: 'denomination', value: 'Aureus', locale: en, usage_count: 40 },
+    { field: 'denomination', value: 'Denarius', locale: en, usage_count: 80 },
+    { field: 'denomination', value: 'Antoninianus', locale: en, usage_count: 60 },
+    { field: 'denomination', value: 'Sestertius', locale: en, usage_count: 50 },
+    { field: 'denomination', value: 'Dupondius', locale: en, usage_count: 20 },
+    { field: 'denomination', value: 'As', locale: en, usage_count: 35 },
+    { field: 'denomination', value: 'Semis', locale: en, usage_count: 10 },
+    { field: 'denomination', value: 'Triens', locale: en, usage_count: 8 },
+    { field: 'denomination', value: 'Quadrans', locale: en, usage_count: 12 },
+    { field: 'denomination', value: 'Uncia', locale: en, usage_count: 6 },
+    { field: 'denomination', value: 'Quinarius', locale: en, usage_count: 15 },
+    { field: 'denomination', value: 'Miliarense', locale: en, usage_count: 12 },
+    { field: 'denomination', value: 'Siliqua', locale: en, usage_count: 18 },
+    { field: 'denomination', value: 'Follis', locale: en, usage_count: 30 },
+    { field: 'denomination', value: 'Nummus', locale: en, usage_count: 20 },
+    // Grades
+    { field: 'grade', value: 'MS-70', locale: en, usage_count: 2 },
+    { field: 'grade', value: 'MS-69', locale: en, usage_count: 3 },
+    { field: 'grade', value: 'MS-68', locale: en, usage_count: 5 },
+    { field: 'grade', value: 'MS-67', locale: en, usage_count: 8 },
+    { field: 'grade', value: 'MS-66', locale: en, usage_count: 12 },
+    { field: 'grade', value: 'MS-65', locale: en, usage_count: 20 },
+    { field: 'grade', value: 'MS-64', locale: en, usage_count: 18 },
+    { field: 'grade', value: 'MS-63', locale: en, usage_count: 16 },
+    { field: 'grade', value: 'MS-62', locale: en, usage_count: 10 },
+    { field: 'grade', value: 'MS-61', locale: en, usage_count: 6 },
+    { field: 'grade', value: 'MS-60', locale: en, usage_count: 8 },
+    { field: 'grade', value: 'AU-58', locale: en, usage_count: 25 },
+    { field: 'grade', value: 'AU-55', locale: en, usage_count: 20 },
+    { field: 'grade', value: 'AU-50', locale: en, usage_count: 15 },
+    { field: 'grade', value: 'EF-45', locale: en, usage_count: 30 },
+    { field: 'grade', value: 'EF-40', locale: en, usage_count: 35 },
+    { field: 'grade', value: 'VF-35', locale: en, usage_count: 28 },
+    { field: 'grade', value: 'VF-30', locale: en, usage_count: 32 },
+    { field: 'grade', value: 'VF-25', locale: en, usage_count: 25 },
+    { field: 'grade', value: 'VF-20', locale: en, usage_count: 30 },
+    { field: 'grade', value: 'F-15', locale: en, usage_count: 20 },
+    { field: 'grade', value: 'F-12', locale: en, usage_count: 22 },
+    { field: 'grade', value: 'VG-10', locale: en, usage_count: 15 },
+    { field: 'grade', value: 'VG-8', locale: en, usage_count: 18 },
+    { field: 'grade', value: 'G-6', locale: en, usage_count: 10 },
+    { field: 'grade', value: 'G-4', locale: en, usage_count: 8 },
+    { field: 'grade', value: 'AG-3', locale: en, usage_count: 6 },
+    { field: 'grade', value: 'FR-2', locale: en, usage_count: 4 },
+    // Eras
+    { field: 'era', value: 'Ancient', locale: en, usage_count: 30 },
+    { field: 'era', value: 'Roman Republic', locale: en, usage_count: 40 },
+    { field: 'era', value: 'Roman Imperial', locale: en, usage_count: 80 },
+    { field: 'era', value: 'Roman Provincial', locale: en, usage_count: 25 },
+    { field: 'era', value: 'Byzantine', locale: en, usage_count: 30 },
+    { field: 'era', value: 'Early Medieval', locale: en, usage_count: 15 },
+    { field: 'era', value: 'High Medieval', locale: en, usage_count: 20 },
+    { field: 'era', value: 'Late Medieval', locale: en, usage_count: 15 },
+    { field: 'era', value: 'Medieval', locale: en, usage_count: 10 },
+    { field: 'era', value: 'Islamic', locale: en, usage_count: 12 },
+    { field: 'era', value: 'Modern', locale: en, usage_count: 20 },
+    // Die Axis
+    { field: 'die_axis', value: '1h', locale: en, usage_count: 5 },
+    { field: 'die_axis', value: '2h', locale: en, usage_count: 5 },
+    { field: 'die_axis', value: '3h', locale: en, usage_count: 15 },
+    { field: 'die_axis', value: '4h', locale: en, usage_count: 8 },
+    { field: 'die_axis', value: '5h', locale: en, usage_count: 8 },
+    { field: 'die_axis', value: '6h', locale: en, usage_count: 50 },
+    { field: 'die_axis', value: '7h', locale: en, usage_count: 8 },
+    { field: 'die_axis', value: '8h', locale: en, usage_count: 8 },
+    { field: 'die_axis', value: '9h', locale: en, usage_count: 15 },
+    { field: 'die_axis', value: '10h', locale: en, usage_count: 6 },
+    { field: 'die_axis', value: '11h', locale: en, usage_count: 5 },
+    { field: 'die_axis', value: '12h', locale: en, usage_count: 45 },
+    // Mints
+    { field: 'mint', value: 'Rome', locale: en, usage_count: 100 },
+    { field: 'mint', value: 'Constantinople', locale: en, usage_count: 60 },
+    { field: 'mint', value: 'Antioch', locale: en, usage_count: 45 },
+    { field: 'mint', value: 'Alexandria', locale: en, usage_count: 40 },
+    { field: 'mint', value: 'Lugdunum', locale: en, usage_count: 30 },
+    { field: 'mint', value: 'Siscia', locale: en, usage_count: 25 },
+    { field: 'mint', value: 'Mediolanum', locale: en, usage_count: 22 },
+    { field: 'mint', value: 'Thessalonica', locale: en, usage_count: 20 },
+    { field: 'mint', value: 'Nicomedia', locale: en, usage_count: 20 },
+    { field: 'mint', value: 'Athens', locale: en, usage_count: 20 },
+    { field: 'mint', value: 'Cyzicus', locale: en, usage_count: 18 },
+    { field: 'mint', value: 'Ticinum', locale: en, usage_count: 15 },
+    { field: 'mint', value: 'Aquileia', locale: en, usage_count: 15 },
+    { field: 'mint', value: 'Carthage', locale: en, usage_count: 12 },
+    { field: 'mint', value: 'Ephesus', locale: en, usage_count: 12 },
+  ];
+}
 
 const isDev = !app.isPackaged;
 const dbPath = isDev 
@@ -136,6 +240,89 @@ export const dbService = {
     validate(idSchema, id);
     const info = db.prepare('DELETE FROM images WHERE id = ?').run(id);
     return info.changes > 0;
+  },
+
+  // Vocabulary service methods
+  getVocabularies: (field: VocabField): string[] => {
+    if (!ALLOWED_VOCAB_FIELDS.includes(field)) {
+      throw new Error(`Invalid vocabulary field: ${field}`);
+    }
+    const rows = db.prepare(
+      'SELECT value FROM vocabularies WHERE field = ? ORDER BY usage_count DESC, value ASC'
+    ).all(field) as { value: string }[];
+    return rows.map(r => r.value);
+  },
+
+  addVocabulary: (field: VocabField, value: string, locale = 'en'): void => {
+    if (!ALLOWED_VOCAB_FIELDS.includes(field)) {
+      throw new Error(`Invalid vocabulary field: ${field}`);
+    }
+    db.prepare(
+      'INSERT OR IGNORE INTO vocabularies (field, value, locale, is_builtin, usage_count) VALUES (?, ?, ?, 0, 0)'
+    ).run(field, value, locale);
+  },
+
+  searchVocabularies: (field: VocabField, query: string): string[] => {
+    if (!ALLOWED_VOCAB_FIELDS.includes(field)) {
+      throw new Error(`Invalid vocabulary field: ${field}`);
+    }
+    if (!query) {
+      const rows = db.prepare(
+        'SELECT value FROM vocabularies WHERE field = ? ORDER BY usage_count DESC, value ASC'
+      ).all(field) as { value: string }[];
+      return rows.map(r => r.value);
+    }
+    const rows = db.prepare(
+      "SELECT value FROM vocabularies WHERE field = ? AND value LIKE ? ESCAPE '\\' ORDER BY usage_count DESC, value ASC"
+    ).all(field, `%${query.replace(/[%_\\]/g, '\\$&')}%`) as { value: string }[];
+    return rows.map(r => r.value);
+  },
+
+  incrementVocabularyUsage: (field: VocabField, value: string): void => {
+    if (!ALLOWED_VOCAB_FIELDS.includes(field)) {
+      throw new Error(`Invalid vocabulary field: ${field}`);
+    }
+    db.prepare(
+      'UPDATE vocabularies SET usage_count = usage_count + 1 WHERE field = ? AND value = ?'
+    ).run(field, value);
+  },
+
+  resetVocabularies: (field?: VocabField): void => {
+    if (field !== undefined && !ALLOWED_VOCAB_FIELDS.includes(field)) {
+      throw new Error(`Invalid vocabulary field: ${field}`);
+    }
+    if (field) {
+      db.prepare('DELETE FROM vocabularies WHERE field = ? AND is_builtin = 0').run(field);
+    } else {
+      db.prepare('DELETE FROM vocabularies WHERE is_builtin = 0').run();
+    }
+    // Restore seeded usage_count values
+    const seedEntries = getSeedEntries();
+    const filtered = field ? seedEntries.filter(e => e.field === field) : seedEntries;
+    const stmt = db.prepare(
+      'UPDATE vocabularies SET usage_count = ? WHERE field = ? AND value = ? AND locale = ?'
+    );
+    for (const entry of filtered) {
+      stmt.run(entry.usage_count, entry.field, entry.value, entry.locale);
+    }
+  },
+
+  seedVocabularies: (): void => {
+    const CURRENT_SEED_VERSION = '6a.1';
+    const row = db.prepare('SELECT value FROM preferences WHERE key = ?').get('vocab_seeded_version') as { value: string } | undefined;
+    if (row?.value === CURRENT_SEED_VERSION) return;
+
+    const insert = db.prepare(
+      'INSERT OR IGNORE INTO vocabularies (field, value, locale, is_builtin, usage_count) VALUES (?, ?, ?, 1, ?)'
+    );
+    const insertMany = db.transaction((entries: Array<{ field: string; value: string; locale: string; usage_count: number }>) => {
+      for (const entry of entries) {
+        insert.run(entry.field, entry.value, entry.locale, entry.usage_count);
+      }
+    });
+    insertMany(getSeedEntries());
+
+    db.prepare('INSERT OR REPLACE INTO preferences (key, value) VALUES (?, ?)').run('vocab_seeded_version', CURRENT_SEED_VERSION);
   }
 };
 

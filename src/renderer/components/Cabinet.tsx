@@ -66,7 +66,7 @@ export const Cabinet: React.FC = () => {
               <p className="type-body cabinet-subtitle">
                 {loading 
                   ? 'Synchronizing with the local archive...' 
-                  : `The collection contains ${filteredCoins.length} verified historical objects.`}
+                  : `${filteredCoins.length} ${filteredCoins.length === 1 ? 'object' : 'objects'} in the ledger.`}
               </p>
             </header>
 

@@ -18,4 +18,9 @@ window.electronAPI = {
   removeLensListeners: vi.fn(),
   exportToZip: vi.fn(),
   exportToPdf: vi.fn(),
+  getVocab: vi.fn().mockResolvedValue([]),
+  addVocabEntry: vi.fn().mockResolvedValue(undefined),
+  searchVocab: vi.fn().mockResolvedValue([]),
+  incrementVocabUsage: vi.fn().mockResolvedValue(undefined),
+  resetVocab: vi.fn().mockResolvedValue(undefined),
 };

@@ -12,7 +12,7 @@ Defined in `src/renderer/styles/index.css`. These colors are tested for WCAG 2.1
 | :--- | :--- | :--- |
 | `--bg-manuscript` | `#FCF9F2` | Primary background (Parchment). Reduces glare. |
 | `--text-ink` | `#2D2926` | High-contrast typography (Iron Gall Ink). |
-| `--text-muted` | `#7A7875` | Secondary metadata and labels. |
+| `--text-muted` | `#6A6764` | Secondary metadata and labels. |
 | `--border-hairline`| `#E0DCCD` | Subtle structural dividers (Vellum tone). |
 | `--accent-manuscript` | `#914E32` | Action states and primary accents (Burnt Sienna). |
 | `--stone-pedestal` | `#F0EDE6` | Soft background for coin frames and containers. |
@@ -89,6 +89,7 @@ Maintain a strict horizontal breath around the central divider:
 - **Solid Actions:** `--text-ink` background with white text. High-contrast, no rounding.
 - **Minimal Actions:** Text-only with a bottom border using `var(--font-mono)`.
 - **Hover:** All actions transition to `--accent-manuscript`.
+- **Destructive Actions (`.btn-delete`):** Rendered in `--text-muted` with a `--text-muted` bottom border at rest — visually de-prioritised to avoid drawing attention. On hover only, transitions to `--error-red` color and border. This "deferred disclosure" pattern surfaces the destructive signal only on deliberate approach, preventing accidental triggering while maintaining discoverability. Apply `.btn-delete` to any action that permanently removes data (coin records, images). Never use `--error-red` at rest state.
 
 ### Form Inputs
 - **Style:** Underlined only (`border-bottom`). No side or top borders.

@@ -310,6 +310,24 @@ Per `catalog_standards.md` §1-2, catalog abbreviations (RIC, RPC, Crawford, BMC
   - Aleación (for Alloy/Metal instead of generic "Material")
 - **Catalog References:** RIC, RPC, BMC remain in original language
 
+### Note: Nomisma.org as Vocabulary Translation Source
+
+Phase 6a seed data was hand-curated and covers English-only vocabulary values. For Phase 6b, **Nomisma.org** (American Numismatic Society) is a natural fit for translating vocabulary entries:
+
+- CC-BY licensed Linked Open Data with labels in 40+ languages including Spanish
+- Covers metals (`av`→Gold/Oro, `ar`→Silver/Plata), denominations, mints, and periods
+- Fetch once at build/seed time via their `getLabel` API or SPARQL endpoint — no runtime calls
+- Results stored in the existing `vocabularies` table using the reserved `locale` column (e.g. `locale = 'es'`)
+- The `UNIQUE(field, value, locale)` constraint in the schema was designed for exactly this
+
+**Fields NOT covered by Nomisma** (grades, die axis) would fall back to untranslated English values, which is acceptable — these are international standards (EF-40, 6h) with no conventional Spanish equivalent.
+
+**Implementation sketch:**
+1. Add a `scripts/fetch_nomisma_vocab.ts` build-time script
+2. Query Nomisma SPARQL for `skos:prefLabel` where `xml:lang = 'es'`
+3. `INSERT OR IGNORE INTO vocabularies (field, value, locale, is_builtin, usage_count)` for each result
+4. Bump `CURRENT_SEED_VERSION` to `'6b.1'` to trigger re-seed on next launch
+
 ---
 
 ## 10. Post-Implementation Retrospective

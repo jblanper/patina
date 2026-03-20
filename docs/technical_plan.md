@@ -161,6 +161,37 @@ The database schema has been finalized and approved following a research phase i
 - [x] Redesigned filters with visible checkbox controls
 - [x] Aligned Edit Coin form fields vertically via CSS grid
 
+#### Cabinet UI Refinements (Proposed)
+**Detailed Blueprint:** [2026-03-20-cabinet-ui-refinements.md](./blueprints/2026-03-20-cabinet-ui-refinements.md)
+**Reference Audit:** [audit_cabinet_2026-03-20.md](./curating-ui/audit_cabinet_2026-03-20.md)
+- [ ] Fix `btn-action` color contrast (C1) — `--text-muted` → `--text-ink`
+- [ ] Fix toolbar gap and right-anchor primary CTA (H1)
+- [ ] Fix metric divider `//` legibility (H2) — `--border-hairline` → `--text-muted`
+- [ ] Increase `btn-action` click target padding (M3)
+- [ ] Remove redundant "SEARCH THE LEDGER" visible label (M1)
+- [ ] Switch gallery grid to `auto-fit` (M2)
+- [ ] Polish collection count copy and sidebar gap (L1, L2)
+
+#### Coin Detail & Scriptorium UI Refinements (Approved)
+**Detailed Blueprint:** [2026-03-20-detail-scriptorium-ui-refinements.md](./blueprints/2026-03-20-detail-scriptorium-ui-refinements.md)
+**Reference Audit:** [audit_detail_and_scriptorium_2026-03-20.md](./curating-ui/audit_detail_and_scriptorium_2026-03-20.md)
+**Visual Mockup:** [mockup_detail_scriptorium_refinements_2026-03-20.html](./curating-ui/archive/mockup_detail_scriptorium_refinements_2026-03-20.html)
+- [ ] Add zoom affordance overlay to plate frame — CD-C1
+- [ ] Reverse header button order; add `.btn-delete` hover signal — CD-H1
+- [ ] Add `border-bottom` to `.metrics-grid` for zone separation — CD-H2
+- [ ] Remove hardcoded "PLATE V" from plate caption — CD-H3
+- [ ] Separate Provenance into its own `numismatic-section` — CD-M1
+- [ ] Unify footer font family to `var(--font-mono)` — CD-M2
+- [ ] Replace `.export-result` in delete modal with `.modal-actions` — CD-L1
+- [ ] Replace `[AUTO-ISSUE]` / `#001` with `—` / `#NEW` fallbacks — SC-C1
+- [ ] Convert Scriptorium footer to `metrics-grid` pattern — SC-H1
+- [ ] Fix `input-legend` to `width: 100%; max-width: 320px` — SC-H2
+- [ ] Reduce `.plate-stack` gap to `2rem` — SC-M1
+- [ ] Give first plate slot full opacity (obverse primacy) — SC-M2
+- [ ] Widen subtitle label column to `130px` — SC-M3
+- [ ] Add `border-top` to `.ledger-footer` — SC-L1
+- [ ] Improve empty plate frame border to `var(--text-muted)` — SC-L2
+
 ---
 
 ## 7. Design Guidelines (Updated to v3.3)

@@ -128,9 +128,63 @@ describe('CoinDetail Component', () => {
     });
 
     render(<CoinDetail />);
-    
+
     const backBtn = screen.getByRole('button', { name: 'Close Ledger Entry' });
     fireEvent.click(backBtn);
     expect(mockNavigate).toHaveBeenCalledWith(-1);
+  });
+
+  it('navigates to edit route', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin,
+      images: mockImages,
+      isLoading: false,
+      error: null,
+    });
+
+    render(<CoinDetail />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit Record' }));
+    expect(mockNavigate).toHaveBeenCalledWith('/scriptorium/edit/1');
+  });
+
+  it('shows delete confirmation modal and calls deleteCoin on confirm', async () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin,
+      images: mockImages,
+      isLoading: false,
+      error: null,
+    });
+    vi.mocked(window.electronAPI.deleteCoin).mockResolvedValue(undefined);
+
+    render(<CoinDetail />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Record' }));
+    expect(screen.getByText('Confirm Deletion')).toBeInTheDocument();
+
+    const cancelBtn = screen.getByRole('button', { name: 'Cancel' });
+    const deleteBtn = screen.getByRole('button', { name: 'Delete' });
+    expect(cancelBtn).toBeInTheDocument();
+    expect(deleteBtn).toBeInTheDocument();
+
+    fireEvent.click(deleteBtn);
+    expect(window.electronAPI.deleteCoin).toHaveBeenCalledWith(1);
+  });
+
+  it('closes delete modal on cancel', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin,
+      images: mockImages,
+      isLoading: false,
+      error: null,
+    });
+
+    render(<CoinDetail />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Record' }));
+    expect(screen.getByText('Confirm Deletion')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.queryByText('Confirm Deletion')).not.toBeInTheDocument();
   });
 });

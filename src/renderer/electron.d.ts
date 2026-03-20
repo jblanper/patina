@@ -1,4 +1,5 @@
 import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage } from '../common/types';
+import type { VocabField } from '../common/validation';
 
 export interface IElectronAPI {
   ping: () => Promise<string>;
@@ -22,6 +23,13 @@ export interface IElectronAPI {
   // Export API
   exportToZip: (options: { includeImages?: boolean; includeCsv?: boolean }) => Promise<{ success: boolean; path?: string; error?: string }>;
   exportToPdf: () => Promise<{ success: boolean; path?: string; error?: string }>;
+
+  // Vocabulary API
+  getVocab: (field: VocabField) => Promise<string[]>;
+  addVocabEntry: (field: VocabField, value: string) => Promise<void>;
+  searchVocab: (field: VocabField, query: string) => Promise<string[]>;
+  incrementVocabUsage: (field: VocabField, value: string) => Promise<void>;
+  resetVocab: (field?: VocabField) => Promise<void>;
 }
 
 declare global {

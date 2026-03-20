@@ -47,6 +47,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "jsdom": "^28.1.0",
+    "playwright": "^1.58.2",
     "tsc-watch": "^7.2.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
