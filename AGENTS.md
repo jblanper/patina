@@ -2,7 +2,7 @@
 
 This document defines the absolute standards for the Patina project. All development must rigorously adhere to these rules to maintain the "Curator-First" experience and ensure system integrity.
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Last Updated:** 2026-03-20
 
 ---
@@ -54,9 +54,11 @@ This document defines the absolute standards for the Patina project. All develop
 - **Optimization:** Use `React.memo` and `useCallback` strategically in the Gallery grid to ensure smooth scrolling and interaction.
 
 ### Database & File System
-- **SQLite Integrity:** Use `better-sqlite3` with WAL mode. Ensure all writes are atomic and follow the structured schema defined in `src/common/schema.ts`. This file is the single source of truth for all table and column definitions.
+- **SQLite Integrity:** Use `better-sqlite3` with WAL mode and `foreign_keys = ON`. Foreign key constraints must be enabled to ensure cascade deletes work correctly. All writes must be atomic and follow the structured schema defined in `src/common/schema.ts`.
+- **Data Defaults:** New coins default to `era: 'Ancient'` as most collections focus on ancient coinage. This default is enforced in both `schema.ts` (database level) and `useCoinForm.ts` (form level).
 - **Portable Paths:** Store image paths as relative to the `data/images/` directory. Never use absolute system paths in the database.
-- **Secure Image Loading:** Use a custom protocol (e.g., `patina-img://`) in the Main process to serve local images to the Renderer. This preserves the sandbox and CSP integrity by avoiding `file://` protocols or direct filesystem access.
+- **File Cleanup:** When deleting records, associated files must be removed from the filesystem. The `deleteCoin()` function cleans up orphaned image files from `data/images/`.
+- **Secure Image Loading:** Use a custom protocol (e.g., `patina-img://`) in the Main process to serve local images to the Renderer. This preserves the sandbox and CSP integrity by avoiding `file://` protocols or direct filesystem access. Async file reads are mandatory to avoid blocking the main process.
 - **Atomic File Operations:**
  When moving or saving images from the "Lens" bridge, use atomic move/write operations to prevent data loss.
 - **Preservation & Export (Phase 5):** The export system (`src/main/export/`) generates PDF catalogs and ZIP archives for collection backup. PDF uses Garamond font with aligned tables; ZIP includes CSV data and database snapshot. All export operations are atomic and preserve data integrity.
@@ -68,7 +70,7 @@ This document defines the absolute standards for the Patina project. All develop
 - **Input Sanitization:** Use `zod` to validate all incoming multipart/form-data. Define strict schemas with clear error messages.
 - **Stateless Design:** The Express server is a passthrough. It should receive the image, hand it to the Main process for indexing, and return a simple status code.
 - **Security:** Apply `helmet` middleware and restrict CORS to localhost only.
-- **File Handling:** Validate MIME types (image/jpeg, image/png, image/webp) and enforce a 10MB size limit.
+- **File Handling:** MIME type allowlist is strictly enforced: only `image/jpeg`, `image/png`, and `image/webp` are accepted. SVG (`image/svg+xml`) is explicitly blocked to prevent script injection. Maximum file size is 10MB.
 
 ---
 
