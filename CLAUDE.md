@@ -26,8 +26,11 @@ npm run test -- path/to/file.test.ts  # Run a single test file
 npm run lint             # ESLint check
 npx tsc --noEmit         # Zero-Error Rule: must pass before any commit
 
+# Dependencies
+npm install --legacy-peer-deps   # Required — React 19 peer-dep friction with some packages
+
 # Database
-npm run db:seed          # Seed database with test data
+npm run db:seed          # Seed database with test data (runs via electron binary — do NOT run seed scripts with node directly; ABI mismatch with better-sqlite3)
 node scripts/extract_schema.cjs  # Print current DB schema to stdout
 ```
 
@@ -60,8 +63,13 @@ src/common/      ← Shared types and validation (used by both)
 | `src/common/types.ts` | Domain models: `Coin`, `CoinImage` — single source of truth |
 | `src/common/validation.ts` | Zod schemas — 100% branch coverage required |
 | `src/common/schema.ts` | SQLite table/column definitions |
-| `src/renderer/App.tsx` | HashRouter with 4 routes: `/`, `/coin/:id`, `/scriptorium/add`, `/scriptorium/edit/:id` |
+| `src/renderer/App.tsx` | HashRouter with 5 routes: `/`, `/coin/:id`, `/scriptorium/add`, `/scriptorium/edit/:id`, `/glossary` |
 | `src/renderer/styles/index.css` | All CSS lives here — vanilla CSS only, no CSS-in-JS |
+| `src/renderer/components/Glossary.tsx` | Full-page `/glossary` route — bilingual coin field reference scroll |
+| `src/renderer/components/GlossaryDrawer.tsx` | Contextual slide-in drawer triggered by `?` icons on field labels in Scriptorium and CoinDetail |
+| `src/renderer/data/glossaryFields.ts` | Static bilingual glossary content (TS constant, bundled at build time — no runtime fetch) |
+| `src/renderer/i18n/locales/en.json` | English translations (namespaces: `common`, `ledger`, `cabinet`, `plateEditor`, `autocomplete`) |
+| `src/renderer/i18n/locales/es.json` | Spanish translations — default language |
 
 ### Routing
 
@@ -69,12 +77,13 @@ src/common/      ← Shared types and validation (used by both)
 - `/coin/:id` → `CoinDetail` — single coin record
 - `/scriptorium/add` — `Scriptorium` — new coin form
 - `/scriptorium/edit/:id` — `Scriptorium` — edit coin form
+- `/glossary` → `Glossary` — bilingual coin field reference (EN/ES)
 
 All pages are wrapped in `.app-container` from `App.tsx` (the "Sanctuary" layout) — do not add local page-level wrappers that override this horizontal padding.
 
 ### State & Data Flow
 
-All database interaction and bridge state must be encapsulated in custom hooks (`useCoins`, `useCoin`, `useCoinForm`, `useExport`, `useLens`). Components should not call `window.electronAPI` directly.
+All database interaction and bridge state must be encapsulated in custom hooks (`useCoins`, `useCoin`, `useCoinForm`, `useExport`, `useLens`, `useLanguage`). Components should not call `window.electronAPI` directly.
 
 ## Testing Standards
 
@@ -111,6 +120,7 @@ All database interaction and bridge state must be encapsulated in custom hooks (
 - Native module `better-sqlite3` must be rebuilt for Electron ABI using `@electron/rebuild` after version changes.
 - The Lens Express server: binds to local network only, UUID session token auth, validates MIME types (jpeg/png/webp), enforces 10 MB limit.
 - Nomisma.org vocabulary is fetched **once at seed time** and stored locally — no external network calls during runtime.
+- **Default language is Spanish (`'es'`).** The UI is bilingual (ES/EN) via `react-i18next`. Language preference is persisted to SQLite via `pref:get`/`pref:set` IPC. Never add hardcoded English UI strings — use translation keys.
 - **Single-Click Rule:** Every feature must be reachable within two clicks.
 
 ## Development Workflow

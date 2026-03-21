@@ -48,9 +48,15 @@ This document defines the absolute standards for the Patina project. All develop
 ### React & Frontend Architecture
 - **Component Focused:** One file per component. Keep components small, focused, and documented with TS interfaces for props.
 - **Custom Hooks:** All database interaction, filtering logic, or bridge state must be encapsulated in custom hooks (e.g., `useCoins()`, `useLens()`).
+- **IPC Listener Ownership:** A hook that registers an IPC event listener (e.g. `lens:image-received`) must also remove it on cleanup. Register in `useEffect`, return a cleanup function that calls `removeListener`. Never register the same IPC listener in multiple places — duplicate listeners cause double-fires on re-render.
+- **Derived Arrays:** Use `useMemo` (not `useState`) for arrays derived from props or other state (e.g. `existingImagePaths`). `useState` for derived data goes stale between renders.
 - **Centralized Layout:** All pages MUST be wrapped in the `.app-container` within `App.tsx`. This ensures a unified "top line" width and consistent horizontal padding (The Sanctuary) across the application. Avoid local page-level wrappers that override this.
 - **Smart Ledger Grid:** Prefer container-aware CSS Grid (`auto-fit`) over rigid media query breakpoints for primary layouts. Use `grid-template-columns: repeat(auto-fit, minmax(min(100%, <breakpoint>), 1fr))` to ensure zero-overflow responsiveness.
-- **Styling:** All CSS must be implemented using **Vanilla CSS** in the global `src/renderer/styles/index.css` file. Follow the standards in `docs/style_guide.md`. Do NOT use `styled-jsx`, `styled-components`, or utility-first frameworks like Tailwind unless specifically requested. This ensures a stable, type-safe, and archival-focused build.
+- **Grid Overflow Prevention:** Always set `min-width: 0` on direct grid children — without it, text content forces cells wider than the column definition. Pair with `overflow-wrap: anywhere` on long text nodes and `object-fit: contain` on images to prevent content from breaking the layout.
+- **Styling:** All CSS must be implemented using **Vanilla CSS** in the global `src/renderer/styles/index.css` file. Follow the standards in `docs/style_guide.md`. Do NOT use `styled-jsx`, `styled-components`, or utility-first frameworks like Tailwind. Inline `<style jsx>` blocks have caused build failures in this project (missing peer dependency) and were removed — do not reintroduce them.
+- **Touch Targets:** Interactive elements must meet a 44px minimum touch target. Use at least `0.75rem` padding on action buttons. Checked during code review — do not regress.
+- **Accessibility — Modal Tab Order:** In confirmation dialogs, the Cancel action must come before the destructive action (Delete/Confirm) in both DOM order and tab sequence. This is required by WCAG 3.2.4 and was corrected in a post-implementation audit.
+- **Accessibility — Interactive Controls:** Use native `<button>` elements for clickable list items — not `<li onClick>`. Native elements get keyboard focus and Enter/Space activation for free.
 - **Optimization:** Use `React.memo` and `useCallback` strategically in the Gallery grid to ensure smooth scrolling and interaction.
 
 ### Vocabulary System (Phase 6a)
@@ -58,9 +64,28 @@ This document defines the absolute standards for the Patina project. All develop
 - **Defence-in-Depth:** Vocabulary IPC handlers validate input with `.strict()` Zod schemas at the IPC boundary. DB service methods perform a redundant `ALLOWED_VOCAB_FIELDS` allowlist check before any field string is used in SQL. Never interpolate a `field` parameter directly into SQL — use only parameterized queries.
 - **Seed Versioning:** `seedVocabularies()` is called from `app.whenReady()` — never via IPC. Bump `CURRENT_SEED_VERSION` (e.g. `'6a.1'` → `'6b.1'`) to trigger a re-seed on next launch. The `INSERT OR IGNORE` pattern preserves user-modified `usage_count` values and user-added entries across re-seeds.
 - **Schema Extension:** Add new tables to the `SCHEMA` array in `src/common/schema.ts` — never as raw SQL in `db.ts`. The `generateSQL()` / `CREATE TABLE IF NOT EXISTS` pattern handles migration automatically on next startup.
-- **AutocompleteField Pattern:** Vocab-backed form fields use the `AutocompleteField` component + `useVocabularies(field)` hook. The hook holds a module-level cache; call `clearVocabCache()` (exported for tests only) in `beforeEach` to prevent cross-test contamination. Usage increment (`incrementUsage`) is fire-and-forget — never block the UI on it.
+- **AutocompleteField Pattern:** Vocab-backed form fields use the `AutocompleteField` component + `useVocabularies(field)` hook. The hook holds a module-level cache keyed as `"${field}:${locale}"` — always include locale in the cache key to prevent cross-locale stale hits. Call `clearVocabCache()` (exported for tests only) in `beforeEach` to prevent cross-test contamination. Usage increment (`incrementUsage`) is fire-and-forget — never block the UI on it.
+
+### Internationalization (Phase 6b)
+- **Library:** `react-i18next` with static JSON resources — no external CDN, no runtime network calls. Translation files live in `src/renderer/i18n/locales/en.json` and `es.json`.
+- **Default Language:** Spanish (`'es'`). Never add hardcoded English strings to UI components — always use `t('namespace.key')`. Namespaces: `common`, `ledger`, `cabinet`, `plateEditor`, `autocomplete`.
+- **Language Preference Bridge:** User language selection is persisted to SQLite via `pref:get`/`pref:set` IPC handlers. Schemas `PreferenceGetSchema` and `PreferenceSetSchema` use a strict key allowlist — never accept arbitrary preference keys.
+- **`useLanguage` Hook:** Wraps `i18n.changeLanguage` + preference persistence. Components use this hook; they never call `i18n.changeLanguage` directly.
+- **Vocabulary Locale:** `getVocab(field, locale?)` filters vocabulary by locale. The `useVocabularies` hook always passes the active locale. Cache key is always `"${field}:${locale}"` — a bare `field` key causes cross-locale pollution.
+- **Lens Server Locale:** Read the language preference in the `lens:start` handler and pass it to `createLensServer()`. Embed translated strings into the mobile HTML as a JSON `data-strings='...'` attribute on `<body>` — this is CSP-compliant (no inline scripts).
+- **Meta-line Fallbacks:** Use the literal string `'—'` for empty header fields. Never use a translation key as a fallback value — it creates the false impression that a field has been set.
+- **Test Global Mock:** `react-i18next` is mocked in `src/renderer/setupTests.ts`; the mock resolves all keys to their English equivalents so existing test assertions remain stable. Do not override this mock per-test unless specifically testing translation behaviour.
+- **Composition Check:** `src/renderer/i18n/__tests__/translations.test.ts` verifies key completeness between `en.json` and `es.json`. When adding new keys to one locale, always add them to both.
+
+### Glossary System (Phase 1a/1b)
+- **Content Source:** `src/renderer/data/glossaryFields.ts` is the single source of truth for all bilingual glossary content — a typed TS constant bundled at build time. No runtime fetch, no Markdown parsing. `description` and `vocabulary` tables stay as bilingual TS objects; only short UI strings (`nameKey`, `typeKey`, section `labelKey`) reference i18n keys.
+- **Full-Page Route:** `/glossary` → `Glossary.tsx` — a scrollable manuscript with a sticky section rail and `#anchor` deep-links.
+- **Contextual Drawer:** `GlossaryDrawer.tsx` overlays the current view and targets a specific field. Triggered by `?` icons on field labels in Scriptorium (`LedgerForm`) and CoinDetail. The drawer reuses the same scroll layout as the full-page route.
+- **Context Pattern:** `GlossaryContext` + `useGlossaryDrawer` hook manage drawer state (open/closed, target field). `App.tsx` provides the context and renders `GlossaryDrawer` at the root so it can overlay any route without re-mounting. Components call `useGlossaryDrawer().open(fieldId)` — never manage drawer state locally.
+- **i18n Keys:** Field human-readable names use existing `ledger.*` keys where available; new `glossary.fields.*` keys for fields without a ledger equivalent. Type annotations use `glossary.types.*` keys.
 
 ### Database & File System
+- **Script Execution:** Any script that imports `better-sqlite3` (or any native Electron module) MUST be executed via the `electron` binary, not `node`. The ABI versions differ; running with `node` causes a module load failure. Use `npm run db:seed` — never `node scripts/seed_data.ts` directly.
 - **SQLite Integrity:** Use `better-sqlite3` with WAL mode and `foreign_keys = ON`. Foreign key constraints must be enabled to ensure cascade deletes work correctly. All writes must be atomic and follow the structured schema defined in `src/common/schema.ts`.
 - **Data Defaults:** New coins default to `era: 'Ancient'` as most collections focus on ancient coinage. This default is enforced in both `schema.ts` (database level) and `useCoinForm.ts` (form level).
 - **Portable Paths:** Store image paths as relative to the `data/images/` directory. Never use absolute system paths in the database.
