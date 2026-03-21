@@ -32,45 +32,28 @@ Delivery is in two sequential phases:
 All glossary content lives here as a typed TS constant — not in i18n JSON (content is long-form, rich with tables) and not parsed from Markdown at runtime (no additional dependency). The file is the single source of truth for both languages.
 
 ```typescript
-export type GlossarySection =
-  | 'identity'
-  | 'dating'
-  | 'physical'
-  | 'inscriptions'
-  | 'cataloging'
-  | 'provenance';
-
-export interface GlossaryVocabTable {
-  columns: string[];           // e.g. ['Value', 'Full Name', 'Notes']
-  rows: string[][];            // each inner array is one row
-}
-
 export interface GlossaryField {
-  id: string;                  // matches Coin key: 'die_axis', 'metal', etc.
+  id: string;        // matches Coin key: 'die_axis', 'metal', etc.
+  nameKey: string;   // i18n key for the human-readable label, e.g. 'ledger.material'
   section: GlossarySection;
   required: boolean;
-  type: string;                // 'Text', 'Integer', 'Decimal (grams)', etc.
-  description: { en: string; es: string };
+  typeKey: string;   // i18n key for the type annotation, e.g. 'glossary.types.text'
+  description: { en: string; es: string };  // long-form content — stays bilingual in TS
   vocabulary?: { en: GlossaryVocabTable; es: GlossaryVocabTable };
-  furtherReading?: { label: string; url: string }[];  // opens via shell.openExternal
+  furtherReading?: { label: string; url: string }[];
 }
-
-export const GLOSSARY_FIELDS: GlossaryField[] = [ /* ~25 entries */ ];
-
-export const GLOSSARY_SECTIONS: {
-  id: GlossarySection;
-  label: { en: string; es: string };
-}[] = [
-  { id: 'identity',     label: { en: 'Identity & Classification', es: 'Identidad y Clasificación' } },
-  { id: 'dating',       label: { en: 'Dating',                    es: 'Datación'                  } },
-  { id: 'physical',     label: { en: 'Physical Description',      es: 'Descripción Física'         } },
-  { id: 'inscriptions', label: { en: 'Inscriptions & Descriptions', es: 'Inscripciones y Descripciones' } },
-  { id: 'cataloging',   label: { en: 'Cataloging & Reference',    es: 'Catalogación y Referencia'  } },
-  { id: 'provenance',   label: { en: 'Provenance & Acquisition',  es: 'Procedencia y Adquisición'  } },
-];
 ```
 
-`id` maps directly to `Coin` interface keys. This enables the `?` trigger to call `openField('die_axis')` and the Glossary to render the matching entry. The `GLOSSARY_FIELDS` array is populated from the authoritative glossary markdown files.
+**i18n key strategy (post-implementation revision):** The original design used hardcoded `{ en: string; es: string }` objects for `name` and `type`. After implementation, these were refactored to reference i18n keys:
+
+- `nameKey` maps to existing `ledger.*` keys where available (e.g. `metal` → `ledger.material`, `title` → `ledger.designation`), and to new `glossary.fields.*` keys for fields without a ledger equivalent (e.g. `glossary.fields.mint`, `glossary.fields.rarity`, `glossary.fields.obverseLegend`).
+- `typeKey` references new `glossary.types.*` keys (`glossary.types.text`, `glossary.types.decimal`, `glossary.types.decimalGrams`, etc.).
+- `GLOSSARY_SECTIONS` likewise uses `labelKey: string` referencing `glossary.sections.*` keys.
+- `description` and `vocabulary` remain as bilingual TS objects — these are long-form content (paragraphs, tables), not UI strings; moving them to flat JSON would be impractical.
+
+**Spanish title field correction:** The `title` field was initially translated as "Denominación" (matching the `denomination` field), creating two identically-named fields in Spanish. Corrected to **"Designación"** — the direct cognate of "Designation", unambiguous and professionally appropriate.
+
+**Denomination vocabulary expansion:** 16 Modern-era denominations added (Thaler, Escudo, Real de a Ocho, Guinea, Sovereign, Shilling, Eagle, Franc, Peso, Peseta, Mark, Krone/Krona, Lira, Rouble, Rupee, Maravedi), both in English and Spanish.
 
 **No new Zod schema needed** — this is static display data, not user input.
 
@@ -101,14 +84,16 @@ export const GLOSSARY_SECTIONS: {
 
 ```
 <Glossary>
-  <header class="app-header">           ← reuses existing header pattern
-    <Link "← Back">                     ← hairline nav link, top-left
+  <header class="app-header">
+    <Link "← Back to Cabinet">           ← hairline nav link, top-left
     <h1> Field Reference </h1>
   </header>
 
   <div class="glossary-layout">
-    <aside class="glossary-rail">       ← sticky right-edge section nav
-      { GLOSSARY_SECTIONS.map(s => <a href="#s.id"> initial </a>) }
+    <aside class="glossary-rail">        ← sticky section nav (scroll buttons)
+      { GLOSSARY_SECTIONS.map(s =>
+          <button onClick={scrollIntoView(s.id)}> initial </button>
+      )}
     </aside>
 
     <main class="glossary-scroll">
@@ -118,12 +103,14 @@ export const GLOSSARY_SECTIONS: {
           { fieldsForSection.map(field =>
             <article id={field.id} class="glossary-entry">
               <header>
-                <code class="glossary-field-name"> field.id </code>
+                <h3 class="glossary-field-name"> field.name[lang] </h3>
+                <code class="glossary-field-id"> field.id </code>
                 { field.required && <span class="glossary-required"> obligatorio </span> }
-                <span class="glossary-type"> field.type </span>
+                <span class="glossary-type"> field.type[lang] </span>
               </header>
-              <p> field.description </p>
-              { field.vocabulary && <GlossaryTable> }
+              <p> field.description[lang] </p>
+              { field.vocabulary && <GlossaryTable table={field.vocabulary[lang]}> }
+              { field.furtherReading && <ul class="glossary-further-reading"> }
             </article>
           )}
         </section>
@@ -133,7 +120,11 @@ export const GLOSSARY_SECTIONS: {
 </Glossary>
 ```
 
-Language selection: `const { i18n } = useTranslation()` → `lang = i18n.language as 'en' | 'es'` → select `field.description[lang]` and `field.vocabulary?.[lang]`.
+**Rail implementation note:** `<a href="#section_id">` anchors conflict with HashRouter (they overwrite the `#/glossary` route hash). The rail uses `<button onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}` instead.
+
+`GlossaryTable` and `GlossaryEntry` are **exported** from `Glossary.tsx` for reuse by `GlossaryDrawer`.
+
+Language selection: `const { i18n } = useTranslation()` → `lang = i18n.language as 'en' | 'es'` → select `field.name[lang]`, `field.description[lang]`, `field.vocabulary?.[lang]`.
 
 #### Cabinet Toolbar Link Position
 
@@ -209,13 +200,9 @@ Phase 1a `?` link-triggers were removed after implementation. The `<Link to="/gl
 | `src/renderer/components/GlossaryDrawer.test.tsx` | Component tests |
 | `src/renderer/contexts/GlossaryContext.tsx` | Context + provider for drawer state |
 
-#### New IPC Handler (Main Process)
+#### Further Reading Links — IPC Handler (Deferred)
 
-| Location | Change |
-|---|---|
-| `src/main/index.ts` | Add `ipcMain.handle('open-external-url', ...)` with domain allowlist validation |
-| `src/main/preload.ts` | Expose `openExternalUrl: (url: string) => ipcRenderer.invoke('open-external-url', url)` |
-| `src/common/validation.ts` | Add `ExternalUrlSchema` with Zod allowlist refinement |
+The planned `open-external-url` IPC handler (`src/main/index.ts` + `preload.ts` + `ExternalUrlSchema`) was **not implemented in Phase 1b**. Further Reading links currently render as native `<a href target="_blank" rel="noreferrer">` elements. In Electron's sandboxed renderer this may rely on default link handling; a future phase should add the allowlist-validated `shell.openExternal` IPC handler per the Security Assessment in §5.
 
 #### `useGlossaryDrawer` Hook
 
@@ -276,30 +263,44 @@ State is local (`useState`) — no persistence, no IPC. The hook also registers 
 
 | Behaviour | Implementation |
 |---|---|
-| Slide-in | `transform: translateX(100%)` → `translateX(0)` via CSS transition (0.25s ease) |
-| Backdrop | `position: fixed; inset: 0; background: rgba(45,41,38,0.35)` — lighter than modal (0.6) to keep context visible |
+| Slide-in (enter) | Two-phase mount: `setMounted(true)` → double-`requestAnimationFrame` → `setVisible(true)`. First rAF commits the DOM at `translateX(100%)`; second rAF sets `data-open="true"` triggering the 0.25s ease transition. Double-rAF is required because a single rAF can be batched with the mount into one paint by the browser. |
+| Slide-out (exit) | `setVisible(false)` starts the CSS `translateX(100%)` transition immediately. `setMounted(false)` fires after 250ms (matching transition duration) to unmount the DOM node. |
+| Backdrop | `opacity: 0 → 1` transition (0.25s ease) via `data-visible` attribute. `pointer-events: none` when not visible. Background `rgba(45,41,38,0.35)` — lighter than confirmation modal (0.6) to keep context perceptible. |
 | Esc close | `useEffect` → `keydown` listener active only while `open === true` |
 | Backdrop click | `onMouseDown` on backdrop div calls `close()` |
-| Scroll-lock | `document.body.style.overflow = 'hidden'` on open; restored on close |
-| Focus management | On open: `focus()` the close button (first interactive element). On close: `focus()` returns to the triggering element via a stored `triggerRef` |
-| Focus trap | Tab/Shift+Tab cycles within drawer's focusable elements only. Implemented with a `useFocusTrap(ref, open)` utility hook (~30 lines, no external library) |
-| `?` keyboard shortcut | `keydown` listener on `document` for `key === '?'` (and not in an `<input>` or `<textarea>`). Calls `openIndex()` |
+| Scroll-lock | `document.body.style.overflow = 'hidden'` on open. Scrollbar width (`window.innerWidth − document.documentElement.clientWidth`) applied as `paddingRight` to prevent layout shift. Both restored on close. |
+| Focus management | On open: `focus()` the close button. On close: focus returns to the triggering element via `triggerRef` stored in `useGlossaryDrawer` at the moment `openField` / `openIndex` is called. |
+| Focus trap | Tab/Shift+Tab cycles within drawer's focusable elements only. `useFocusTrap(ref, visible)` — activated on `visible`, not `open`, to avoid trapping focus during the exit transition. |
+| `?` keyboard shortcut | `keydown` listener on `document` for `key === '?'` (skipped when target is `INPUT` or `TEXTAREA`). Registered in `useGlossaryDrawer` via `useEffect`. Calls `openIndex()`. |
 
-#### `?` Triggers in LedgerForm (Phase 1b — Added Fresh)
+#### Field Label Triggers in LedgerForm (Phase 1b — Revised)
 
 Phase 1b triggers are scoped to **Scriptorium only** (`LedgerForm`). CoinDetail drawer triggers may be added in a future phase.
 
-Phase 1b adds `?` buttons directly (Phase 1a links were removed — see above):
+**Initial design (circle `?` button, superseded):** A standalone `<button className="glossary-hint">?</button>` was placed inside the label span as a circle-enclosed superscript. This was replaced after user review.
+
+**Revised design (dagger `†`, whole-label trigger):**
+
+The entire label is the clickable target. The `†` dagger is a non-interactive `<span aria-hidden>` used as a visual footnote marker only. This eliminates the isolated `?` glyph that competed visually with the label text.
 
 ```tsx
-// Phase 1b replacement
+// Each label — subtitle-label, metric-label, or section-label
 <button
-  className="glossary-hint"
-  onClick={() => openField('weight')}
-  aria-label={t('glossary.hintLabel', { field: 'weight' })}
-  ref={triggerRef}       // stored for focus return on close
->?</button>
+  className="subtitle-label"
+  onClick={() => openField('era')}
+  aria-label={t('glossary.hintLabel', { field: 'era' })}
+>
+  <span className="label-text">{t('ledger.era')}</span>
+  <span className="glossary-hint" aria-hidden="true">†</span>
+</button>
 ```
+
+**Visual design decisions:**
+- Symbol: `†` (typographic dagger) — carries scholarly footnote precedent, quieter than `?`
+- Color: `var(--accent-manuscript)` (Burnt Sienna) at `opacity: 0.75` — matches the meta-line accent, visually subordinate at rest
+- Position: `position: relative; top: -0.4em` — reliable superscript across all parent display modes (replaces `vertical-align: super` which failed on buttons inside flex containers)
+- Hit area: `padding: 0.25em 0.3em` on the dagger span for visual breathing room
+- Hover: dotted underline on `.label-text` only (via child selector, not the container) + dagger opacity to 1. Underline is scoped to the text `<span>` because `text-decoration` propagates to all inline children and cannot be cancelled on a sibling — targeting the child span is the only reliable cross-browser fix.
 
 The `GlossaryDrawer` is mounted once in `App.tsx`, with `useGlossaryDrawer` state passed down via a context or prop-drilled to `Cabinet`, `Scriptorium`, and `CoinDetail`.
 
@@ -422,15 +423,18 @@ export const useGlossaryContext = () => {
 - `close()` → `{ open: false, field: null }`
 
 **`src/renderer/components/GlossaryDrawer.test.tsx`**
-- Does not render when `open={false}`
+- Does not render (`null`) when `open={false}` and `mounted` has never been set to true
 - Renders field entry when `open={true}` and `field="die_axis"`
 - Renders field index when `open={true}` and `field={null}`
+- DOM node remains in document during the 250ms exit transition (two-phase mount: `mounted` stays `true` while `visible` goes `false`)
+- DOM node is removed after the 250ms exit transition completes (`mounted` → `false`)
 - Pressing Esc calls `onClose`
 - Clicking backdrop calls `onClose`
 - Close button calls `onClose`
 - Focus moves to close button on open
 - Focus returns to trigger element on close
-- Body scroll is locked while open
+- Body `overflow` is set to `hidden` while open; restored on close
+- Body `paddingRight` is applied equal to scrollbar width while open; restored on close
 - "Browse full reference ↗" link present in index mode
 - `?` keyboard shortcut fires `openIndex` (integration test)
 
@@ -441,6 +445,7 @@ export const useGlossaryContext = () => {
 | `src/renderer/components/Glossary.test.tsx` | `src/renderer/components/Glossary.tsx` |
 | `src/renderer/components/GlossaryDrawer.test.tsx` | `src/renderer/components/GlossaryDrawer.tsx` |
 | `src/renderer/hooks/useGlossaryDrawer.test.ts` | `src/renderer/hooks/useGlossaryDrawer.ts` |
+| `src/renderer/hooks/useFocusTrap.test.ts` | `src/renderer/hooks/useFocusTrap.ts` |
 
 ### Mocking Strategy
 
@@ -608,17 +613,42 @@ For language switching tests: use `i18n.changeLanguage('es')` in `beforeEach` / 
 
 ## 10. Post-Implementation Retrospective
 
-*(To be completed after Verification stage)*
-
-**Date:** —
-**Outcome:** —
+**Date:** 2026-03-21
+**Outcome:** All Phase 1a and Phase 1b code is implemented. Pending: tests (§3), re-audits (§5/§6/§7/§8), and `open-external-url` IPC handler (deferred).
 
 ### Summary of Work
--
+
+- **Phase 1a delivered:** Full-page `/glossary` route (`Glossary.tsx`), bilingual data constant (`glossaryFields.ts`, 25 entries, EN + ES), sticky section rail, Cabinet toolbar "Field Reference" link placed to the left of the "+ New Entry" CTA.
+- **Phase 1b delivered:** `GlossaryDrawer` slide-in overlay, `useGlossaryDrawer` hook (state + `?` keyboard shortcut), `useFocusTrap` hook, `GlossaryContext` provider, field label triggers on all 19 labelled fields in `LedgerForm`.
+- **Unplanned scope adjustments:**
+  - Phase 1a `?` links (hash anchors → `/glossary`) were implemented then removed due to HashRouter conflict and no-return UX problem. Phase 1b drawer triggers were the correct solution.
+  - `GlossaryField.name` bilingual key was added post-design-audit, then refactored to `nameKey` i18n key reference (see data model section).
+  - Scrollbar-width compensation (`paddingRight`) was added to the scroll-lock effect to prevent layout shift on open.
+  - `open-external-url` IPC handler deferred — Further Reading links use `<a target="_blank" rel="noreferrer">` for now.
+- **Post-Phase-1b UX revisions (iterative polish):**
+  - Circle `?` button replaced with typographic dagger `†` (`var(--accent-manuscript)`, superscript) — less visually prominent, carries scholarly footnote precedent.
+  - `vertical-align: super` failed on buttons inside flex containers; replaced with `position: relative; top: -0.4em`.
+  - Whole label converted to `<button>` — the entire label text + dagger is the click target. Dagger downgraded to `<span aria-hidden>` (non-interactive). Hover: dotted underline scoped to inner `.label-text` span to avoid CSS `text-decoration` inheritance propagating to the dagger.
+  - Spanish `title` field translation corrected from "Denominación" → "Designación".
+  - 16 Modern-era denominations added to the `denomination` vocabulary table (EN + ES).
+  - `glossaryFields.ts` i18n refactor: `name`/`type` bilingual objects → `nameKey`/`typeKey` i18n key references; `GLOSSARY_SECTIONS` label → `labelKey`. Components updated to use `t(field.nameKey)` etc.
+  - `CoinDetail` footer layout fixed: `display: flex; justify-content: space-between` on `.ledger-footer` to align ADQUIRIDA and COSTE on the same row.
+  - `plate-caption` top margin added (`margin-top: 0.75rem`) to separate the caption from the dashed frame border.
 
 ### Pain Points
--
+
+- **HashRouter vs. hash anchors:** `<a href="#section_id">` in the sticky rail overwrites the `#/glossary` route hash, rendering Cabinet instead of the Glossary. Took one full round-trip (implement → observe → fix) to catch. Any future feature using hash-based in-page navigation must account for this at design time.
+- **Double-rAF animation pattern:** A single `requestAnimationFrame` was insufficient — the browser batched `setMounted(true)` and `setVisible(true)` into the same paint, so the CSS transition never fired from the initial off-screen position. The double-rAF requirement is non-obvious and was discovered only after the first animation attempt failed. Documented in §2.3 Behaviours table for future reference.
+- **TypeScript `RefObject<HTMLElement>` vs. `RefObject<HTMLElement | null>`:** React 18 + TypeScript strict mode returns `RefObject<T | null>` from `useRef<T>(null)`. The `useFocusTrap` parameter type had to be widened from `RefObject<HTMLElement>` to `RefObject<HTMLElement | null>` to satisfy the type checker without casting.
+- **Curly/smart quotes in TS string literals:** A stray curly quote (`"`) inside a double-quoted TypeScript string in `glossaryFields.ts` caused a parse error. Replaced with escaped Unicode (`\u2014`) + structural single/double quote nesting.
+- **`text-decoration` CSS inheritance:** `text-decoration` on a parent propagates to all inline children and cannot be cancelled on a child with `text-decoration: none` (despite the spec allowing it, Electron's Chromium did not honour it). Workaround: apply the underline only to a `.label-text` child `<span>` — sibling spans are unaffected.
+- **`vertical-align: super` on flex-context buttons:** Buttons inside a flex or grid parent do not honour `vertical-align: super` for raising child elements. Replaced with `position: relative; top: -0.4em` which works regardless of parent display mode.
 
 ### Things to Consider
--
-- **Core Doc Revision:** Confirm if `AGENTS.md`, `style_guide.md`, or `style_guide.html` were updated.
+
+- **Tests:** `Glossary.test.tsx`, `GlossaryDrawer.test.tsx`, `useGlossaryDrawer.test.ts`, `useFocusTrap.test.ts` are all pending. This is the primary blocker for advancing from Verification → Completed.
+- **`open-external-url` IPC handler:** Deferred to a future phase. Further Reading links use `<a target="_blank">` which may not open reliably in Electron sandbox. The allowlist-validated handler (§5) should be prioritised before the feature is considered fully production-ready.
+- **CoinDetail `?` triggers:** Deferred. Scriptorium-only for Phase 1b. If collectors request point-of-need glossary access in read-only views, add in a follow-up.
+- **`GlossaryField.id` type narrowing:** Could be tightened to `keyof Coin` at compile time (currently `string`). Low-risk enhancement — not a correctness issue since 25 entries were manually verified against `src/common/types.ts`.
+- **i18n single source of truth:** The `nameKey`/`typeKey` refactor means field name translations are now maintained exclusively in `en.json`/`es.json`. Adding a new glossary field requires: (1) adding the `nameKey` to `ledger.*` or `glossary.fields.*` in both JSON files, (2) adding a `typeKey` to `glossary.types.*` if a new type is needed, (3) adding the entry to `GLOSSARY_FIELDS`. No bilingual duplication.
+- **Core Doc Revision:** `AGENTS.md`, `style_guide.md`, and `style_guide.html` were not updated. If the double-rAF animation pattern, two-phase mount idiom, or GlossaryContext context pattern are to be codified as project standards, they should be added in the post-completion standardisation step.

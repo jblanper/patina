@@ -31,20 +31,20 @@ export const GlossaryTable: React.FC<GlossaryTableProps> = ({ table }) => (
 export interface GlossaryEntryProps {
   field: GlossaryField;
   lang: 'en' | 'es';
-  requiredLabel: string;
 }
 
-export const GlossaryEntry: React.FC<GlossaryEntryProps> = ({ field, lang, requiredLabel }) => {
+export const GlossaryEntry: React.FC<GlossaryEntryProps> = ({ field, lang }) => {
+  const { t } = useTranslation();
   const vocab = field.vocabulary?.[lang];
   return (
     <article id={field.id} className="glossary-entry">
       <header className="glossary-entry-header">
-        <h3 className="glossary-field-name">{field.name[lang]}</h3>
+        <h3 className="glossary-field-name">{t(field.nameKey)}</h3>
         <code className="glossary-field-id">{field.id}</code>
         {field.required && (
-          <span className="glossary-required">{requiredLabel}</span>
+          <span className="glossary-required">{t('glossary.required')}</span>
         )}
-        <span className="glossary-type">{field.type[lang]}</span>
+        <span className="glossary-type">{t(field.typeKey)}</span>
       </header>
       <p className="glossary-description">{field.description[lang]}</p>
       {vocab && <GlossaryTable table={vocab} />}
@@ -66,7 +66,6 @@ export const GlossaryEntry: React.FC<GlossaryEntryProps> = ({ field, lang, requi
 export const Glossary: React.FC = () => {
   const { t, i18n } = useTranslation();
   const lang = (i18n.language === 'es' ? 'es' : 'en') as 'en' | 'es';
-  const requiredLabel = t('glossary.required');
 
   return (
     <>
@@ -81,10 +80,10 @@ export const Glossary: React.FC = () => {
             <button
               key={section.id}
               className="glossary-rail-link"
-              title={section.label[lang]}
+              title={t(section.labelKey)}
               onClick={() => document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth' })}
             >
-              {section.label[lang].charAt(0)}
+              {t(section.labelKey).charAt(0)}
             </button>
           ))}
         </aside>
@@ -94,13 +93,12 @@ export const Glossary: React.FC = () => {
             const fields = GLOSSARY_FIELDS.filter((f) => f.section === section.id);
             return (
               <section key={section.id} id={section.id} className="glossary-section">
-                <h2 className="glossary-section-heading">{section.label[lang]}</h2>
+                <h2 className="glossary-section-heading">{t(section.labelKey)}</h2>
                 {fields.map((field) => (
                   <GlossaryEntry
                     key={field.id}
                     field={field}
                     lang={lang}
-                    requiredLabel={requiredLabel}
                   />
                 ))}
               </section>

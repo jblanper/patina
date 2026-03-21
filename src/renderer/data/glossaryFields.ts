@@ -13,10 +13,10 @@ export interface GlossaryVocabTable {
 
 export interface GlossaryField {
   id: string;
-  name: { en: string; es: string };
+  nameKey: string;
   section: GlossarySection;
   required: boolean;
-  type: { en: string; es: string };
+  typeKey: string;
   description: { en: string; es: string };
   vocabulary?: { en: GlossaryVocabTable; es: GlossaryVocabTable };
   furtherReading?: { label: string; url: string }[];
@@ -24,24 +24,24 @@ export interface GlossaryField {
 
 export const GLOSSARY_SECTIONS: {
   id: GlossarySection;
-  label: { en: string; es: string };
+  labelKey: string;
 }[] = [
-  { id: 'identity',     label: { en: 'Identity & Classification',      es: 'Identidad y Clasificación'        } },
-  { id: 'dating',       label: { en: 'Dating',                          es: 'Datación'                         } },
-  { id: 'physical',     label: { en: 'Physical Description',            es: 'Descripción Física'               } },
-  { id: 'inscriptions', label: { en: 'Inscriptions & Descriptions',     es: 'Inscripciones y Descripciones'    } },
-  { id: 'cataloging',   label: { en: 'Cataloging & Reference',          es: 'Catalogación y Referencia'        } },
-  { id: 'provenance',   label: { en: 'Provenance & Acquisition',        es: 'Procedencia y Adquisición'        } },
+  { id: 'identity',     labelKey: 'glossary.sections.identity'     },
+  { id: 'dating',       labelKey: 'glossary.sections.dating'       },
+  { id: 'physical',     labelKey: 'glossary.sections.physical'     },
+  { id: 'inscriptions', labelKey: 'glossary.sections.inscriptions' },
+  { id: 'cataloging',   labelKey: 'glossary.sections.cataloging'   },
+  { id: 'provenance',   labelKey: 'glossary.sections.provenance'   },
 ];
 
 export const GLOSSARY_FIELDS: GlossaryField[] = [
   // ── Identity & Classification ──────────────────────────────────────────────
   {
     id: 'title',
-    name: { en: 'Designation', es: 'Denominación' },
+    nameKey: 'ledger.designation',
     section: 'identity',
     required: true,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: "The collector's personal name or short description for this coin. This is the primary label displayed throughout the Cabinet. It should be descriptive enough to identify the coin at a glance (e.g., 'Hadrian Denarius \u2014 Felicitas' or '1921 Morgan Dollar').",
       es: 'El nombre personal o descripción breve que el coleccionista asigna a esta moneda. Es la etiqueta principal que se muestra en todo el Gabinete. Debe ser suficientemente descriptivo para identificar la moneda de un vistazo (p. ej., «Denario de Adriano — Felicitas» o «Morgan Dollar 1921»).',
@@ -49,10 +49,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'issuer',
-    name: { en: 'Issuer', es: 'Emisor' },
+    nameKey: 'ledger.issuer',
     section: 'identity',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'The authority responsible for issuing the coin — typically a ruler, emperor, republic, or state. For ancient coins, this is the emperor\'s full name and dynasty (e.g., "Marcus Aurelius Antoninus"). For modern coins, it is the issuing nation or institution (e.g., "United States of America"). Corresponds to the Nomisma authority concept.',
       es: 'La autoridad responsable de emitir la moneda — generalmente un gobernante, emperador, república o estado. Para monedas antiguas, es el nombre completo del emperador y su dinastía (p. ej., «Marcus Aurelius Antoninus»). Para monedas modernas, es la nación o institución emisora (p. ej., «Estados Unidos de América»). Corresponde al concepto authority de Nomisma.',
@@ -60,10 +60,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'denomination',
-    name: { en: 'Denomination', es: 'Denominación' },
+    nameKey: 'ledger.denomination',
     section: 'identity',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'The official monetary unit or face value of the coin as defined by its issuing authority. Denominations vary greatly by culture and period.',
       es: 'La unidad monetaria oficial o valor nominal de la moneda según lo definido por su autoridad emisora. Las denominaciones varían considerablemente según la cultura y el período.',
@@ -88,8 +88,24 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
           ['Penny / Denarius','Medieval European',  'Silver'],
           ['Florin',         'Medieval European',   'Gold'],
           ['Ducat',          'Medieval/Renaissance','Gold'],
-          ['Dollar',         'Modern',              'Various metals'],
-          ['Crown',          'Modern British',      'Silver or cupro-nickel'],
+          ['Maravedi',        'Spanish Medieval–Modern', 'Base metal; ubiquitous small denomination'],
+          ['Real de a Ocho',  'Spanish Colonial',        'Silver; 8 reales; global trade coin ("Piece of Eight")'],
+          ['Escudo',          'Spanish/Portuguese Colonial', 'Gold; 2, 4, or 8 escudos'],
+          ['Thaler',          'Holy Roman Empire/Germanic', 'Large silver; etymological origin of "dollar"'],
+          ['Guinea',          'British Early Modern',    'Gold; 21 shillings (1663–1813)'],
+          ['Sovereign',       'British Modern',          'Gold; £1 (1489–present)'],
+          ['Shilling',        'British Modern',          'Silver then cupro-nickel; 1/20 of a pound'],
+          ['Crown',          'Modern British',           'Silver or cupro-nickel; 5 shillings'],
+          ['Dollar',         'Modern (US/global)',       'Silver then base metal; multiple national variants'],
+          ['Eagle',           'US Modern',               'Gold; $10 (also Half Eagle $5, Double Eagle $20)'],
+          ['Franc',           'French/Swiss/Belgian',    'Silver then base metal; 1795–present'],
+          ['Peso',            'Spanish Colonial / Latin American', 'Silver then base metal; multiple national variants'],
+          ['Peseta',          'Spanish Modern',          'Silver then base metal; 1868–2002'],
+          ['Mark',            'German Modern',           'Silver; Goldmark 1871–1914, Reichsmark 1924–1948'],
+          ['Krone / Krona',   'Germanic / Scandinavian', 'Silver then base metal; Austria, Denmark, Sweden, Norway'],
+          ['Lira',            'Italian / Ottoman',       'Silver then base metal; Italy 1861–2002, Ottoman Empire'],
+          ['Rouble',          'Russian',                 'Silver then base metal; 1704–present'],
+          ['Rupee',           'South Asian',             'Silver then base metal; Mughal, British India, modern'],
         ],
       },
       es: {
@@ -111,18 +127,34 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
           ['Penny / Denarius','Medieval Europeo',       'Plata'],
           ['Florin',         'Medieval Europeo',        'Oro'],
           ['Ducat',          'Medieval/Renacimiento',   'Oro'],
-          ['Dollar',         'Moderno',                 'Diversos metales'],
-          ['Crown',          'Británico Moderno',       'Plata o cuproníquel'],
+          ['Maravedi',        'Español Medieval–Moderno',   'Metal base; denominación menor ubicua'],
+          ['Real de a Ocho',  'Colonial Español',            'Plata; 8 reales; moneda de comercio global ("Peso de a Ocho")'],
+          ['Escudo',          'Colonial Español/Portugués',  'Oro; 2, 4 u 8 escudos'],
+          ['Thaler',          'Sacro Imperio/Germánico',     'Gran plata; origen etimológico del "dollar"'],
+          ['Guinea',          'Británico Moderno Temprano',  'Oro; 21 chelines (1663–1813)'],
+          ['Sovereign',       'Británico Moderno',           'Oro; £1 (1489–presente)'],
+          ['Shilling',        'Británico Moderno',           'Plata luego cuproníquel; 1/20 de libra'],
+          ['Crown',          'Británico Moderno',            'Plata o cuproníquel; 5 chelines'],
+          ['Dollar',         'Moderno (EE. UU./global)',     'Plata luego metal base; múltiples variantes nacionales'],
+          ['Eagle',           'Moderno Estadounidense',      'Oro; $10 (también Half Eagle $5, Double Eagle $20)'],
+          ['Franc',           'Francés/Suizo/Belga',         'Plata luego metal base; 1795–presente'],
+          ['Peso',            'Colonial Español / Latinoamericano', 'Plata luego metal base; múltiples variantes nacionales'],
+          ['Peseta',          'Español Moderno',             'Plata luego metal base; 1868–2002'],
+          ['Mark',            'Alemán Moderno',              'Plata; Marco Oro 1871–1914, Reichsmark 1924–1948'],
+          ['Krone / Krona',   'Germánico / Escandinavo',     'Plata luego metal base; Austria, Dinamarca, Suecia, Noruega'],
+          ['Lira',            'Italiano / Otomano',          'Plata luego metal base; Italia 1861–2002, Imperio Otomano'],
+          ['Rouble',          'Ruso',                        'Plata luego metal base; 1704–presente'],
+          ['Rupee',           'Sudasiático',                 'Plata luego metal base; Imperio Mogol, India Británica, moderno'],
         ],
       },
     },
   },
   {
     id: 'era',
-    name: { en: 'Era', es: 'Época' },
+    nameKey: 'ledger.era',
     section: 'identity',
     required: true,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'The calendrical or historical era system used for dating this coin. Determines how year_display and year_numeric should be interpreted.',
       es: 'El sistema de era calendárica o histórica utilizado para fechar esta moneda. Determina cómo deben interpretarse year_display y year_numeric.',
@@ -156,10 +188,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   // ── Dating ─────────────────────────────────────────────────────────────────
   {
     id: 'year_display',
-    name: { en: 'Year', es: 'Año' },
+    nameKey: 'ledger.year',
     section: 'dating',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'A human-readable date or date range as it appears in a catalog or should be presented to the viewer. This is the display value — it accommodates uncertainty, ranges, and calendar notation. Examples: "134 AD", "44 BC", "c. 119–122 AD", "AH 76 (c. 694 AD)", "TR P III (119 AD)", "Undated, c. 330–340 AD".',
       es: 'Una fecha legible por humanos o un intervalo de fechas tal como aparece en un catálogo o debe presentarse al espectador. Es el valor de visualización — admite incertidumbre, rangos y notación de calendario. Ejemplos: «134 d. C.», «44 a. C.», «c. 119–122 d. C.», «AH 76 (c. 694 d. C.)», «TR P III (119 d. C.)», «Sin fecha, c. 330–340 d. C.».',
@@ -167,10 +199,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'year_numeric',
-    name: { en: 'Year (Numeric)', es: 'Año (Numérico)' },
+    nameKey: 'glossary.fields.yearNumeric',
     section: 'dating',
     required: false,
-    type: { en: 'Integer', es: 'Entero' },
+    typeKey: 'glossary.types.integer',
     description: {
       en: 'A single integer for sorting and filtering purposes. Always convert to the Christian/Common Era scale. AD/CE: positive integer (e.g., 134 for 134 AD). BC/BCE: negative integer (e.g., −44 for 44 BC). Undated: use the midpoint or earliest year of the scholarly estimate. AH: convert to approximate AD year before storing.',
       es: 'Un único entero para ordenación y filtrado. Convertir siempre a la escala de la Era Cristiana/Común. d. C. / EC: entero positivo (p. ej., 134 para el 134 d. C.). a. C. / AEC: entero negativo (p. ej., −44 para el 44 a. C.). Sin fecha: usar el punto medio o el año más temprano de la estimación académica. AH: convertir al año d. C. aproximado antes de almacenar.',
@@ -180,10 +212,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   // ── Physical Description ───────────────────────────────────────────────────
   {
     id: 'mint',
-    name: { en: 'Mint', es: 'Ceca' },
+    nameKey: 'glossary.fields.mint',
     section: 'physical',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'The city, workshop, or facility where the coin was struck. For Roman coins this is often a city abbreviation in the exergue (e.g., "Rome", "Lugdunum", "Antioch"). For modern coins it may be a mint mark letter (e.g., "Philadelphia", "San Francisco"). Corresponds to Nomisma mint vocabulary.',
       es: 'La ciudad, taller o instalación donde se acuñó la moneda. Para monedas romanas, suele ser una abreviatura de ciudad en el exergo (p. ej., «Roma», «Lugdunum», «Antioquía»). Para monedas modernas puede ser una letra de marca de ceca (p. ej., «Filadelfia», «San Francisco»). Corresponde al vocabulario de ceca de Nomisma.',
@@ -191,10 +223,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'metal',
-    name: { en: 'Material', es: 'Aleación' },
+    nameKey: 'ledger.material',
     section: 'physical',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'The primary metal or alloy of the coin. Use the standard numismatic abbreviation or full name.',
       es: 'El metal o aleación principal de la moneda. Utilizar la abreviatura numismática estándar o el nombre completo.',
@@ -240,10 +272,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'fineness',
-    name: { en: 'Fineness', es: 'Fineza' },
+    nameKey: 'ledger.fineness',
     section: 'physical',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'The proportion of precious metal in the alloy, expressed as a decimal fraction (millesimal fineness). Applicable to gold and silver coins where purity is a diagnostic or value factor. For ancient coins, fineness varies significantly by period and emperor — the silver content of the Roman denarius declined from ~95% under Augustus to under 5% by the 280s AD.',
       es: 'La proporción de metal precioso en la aleación, expresada como fracción decimal (fineza milésimal). Aplicable a monedas de oro y plata donde la pureza es un factor diagnóstico o de valor. Para monedas antiguas, la fineza varía significativamente según el período y el emperador — el contenido de plata del denario romano descendió desde ~95% bajo Augusto hasta menos del 5% hacia el año 280 d. C.',
@@ -285,10 +317,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'weight',
-    name: { en: 'Weight', es: 'Peso' },
+    nameKey: 'ledger.weight',
     section: 'physical',
     required: false,
-    type: { en: 'Decimal (grams)', es: 'Decimal (gramos)' },
+    typeKey: 'glossary.types.decimalGrams',
     description: {
       en: 'The coin\'s weight in grams to two decimal places (e.g., 3.28). Weight is a primary diagnostic tool for authenticity and attribution. Weigh with a digital scale; for high-value coins, a precision balance is recommended. Ancient coins exhibit natural variance from flan cutting and wear; compare against published standards for the type. 1 troy ounce = 31.1035 g (reference for bullion coins).',
       es: 'El peso de la moneda en gramos con dos decimales (p. ej., 3,28). El peso es una herramienta diagnóstica primaria para la autenticidad y la atribución. Pesar con una balanza digital; para monedas de alto valor se recomienda una balanza de precisión. Las monedas antiguas presentan variación natural por el corte del cospel y el desgaste; comparar con los estándares publicados para el tipo. 1 onza troy = 31,1035 g (referencia para monedas de inversión).',
@@ -296,10 +328,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'diameter',
-    name: { en: 'Diameter', es: 'Diámetro' },
+    nameKey: 'ledger.diameter',
     section: 'physical',
     required: false,
-    type: { en: 'Decimal (millimeters)', es: 'Decimal (milímetros)' },
+    typeKey: 'glossary.types.decimalMm',
     description: {
       en: "The coin's diameter in millimeters to one decimal place (e.g., 18.5). Measure at the widest point using digital calipers. If the flan is significantly oval (common in ancient hand-struck coins), measure both axes and record the larger value, noting the variation in obverse_desc or story.",
       es: 'El diámetro de la moneda en milímetros con un decimal (p. ej., 18,5). Medir en el punto más ancho con un calibre digital. Si el cospel es significativamente ovalado (común en monedas antiguas acuñadas a mano), medir ambos ejes y registrar el valor mayor, anotando la variación en obverse_desc o story.',
@@ -307,10 +339,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'die_axis',
-    name: { en: 'Die Axis', es: 'Eje de Cuño' },
+    nameKey: 'ledger.dieAxis',
     section: 'physical',
     required: false,
-    type: { en: 'Text (clock-hour notation)', es: 'Texto (notación de horas del reloj)' },
+    typeKey: 'glossary.types.textClockHour',
     description: {
       en: "The rotational relationship between the obverse die and the reverse die, expressed as an O'clock position (1h–12h). To measure: hold the coin obverse-up with the portrait upright; flip the coin left-to-right on its vertical axis; the hour position where the top of the reverse design points is the die axis. Each clock hour = 30 degrees of rotation (clockwise from 12h). Note for ancient coins: die axis variation is normal for hand-struck coinage and is not an error. On modern machine-struck coins, a die axis other than 12h or 6h constitutes a die rotation error, which may affect rarity.",
       es: 'La relación rotacional entre el cuño de anverso y el cuño de reverso, expresada como posición horaria (1h–12h). Para medirla: sostener la moneda con el anverso hacia arriba y el retrato erguido; girar la moneda de izquierda a derecha sobre su eje vertical; la posición horaria hacia donde apunta la parte superior del diseño del reverso es el eje de cuño. Cada hora del reloj = 30 grados de rotación (en sentido horario desde las 12h). Nota para monedas antiguas: la variación del eje de cuño es normal en la acuñación a mano y no constituye un error. En monedas modernas acuñadas a máquina, un eje de cuño distinto de 12h o 6h constituye un error de rotación de cuño, que puede afectar a la rareza.',
@@ -356,10 +388,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   // ── Inscriptions & Descriptions ────────────────────────────────────────────
   {
     id: 'obverse_legend',
-    name: { en: 'Obverse Legend', es: 'Leyenda del Anverso' },
+    nameKey: 'glossary.fields.obverseLegend',
     section: 'inscriptions',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'The inscription on the obverse (front/heads side) of the coin, transcribed exactly as it appears. Use uppercase for Latin, Greek, and Arabic legends. Expand abbreviations in square brackets only when certain (e.g., IMP[ERATOR] CAES[AR] HADRIANVS AVG[VSTVS]). Use a period to separate words when no dividers appear on the coin.',
       es: 'La inscripción en el anverso (cara delantera/cara) de la moneda, transcrita exactamente tal como aparece. Usar mayúsculas para las leyendas en latín, griego y árabe. Expandir abreviaturas entre corchetes solo cuando sea seguro (p. ej., IMP[ERATOR] CAES[AR] HADRIANVS AVG[VSTVS]). Usar un punto para separar palabras cuando no aparecen divisores en la moneda.',
@@ -397,10 +429,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'obverse_desc',
-    name: { en: 'Obverse Description', es: 'Descripción del Anverso' },
+    nameKey: 'glossary.fields.obverseDesc',
     section: 'inscriptions',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'A concise description of the obverse design, motif, and portrait. Follow the formula: [subject] [orientation], [description]. Standard orientation terms: right (facing right), left (facing left), facing (facing viewer). Standard portrait qualifiers: laureate (laurel wreath), radiate (radiate crown), diademed (simple headband), helmeted, draped, cuirassed (in armor). Examples: "Bust of Hadrian, laureate, right"; "Eagle standing facing, wings spread".',
       es: 'Una descripción concisa del diseño, motivo y retrato del anverso. Seguir la fórmula: [sujeto] [orientación], [descripción]. Términos de orientación estándar: derecha (mirando a la derecha), izquierda (mirando a la izquierda), de frente (mirando al espectador). Calificadores de retrato estándar: laureado (corona de laurel), radiado (corona radiada), diademado (diadema simple), con casco, drapeado, acorazado (con armadura). Ejemplos: «Busto de Adriano, laureado, a la derecha»; «Águila de pie de frente, alas extendidas».',
@@ -408,10 +440,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'reverse_legend',
-    name: { en: 'Reverse Legend', es: 'Leyenda del Reverso' },
+    nameKey: 'glossary.fields.reverseLegend',
     section: 'inscriptions',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'The inscription on the reverse (back/tails side) of the coin. Follow the same transcription rules as obverse_legend. The reverse legend often names the personification, deity, or concept depicted, or carries the date and mint mark.',
       es: 'La inscripción en el reverso (cara trasera/cruz) de la moneda. Seguir las mismas reglas de transcripción que obverse_legend. La leyenda del reverso frecuentemente nombra la personificación, deidad o concepto representado, o indica la fecha y la marca de ceca.',
@@ -451,10 +483,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'reverse_desc',
-    name: { en: 'Reverse Description', es: 'Descripción del Reverso' },
+    nameKey: 'glossary.fields.reverseDesc',
     section: 'inscriptions',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'A concise description of the reverse design and motif. Follow the same formula as obverse_desc. Include the exergue content (mint mark, officina letter) if notable: "…; in exergue: SMANT" (Sacred Mint of Antioch). Examples: "Felicitas standing left, holding caduceus and cornucopia"; "Eagle standing on thunderbolt, wings spread; S C in field".',
       es: 'Una descripción concisa del diseño y motivo del reverso. Seguir la misma fórmula que obverse_desc. Incluir el contenido del exergo (marca de ceca, letra de officina) si es relevante: «…; en exergo: SMANT» (Sagrada Ceca de Antioquía). Ejemplos: «Felicitas de pie a la izquierda, sosteniendo caduceo y cornucopia»; «Águila de pie sobre rayo, alas extendidas; S C en campo».',
@@ -462,10 +494,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'edge_desc',
-    name: { en: 'Edge', es: 'Bordura' },
+    nameKey: 'ledger.edge',
     section: 'inscriptions',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: "A description of the coin's edge (the third side). For ancient coins this is usually plain. For modern coins it is often a distinctive feature.",
       es: 'Una descripción del canto de la moneda (el tercer lado). Para monedas antiguas suele ser liso. Para monedas modernas es frecuentemente una característica distintiva.',
@@ -505,10 +537,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   // ── Cataloging & Reference ─────────────────────────────────────────────────
   {
     id: 'catalog_ref',
-    name: { en: 'Reference', es: 'Referencia' },
+    nameKey: 'ledger.reference',
     section: 'cataloging',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: "The standard bibliographic citation(s) for this coin's type. Format: [Abbreviation] [Volume/Part] [Number]. List the primary reference first; separate multiple references with a semicolon. Examples: RIC II 218, Crawford 432/1, DOC 4, RIC VI 121; BMC 45. Online resources: OCRE (numismatics.org/ocre) for Roman Imperial; CRRO (numismatics.org/crro) for Republican.",
       es: 'La cita bibliográfica estándar para el tipo de esta moneda. Formato: [Abreviatura] [Volumen/Parte] [Número]. Indicar primero la referencia principal; separar referencias múltiples con punto y coma. Ejemplos: RIC II 218, Crawford 432/1, DOC 4, RIC VI 121; BMC 45. Recursos en línea: OCRE (numismatics.org/ocre) para Imperial Romano; CRRO (numismatics.org/crro) para Republicano.',
@@ -550,10 +582,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'rarity',
-    name: { en: 'Rarity', es: 'Rareza' },
+    nameKey: 'glossary.fields.rarity',
     section: 'cataloging',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'An assessment of how scarce this specific type is in the numismatic market. Rarity ratings in the major catalogs reflect specimens known at time of publication — treat them as a rough guide, not an absolute statement. Three scales are in common use: RIC (Roman Imperial Coinage), Cohen (older Roman catalogs), and General/Modern (Sear, dealer catalogs).',
       es: 'Una evaluación de la escasez de este tipo específico en el mercado numismático. Las calificaciones de rareza en los principales catálogos reflejan los ejemplares conocidos en el momento de la publicación — tratar como guía aproximada, no como dato absoluto. Se usan tres escalas: RIC (Roman Imperial Coinage), Cohen (catálogos romanos más antiguos) y General/Moderna (Sear, catálogos de marchantes).',
@@ -615,10 +647,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'grade',
-    name: { en: 'Grade', es: 'Grado' },
+    nameKey: 'ledger.grade',
     section: 'cataloging',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: "The condition of the coin on a recognized grading scale. The appropriate scale depends on the coin's type and age. Adjectival Scale is used for ancient, medieval, and Byzantine coins. The Sheldon 70-point scale is used for modern and world coins (standardized by PCGS in 1986 and NGC in 1987). Proof coins use the same numeric scale with prefix PR (PCGS) or PF (NGC). A \"+\" suffix (e.g., MS-64+) indicates exceptional eye appeal. CAM / DCAM designations indicate cameo contrast on proof coins.",
       es: 'El estado de conservación de la moneda en una escala de clasificación reconocida. La escala adecuada depende del tipo y la antigüedad de la moneda. La Escala Adjetival se usa para monedas antiguas, medievales y bizantinas. La Escala Sheldon de 70 puntos se usa para monedas modernas y mundiales (estandarizada por PCGS en 1986 y NGC en 1987). Las monedas proof usan la misma escala numérica con el prefijo PR (PCGS) o PF (NGC). Un sufijo «+» (p. ej., MS-64+) indica un atractivo visual excepcional. Las designaciones CAM / DCAM indican contraste cameo en monedas proof.',
@@ -707,10 +739,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   // ── Provenance & Acquisition ───────────────────────────────────────────────
   {
     id: 'provenance',
-    name: { en: 'Provenance', es: 'Procedencia' },
+    nameKey: 'ledger.provenance',
     section: 'provenance',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'The documented ownership history of the coin before it entered the current collection. Provenance is important for authentication, legal compliance, and scholarly credibility. Record named collections, auction house sales, and documented find spots where known. Examples: "Ex Naville Numismatics, Auction 58, Lot 312 (2020)"; "Found in Wiltshire, UK (PAS record WILT-AB123)". Note: many countries require documentation of provenance for coins acquired after 1970 (UNESCO Convention threshold).',
       es: 'El historial documentado de propiedad de la moneda antes de que ingresara a la colección actual. La procedencia es importante para la autenticación, el cumplimiento legal y la credibilidad académica. Registrar colecciones nombradas, ventas en casas de subastas y lugares de hallazgo documentados cuando se conozcan. Ejemplos: «Ex Naville Numismatics, Subasta 58, Lote 312 (2020)»; «Hallada en Wiltshire, Reino Unido (registro PAS WILT-AB123)». Nota: muchos países exigen documentación de procedencia para monedas adquiridas después de 1970 (umbral de la Convención UNESCO).',
@@ -721,10 +753,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'story',
-    name: { en: "Curator's Note", es: 'Nota del Curador' },
+    nameKey: 'ledger.curatorsNote',
     section: 'provenance',
     required: false,
-    type: { en: 'Text (long form)', es: 'Texto (formato largo)' },
+    typeKey: 'glossary.types.textLong',
     description: {
       en: "A free-text field for historical context, personal notes, scholarly commentary, or the collector's own narrative about this coin. This is the curator's note — use it to record what makes this coin significant, interesting legends about the depicted figure, or notes on authenticity and condition nuances not captured by other fields.",
       es: 'Campo de texto libre para contexto histórico, notas personales, comentario académico o la narrativa propia del coleccionista sobre esta moneda. Esta es la nota del curador — usar para registrar lo que hace significativa a esta moneda, leyendas interesantes sobre el personaje representado, o notas sobre matices de autenticidad y conservación no recogidos en otros campos.',
@@ -732,10 +764,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'purchase_price',
-    name: { en: 'Cost', es: 'Coste' },
+    nameKey: 'ledger.cost',
     section: 'provenance',
     required: false,
-    type: { en: 'Decimal', es: 'Decimal' },
+    typeKey: 'glossary.types.decimal',
     description: {
       en: 'The price paid to acquire this coin, in the currency of the transaction. Used for insurance valuation and collection accounting. For coins received as gifts or inherited, record the estimated fair market value at time of acquisition.',
       es: 'El precio pagado para adquirir esta moneda, en la moneda de la transacción. Usado para valoración de seguros y contabilidad de la colección. Para monedas recibidas como regalo o heredadas, registrar el valor de mercado estimado en el momento de la adquisición.',
@@ -743,10 +775,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'purchase_date',
-    name: { en: 'Acquired', es: 'Adquirida' },
+    nameKey: 'ledger.acquired',
     section: 'provenance',
     required: false,
-    type: { en: 'Date (ISO 8601 — YYYY-MM-DD)', es: 'Fecha (ISO 8601 — AAAA-MM-DD)' },
+    typeKey: 'glossary.types.dateISO',
     description: {
       en: 'The date the coin was acquired. Use YYYY-MM-DD format for consistency (e.g., 2024-03-15).',
       es: 'La fecha en que se adquirió la moneda. Usar el formato AAAA-MM-DD para consistencia (p. ej., 2024-03-15).',
@@ -754,10 +786,10 @@ export const GLOSSARY_FIELDS: GlossaryField[] = [
   },
   {
     id: 'purchase_source',
-    name: { en: 'Source', es: 'Fuente' },
+    nameKey: 'ledger.source',
     section: 'provenance',
     required: false,
-    type: { en: 'Text', es: 'Texto' },
+    typeKey: 'glossary.types.text',
     description: {
       en: 'Where or from whom the coin was acquired. Include auction house name, dealer, show, or private seller as appropriate. Examples: "Heritage Auctions, NYINC 2024"; "Classical Numismatic Group (CNG), Mail Bid Sale 112"; "Roma Numismatics, E-Sale 94"; "Private purchase from fellow collector".',
       es: 'Dónde o de quién se adquirió la moneda. Incluir el nombre de la casa de subastas, marchante, feria o vendedor privado según corresponda. Ejemplos: «Heritage Auctions, NYINC 2024»; «Classical Numismatic Group (CNG), Mail Bid Sale 112»; «Roma Numismatics, E-Sale 94»; «Compra privada a coleccionista particular».',

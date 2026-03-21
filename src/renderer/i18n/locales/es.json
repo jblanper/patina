@@ -43,7 +43,7 @@
     "ariaLabel": "Galería de Monedas"
   },
   "ledger": {
-    "designation": "Denominación",
+    "designation": "Designación",
     "era": "Época",
     "mintedAt": "Acuñado en",
     "year": "Año",
@@ -150,7 +150,34 @@
     "type": "Tipo",
     "allFields": "Todos los Campos",
     "close": "Cerrar referencia de campos",
-    "browseAll": "Ver referencia completa"
+    "browseAll": "Ver referencia completa",
+    "sections": {
+      "identity":     "Identidad y Clasificación",
+      "dating":       "Datación",
+      "physical":     "Descripción Física",
+      "inscriptions": "Inscripciones y Descripciones",
+      "cataloging":   "Catalogación y Referencia",
+      "provenance":   "Procedencia y Adquisición"
+    },
+    "types": {
+      "text":          "Texto",
+      "integer":       "Entero",
+      "decimal":       "Decimal",
+      "decimalGrams":  "Decimal (gramos)",
+      "decimalMm":     "Decimal (milímetros)",
+      "textClockHour": "Texto (notación de horas del reloj)",
+      "textLong":      "Texto (formato largo)",
+      "dateISO":       "Fecha (ISO 8601 — AAAA-MM-DD)"
+    },
+    "fields": {
+      "mint":          "Ceca",
+      "yearNumeric":   "Año (Numérico)",
+      "obverseLegend": "Leyenda del Anverso",
+      "obverseDesc":   "Descripción del Anverso",
+      "reverseLegend": "Leyenda del Reverso",
+      "reverseDesc":   "Descripción del Reverso",
+      "rarity":        "Rareza"
+    }
   },
   "common": {
     "comingSoon": "Próximamente"

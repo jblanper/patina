@@ -721,6 +721,7 @@ main {
   letter-spacing: 1px;
   text-align: center;
   word-break: break-word;
+  margin-top: 0.75rem;
 }
 
 /* Thumbnail Strip */
@@ -866,6 +867,12 @@ main {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
 }
 
 .metric-value {
@@ -887,9 +894,15 @@ main {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 1rem;
-  display: block;
+  display: flex;
+  align-items: baseline;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
   border-bottom: 1px solid var(--border-hairline);
-  padding-bottom: 0.5rem;
+  padding: 0 0 0.5rem 0;
+  cursor: pointer;
   width: fit-content;
   max-width: 100%;
 }
@@ -936,10 +949,14 @@ main {
 /* Footer */
 .ledger-footer {
   margin-top: auto;
-  padding-top: 0;
+  padding-top: 1rem;
   border-top: 1px solid var(--border-hairline);
   font-size: 0.8rem;
   color: var(--text-muted);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .footer-item {
@@ -1202,7 +1219,10 @@ main {
   font-weight: 500;
   display: flex;
   align-items: baseline;
-  padding-top: 0.1rem;
+  padding: 0.1rem 0 0 0;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .input-sub {
@@ -1970,6 +1990,13 @@ main {
   inset: 0;
   background: rgba(45, 41, 38, 0.35);
   z-index: 900;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+.glossary-drawer-backdrop[data-visible="true"] {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .glossary-drawer {
@@ -1984,7 +2011,8 @@ main {
   transform: translateX(100%);
   transition: transform 0.25s ease;
 }
-.glossary-drawer[data-open="true"] { transform: translateX(0); }
+.glossary-drawer[data-open="true"] { transform: translateX(0); pointer-events: auto; }
+.glossary-drawer[data-open="false"] { pointer-events: none; }
 
 .glossary-drawer-header {
   display: flex;
@@ -2065,16 +2093,26 @@ main {
 }
 .glossary-browse-all:hover { color: var(--accent-manuscript); }
 
-/* ? hint link (Phase 1b button) */
+/* † hint dagger — superscript, now a non-interactive span */
 .glossary-hint {
-  font: 0.7rem var(--font-mono);
-  color: var(--text-muted);
-  margin-left: 0.4rem;
-  text-decoration: none;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-  line-height: inherit;
+  font: 0.65rem var(--font-mono);
+  color: var(--accent-manuscript);
+  position: relative;
+  top: -0.4em;
+  margin-left: 0.5em;
+  padding: 0.25em 0.3em;
+  line-height: 1;
+  opacity: 0.75;
+  transition: opacity 0.15s ease;
 }
-.glossary-hint:hover { color: var(--accent-manuscript); }
+.metric-label:hover,
+.subtitle-label:hover { color: var(--text-ink); }
+.metric-label:hover .label-text,
+.subtitle-label:hover .label-text,
+.section-label:hover .label-text {
+  text-decoration: underline dotted var(--text-muted);
+  text-underline-offset: 3px;
+}
+.metric-label:hover .glossary-hint,
+.subtitle-label:hover .glossary-hint,
+.section-label:hover .glossary-hint { opacity: 1; }

@@ -150,7 +150,34 @@
     "type": "Type",
     "allFields": "All Fields",
     "close": "Close field reference",
-    "browseAll": "Browse full reference"
+    "browseAll": "Browse full reference",
+    "sections": {
+      "identity":     "Identity & Classification",
+      "dating":       "Dating",
+      "physical":     "Physical Description",
+      "inscriptions": "Inscriptions & Descriptions",
+      "cataloging":   "Cataloging & Reference",
+      "provenance":   "Provenance & Acquisition"
+    },
+    "types": {
+      "text":          "Text",
+      "integer":       "Integer",
+      "decimal":       "Decimal",
+      "decimalGrams":  "Decimal (grams)",
+      "decimalMm":     "Decimal (millimeters)",
+      "textClockHour": "Text (clock-hour notation)",
+      "textLong":      "Text (long form)",
+      "dateISO":       "Date (ISO 8601 — YYYY-MM-DD)"
+    },
+    "fields": {
+      "mint":          "Mint",
+      "yearNumeric":   "Year (Numeric)",
+      "obverseLegend": "Obverse Legend",
+      "obverseDesc":   "Obverse Description",
+      "reverseLegend": "Reverse Legend",
+      "reverseDesc":   "Reverse Description",
+      "rarity":        "Rarity"
+    }
   },
   "common": {
     "comingSoon": "Coming soon"
