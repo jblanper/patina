@@ -87,7 +87,6 @@ This document defines the absolute standards for the Patina project. All develop
 ### Database & File System
 - **Script Execution:** Any script that imports `better-sqlite3` (or any native Electron module) MUST be executed via the `electron` binary, not `node`. The ABI versions differ; running with `node` causes a module load failure. Use `npm run db:seed` — never `node scripts/seed_data.ts` directly.
 - **SQLite Integrity:** Use `better-sqlite3` with WAL mode and `foreign_keys = ON`. Foreign key constraints must be enabled to ensure cascade deletes work correctly. All writes must be atomic and follow the structured schema defined in `src/common/schema.ts`.
-- **Data Defaults:** New coins default to `era: 'Ancient'` as most collections focus on ancient coinage. This default is enforced in both `schema.ts` (database level) and `useCoinForm.ts` (form level).
 - **Portable Paths:** Store image paths as relative to the `data/images/` directory. Never use absolute system paths in the database.
 - **File Cleanup:** When deleting records, associated files must be removed from the filesystem. The `deleteCoin()` function cleans up orphaned image files from `data/images/`.
 - **Secure Image Loading:** Use a custom protocol (e.g., `patina-img://`) in the Main process to serve local images to the Renderer. This preserves the sandbox and CSP integrity by avoiding `file://` protocols or direct filesystem access. Async file reads are mandatory to avoid blocking the main process.
