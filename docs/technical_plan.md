@@ -172,6 +172,14 @@ The database schema has been finalized and approved following a research phase i
 - [ ] Switch gallery grid to `auto-fit` (M2)
 - [ ] Polish collection count copy and sidebar gap (L1, L2)
 
+#### Sidebar Filter Overflow — The Soft Reveal (Proposed)
+**Detailed Blueprint:** [2026-03-21-sidebar-filter-overflow.md](./blueprints/2026-03-21-sidebar-filter-overflow.md)
+**Visual Mockup:** [proposal_filter_overflow_2026-03-21.html](./curating-ui/proposal_filter_overflow_2026-03-21.html)
+- [ ] Add `.filter-overflow-wrap` + fade gradient CSS for truncated filter groups
+- [ ] Add `.filter-show-more` inline link style
+- [ ] Implement `renderOverflowGroup` helper in `PatinaSidebar` with active-selection pinning
+- [ ] Replace Metals and Grade filter lists with overflow-aware rendering (threshold: 8)
+
 #### Coin Detail & Scriptorium UI Refinements (Approved)
 **Detailed Blueprint:** [2026-03-20-detail-scriptorium-ui-refinements.md](./blueprints/2026-03-20-detail-scriptorium-ui-refinements.md)
 **Reference Audit:** [audit_detail_and_scriptorium_2026-03-20.md](./curating-ui/audit_detail_and_scriptorium_2026-03-20.md)

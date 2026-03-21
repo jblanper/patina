@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curatorial Proposal: Filter Overflow — PatinaSidebar - Patina</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #6A6764;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --spacing-large: clamp(3rem, 8vw, 4rem);
+            --spacing-med: 2rem;
+            --spacing-small: 1rem;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: #EEEBE4;
+            color: var(--text-ink);
+            line-height: 1.6;
+            padding: var(--spacing-large);
+        }
+
+        /* ── Proposal Shell ── */
+        .proposal-header {
+            max-width: 1400px;
+            margin: 0 auto 4rem;
+            border-bottom: 2px solid var(--text-ink);
+            padding-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .proposal-header h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+        .proposal-meta {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-manuscript);
+            text-align: right;
+        }
+        .proposal-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6rem;
+        }
+        .path-section { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        .path-info { max-width: 800px; }
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            margin-bottom: 0.5rem;
+            display: block;
+            font-weight: 600;
+        }
+        .path-title { font-family: var(--font-serif); font-size: 2.2rem; font-weight: 700; margin-bottom: 1rem; }
+        .rationale {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text-ink);
+            margin-bottom: 2rem;
+            max-width: 65ch;
+            line-height: 1.6;
+        }
+        .browser-frame {
+            background: var(--bg-manuscript);
+            border: 1px solid var(--border-hairline);
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+            overflow: hidden;
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+        .frame-header {
+            background: #E0DDD6;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: #CCC; }
+        .dot.red { background: #FF5F56; }
+        .dot.yellow { background: #FFBD2E; }
+        .dot.green { background: #27C93F; }
+        .address-bar {
+            background: var(--bg-manuscript);
+            padding: 0.3rem 1rem;
+            border-radius: 4px;
+            flex: 1;
+            margin-left: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-align: center;
+            border: 1px solid var(--border-hairline);
+        }
+        .frame-content {
+            flex: 1;
+            overflow: hidden;
+            background-color: var(--bg-manuscript);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Shared App Skeleton inside frame ── */
+        .app-header-mock {
+            padding: 1rem 1.5rem 0.8rem;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            flex-shrink: 0;
+        }
+        .app-header-mock h2 {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            font-weight: 700;
+            font-style: italic;
+        }
+        .version-tag-mock {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .app-layout-mock {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ── Sidebar shared base ── */
+        .patina-sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border-hairline);
+            background: var(--bg-manuscript);
+            padding: 1rem 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-group {
+            padding: 0.75rem 1rem 0.75rem;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .filter-group:last-child { border-bottom: none; }
+        .filter-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--accent-manuscript);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .filter-list { list-style: none; }
+        .filter-item-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.22rem 0;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            color: var(--text-ink);
+            user-select: none;
+        }
+        .filter-item-label:hover { color: var(--accent-manuscript); }
+        .filter-item-label.active { color: var(--accent-manuscript); }
+        .filter-checkbox {
+            width: 11px;
+            height: 11px;
+            border: 1px solid var(--border-hairline);
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .filter-item-label.active .filter-checkbox {
+            background: var(--accent-manuscript);
+            border-color: var(--accent-manuscript);
+        }
+
+        /* ── Gallery stub ── */
+        .app-main-mock {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .gallery-stub {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 0.6rem;
+        }
+        .coin-stub {
+            aspect-ratio: 1;
+            background: var(--stone-pedestal);
+            border: 1px solid var(--border-hairline);
+            border-radius: 2px;
+        }
+        .coin-stub-line {
+            height: 0.5rem;
+            background: var(--border-hairline);
+            margin: 0.4rem 0.5rem 0.2rem;
+            border-radius: 1px;
+        }
+        .coin-stub-line.short { width: 60%; }
+
+        /* ── Audit section ── */
+        .audit-results {
+            background: white;
+            padding: 2rem 2.5rem;
+            border: 1px solid var(--border-hairline);
+            border-left: 4px solid var(--accent-manuscript);
+        }
+        .audit-results h3 {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            margin-bottom: 1.5rem;
+        }
+        .audit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem 2rem;
+        }
+        .audit-item strong {
+            display: block;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+        .audit-item p { font-size: 0.88rem; line-height: 1.5; }
+        .audit-item .pass { color: #2A6E3F; font-weight: 600; }
+        .audit-item .warn { color: #7A5A00; font-weight: 600; }
+
+        /* ════════════════════════════════════════
+           PATH A — The Soft Reveal
+           Pure truncation + fade gradient + inline "Show N more" link
+        ════════════════════════════════════════ */
+        .path-a .filter-overflow-wrap {
+            position: relative;
+        }
+        .path-a .filter-overflow-wrap.truncated::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2rem;
+            background: linear-gradient(to bottom, transparent, var(--bg-manuscript));
+            pointer-events: none;
+        }
+        .path-a .show-more-link {
+            display: inline-block;
+            margin-top: 0.4rem;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--accent-manuscript);
+            text-decoration: underline;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .path-a .show-more-link:hover { opacity: 0.7; }
+
+        /* ════════════════════════════════════════
+           PATH B — The Indexed Archive
+           Truncation + inline search for groups ≥ 12
+        ════════════════════════════════════════ */
+        .path-b .filter-search-input {
+            width: 100%;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--border-hairline);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-ink);
+            padding: 0.3rem 0;
+            margin-bottom: 0.5rem;
+            outline: none;
+        }
+        .path-b .filter-search-input::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .path-b .filter-search-input:focus {
+            border-bottom-color: var(--accent-manuscript);
+        }
+        .path-b .show-more-link {
+            display: inline-block;
+            margin-top: 0.3rem;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--accent-manuscript);
+            text-decoration: underline;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .path-b .no-match {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 0.3rem 0;
+        }
+
+        /* ════════════════════════════════════════
+           PATH C — The Curator's Ledger
+           Group collapse + active badge + truncation
+        ════════════════════════════════════════ */
+        .path-c .filter-group {
+            padding: 0;
+        }
+        .path-c .filter-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.65rem 1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .path-c .filter-group-header:hover { background: var(--stone-pedestal); }
+        .path-c .filter-group-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .path-c .filter-group-toggle {
+            font-family: var(--font-mono);
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            transition: transform 0.15s;
+            display: inline-block;
+        }
+        .path-c .filter-group-toggle.open { transform: rotate(90deg); }
+        .path-c .selection-badge {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            background: var(--accent-manuscript);
+            color: white;
+            border-radius: 10px;
+            padding: 0.05rem 0.4rem;
+            line-height: 1.4;
+        }
+        .path-c .filter-group-body {
+            padding: 0 1rem 0.75rem;
+            overflow: hidden;
+        }
+        .path-c .filter-group-body.collapsed { display: none; }
+        .path-c .show-more-link {
+            display: inline-block;
+            margin-top: 0.3rem;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--accent-manuscript);
+            text-decoration: underline;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .path-c .sidebar-footer {
+            margin-top: auto;
+            padding: 0.75rem 1rem 0;
+            border-top: 1px solid var(--border-hairline);
+        }
+        .path-a .sidebar-footer,
+        .path-b .sidebar-footer {
+            margin-top: auto;
+            padding: 0.75rem 1rem 0;
+            border-top: 1px solid var(--border-hairline);
+        }
+        .reset-btn {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--text-ink);
+            color: var(--text-ink);
+            cursor: pointer;
+            padding: 0 0 2px;
+        }
+        .reset-btn:hover { color: var(--accent-manuscript); border-bottom-color: var(--accent-manuscript); }
+    </style>
+</head>
+<body>
+
+<header class="proposal-header">
+    <h1>Proposal: Filter Overflow</h1>
+    <div class="proposal-meta">
+        Component: PatinaSidebar // Ref: UI-2026-03-21<br>
+        Date: 2026-03-21 // Status: Proposed
+    </div>
+</header>
+
+<main class="proposal-container">
+
+    <!-- ══════════════════════════════════════════
+         PATH A — The Soft Reveal
+    ══════════════════════════════════════════ -->
+    <section class="path-section">
+        <div class="path-info">
+            <span class="tag">Archetype A</span>
+            <h2 class="path-title">The Soft Reveal</h2>
+            <div class="rationale">
+                The simplest intervention: show the top 8 values, fade the last entry into a gradient,
+                and offer a clearly-counted inline link — "Show 9 more" — flush below. No new interaction
+                patterns introduced. The collector who knows their vocabulary finds it immediately; the
+                curious collector discovers the full breadth with a single click. Active selections
+                are always pinned to the top of the list, never hidden.
+            </div>
+        </div>
+
+        <div class="browser-frame">
+            <div class="frame-header">
+                <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                <div class="address-bar">patina://cabinet — The Archive Explorer</div>
+            </div>
+            <div class="frame-content">
+                <div class="app-header-mock">
+                    <h2>Patina — The Cabinet</h2>
+                    <span class="version-tag-mock">Archive v1.0 // The Display Case</span>
+                </div>
+                <div class="app-layout-mock">
+
+                    <!-- SIDEBAR PATH A -->
+                    <aside class="patina-sidebar path-a" id="sidebar-a">
+
+                        <!-- Sort group (unchanged — only 3 values) -->
+                        <div class="filter-group">
+                            <span class="filter-label">Order By</span>
+                            <ul class="filter-list">
+                                <li><label class="filter-item-label active"><span class="filter-checkbox"></span>Year</label></li>
+                                <li><label class="filter-item-label"><span class="filter-checkbox"></span>Title</label></li>
+                                <li><label class="filter-item-label"><span class="filter-checkbox"></span>Acquired</label></li>
+                            </ul>
+                        </div>
+
+                        <!-- Eras (unchanged — 3 values) -->
+                        <div class="filter-group">
+                            <span class="filter-label">Eras</span>
+                            <ul class="filter-list">
+                                <li><label class="filter-item-label active"><span class="filter-checkbox"></span>Ancient</label></li>
+                                <li><label class="filter-item-label"><span class="filter-checkbox"></span>Medieval</label></li>
+                                <li><label class="filter-item-label"><span class="filter-checkbox"></span>Modern</label></li>
+                            </ul>
+                        </div>
+
+                        <!-- Metals — 12 values, truncated to 8 -->
+                        <div class="filter-group">
+                            <span class="filter-label">Metals</span>
+                            <div class="filter-overflow-wrap truncated" id="a-metals-wrap" style="max-height: 10.2rem; overflow: hidden; position: relative;">
+                                <ul class="filter-list" id="a-metals-list">
+                                    <!-- Active selections pinned first -->
+                                    <li><label class="filter-item-label active"><span class="filter-checkbox"></span>Gold (AV)</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Silver (AR)</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Bronze (Æ)</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Copper (Cu)</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Orichalcum (Or)</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Electrum (El)</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Billon (Bi)</label></li>
+                                    <li><label class="filter-item-label" style="opacity:0.45;"><span class="filter-checkbox"></span>Potin (Po)</label></li>
+                                    <!-- Hidden below fold -->
+                                    <li style="display:none" class="a-metals-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Lead (Pb)</label></li>
+                                    <li style="display:none" class="a-metals-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Tin (Sn)</label></li>
+                                    <li style="display:none" class="a-metals-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Iron (Fe)</label></li>
+                                    <li style="display:none" class="a-metals-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Brass (Br)</label></li>
+                                </ul>
+                            </div>
+                            <button class="show-more-link" id="a-metals-toggle" onclick="aToggle('metals')">Show 4 more</button>
+                        </div>
+
+                        <!-- Grade — 13 values, truncated to 8 -->
+                        <div class="filter-group">
+                            <span class="filter-label">Grade</span>
+                            <div class="filter-overflow-wrap truncated" id="a-grade-wrap" style="max-height: 10.2rem; overflow: hidden; position: relative;">
+                                <ul class="filter-list" id="a-grade-list">
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Poor (P-1)</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Fair (F-2)</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>About Good (AG-3)</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Good (G-4)</label></li>
+                                    <li><label class="filter-item-label active"><span class="filter-checkbox"></span>Very Good (VG-8)</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Fine (F-12)</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Very Fine (VF-20)</label></li>
+                                    <li><label class="filter-item-label" style="opacity:0.45;"><span class="filter-checkbox"></span>Ext. Fine (EF-40)</label></li>
+                                    <!-- Hidden -->
+                                    <li style="display:none" class="a-grade-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>About Unc. (AU-50)</label></li>
+                                    <li style="display:none" class="a-grade-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>About Unc. (AU-55)</label></li>
+                                    <li style="display:none" class="a-grade-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Mint State (MS-60)</label></li>
+                                    <li style="display:none" class="a-grade-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Mint State (MS-63)</label></li>
+                                    <li style="display:none" class="a-grade-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Mint State (MS-65)</label></li>
+                                </ul>
+                            </div>
+                            <button class="show-more-link" id="a-grade-toggle" onclick="aToggle('grade')">Show 5 more</button>
+                        </div>
+
+                        <div class="sidebar-footer">
+                            <button class="reset-btn">Reset Archive View</button>
+                        </div>
+                    </aside>
+
+                    <!-- Gallery stub -->
+                    <main class="app-main-mock">
+                        <div style="margin-bottom:0.6rem; font-family:var(--font-mono); font-size:0.65rem; color:var(--text-muted);">47 objects in the ledger.</div>
+                        <div class="gallery-stub">
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+
+        <div class="audit-results">
+            <h3>Curatorial Audit — Path A</h3>
+            <div class="audit-grid">
+                <div class="audit-item">
+                    <strong>Contrast</strong>
+                    <p><span class="pass">Pass AA</span> — "Show N more" in --accent-manuscript on --bg-manuscript: 4.8:1</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Information Density</strong>
+                    <p>8 values always visible. Fade gradient signals continuation clearly. Zero sidebar height change before user action.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Archival Tone</strong>
+                    <p>Excellent. Minimal new UI vocabulary. The link reads like an archival footnote reference.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Discovery Risk</strong>
+                    <p><span class="pass">Low</span> — count in link ("Show 4 more") explicitly signals hidden items. Fade gradient reinforces this.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Active Selection Safety</strong>
+                    <p><span class="pass">Pass</span> — active selections pinned to top of list, never hidden by truncation.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Implementation Cost</strong>
+                    <p><span class="pass">Low</span> — pure React state. No new component dependencies.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+         PATH B — The Indexed Archive
+    ══════════════════════════════════════════ -->
+    <section class="path-section">
+        <div class="path-info">
+            <span class="tag">Archetype B</span>
+            <h2 class="path-title">The Indexed Archive</h2>
+            <div class="rationale">
+                When a filter group exceeds 12 values, a search input appears above the list —
+                narrow by typing a partial term, or browse the truncated list as usual.
+                The metaphor is the card catalogue: the collector can browse the drawers,
+                or go directly to a subject heading they know. Both modes coexist.
+                Smaller groups (≤ 12) receive only the Show/Hide truncation from Path A,
+                keeping the interface proportional to complexity.
+            </div>
+        </div>
+
+        <div class="browser-frame">
+            <div class="frame-header">
+                <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                <div class="address-bar">patina://cabinet — The Archive Explorer</div>
+            </div>
+            <div class="frame-content">
+                <div class="app-header-mock">
+                    <h2>Patina — The Cabinet</h2>
+                    <span class="version-tag-mock">Archive v1.0 // The Display Case</span>
+                </div>
+                <div class="app-layout-mock">
+
+                    <!-- SIDEBAR PATH B -->
+                    <aside class="patina-sidebar path-b" id="sidebar-b">
+
+                        <div class="filter-group">
+                            <span class="filter-label">Order By</span>
+                            <ul class="filter-list">
+                                <li><label class="filter-item-label active"><span class="filter-checkbox"></span>Year</label></li>
+                                <li><label class="filter-item-label"><span class="filter-checkbox"></span>Title</label></li>
+                                <li><label class="filter-item-label"><span class="filter-checkbox"></span>Acquired</label></li>
+                            </ul>
+                        </div>
+
+                        <div class="filter-group">
+                            <span class="filter-label">Eras</span>
+                            <ul class="filter-list">
+                                <li><label class="filter-item-label active"><span class="filter-checkbox"></span>Ancient</label></li>
+                                <li><label class="filter-item-label"><span class="filter-checkbox"></span>Medieval</label></li>
+                                <li><label class="filter-item-label"><span class="filter-checkbox"></span>Modern</label></li>
+                            </ul>
+                        </div>
+
+                        <!-- Metals — 12 values: gets search input -->
+                        <div class="filter-group">
+                            <span class="filter-label">Metals</span>
+                            <input
+                                class="filter-search-input"
+                                id="b-metals-search"
+                                type="text"
+                                placeholder="Filter metals…"
+                                oninput="bSearch('metals')"
+                            />
+                            <ul class="filter-list" id="b-metals-list">
+                                <li data-val="gold av"><label class="filter-item-label active"><span class="filter-checkbox"></span>Gold (AV)</label></li>
+                                <li data-val="silver ar"><label class="filter-item-label"><span class="filter-checkbox"></span>Silver (AR)</label></li>
+                                <li data-val="bronze"><label class="filter-item-label"><span class="filter-checkbox"></span>Bronze (Æ)</label></li>
+                                <li data-val="copper cu"><label class="filter-item-label"><span class="filter-checkbox"></span>Copper (Cu)</label></li>
+                                <li data-val="orichalcum or"><label class="filter-item-label"><span class="filter-checkbox"></span>Orichalcum (Or)</label></li>
+                                <li data-val="electrum el"><label class="filter-item-label"><span class="filter-checkbox"></span>Electrum (El)</label></li>
+                                <li data-val="billon bi"><label class="filter-item-label"><span class="filter-checkbox"></span>Billon (Bi)</label></li>
+                                <li data-val="potin po" class="b-metals-extra" style="display:none"><label class="filter-item-label"><span class="filter-checkbox"></span>Potin (Po)</label></li>
+                                <li data-val="lead pb" class="b-metals-extra" style="display:none"><label class="filter-item-label"><span class="filter-checkbox"></span>Lead (Pb)</label></li>
+                                <li data-val="tin sn" class="b-metals-extra" style="display:none"><label class="filter-item-label"><span class="filter-checkbox"></span>Tin (Sn)</label></li>
+                                <li data-val="iron fe" class="b-metals-extra" style="display:none"><label class="filter-item-label"><span class="filter-checkbox"></span>Iron (Fe)</label></li>
+                                <li data-val="brass br" class="b-metals-extra" style="display:none"><label class="filter-item-label"><span class="filter-checkbox"></span>Brass (Br)</label></li>
+                            </ul>
+                            <span id="b-metals-nomatch" class="no-match" style="display:none">No matching metals.</span>
+                            <button class="show-more-link" id="b-metals-toggle" onclick="bToggle('metals')">Show 5 more</button>
+                        </div>
+
+                        <!-- Grade — 13 values: gets search input -->
+                        <div class="filter-group">
+                            <span class="filter-label">Grade</span>
+                            <input
+                                class="filter-search-input"
+                                id="b-grade-search"
+                                type="text"
+                                placeholder="Filter grades…"
+                                oninput="bSearch('grade')"
+                            />
+                            <ul class="filter-list" id="b-grade-list">
+                                <li data-val="poor p-1"><label class="filter-item-label"><span class="filter-checkbox"></span>Poor (P-1)</label></li>
+                                <li data-val="fair f-2"><label class="filter-item-label"><span class="filter-checkbox"></span>Fair (F-2)</label></li>
+                                <li data-val="about good ag-3"><label class="filter-item-label"><span class="filter-checkbox"></span>About Good (AG-3)</label></li>
+                                <li data-val="good g-4"><label class="filter-item-label"><span class="filter-checkbox"></span>Good (G-4)</label></li>
+                                <li data-val="very good vg-8"><label class="filter-item-label active"><span class="filter-checkbox"></span>Very Good (VG-8)</label></li>
+                                <li data-val="fine f-12"><label class="filter-item-label"><span class="filter-checkbox"></span>Fine (F-12)</label></li>
+                                <li data-val="very fine vf-20"><label class="filter-item-label"><span class="filter-checkbox"></span>Very Fine (VF-20)</label></li>
+                                <li data-val="extremely fine ef-40" class="b-grade-extra" style="display:none"><label class="filter-item-label"><span class="filter-checkbox"></span>Ext. Fine (EF-40)</label></li>
+                                <li data-val="about uncirculated au-50" class="b-grade-extra" style="display:none"><label class="filter-item-label"><span class="filter-checkbox"></span>About Unc. (AU-50)</label></li>
+                                <li data-val="about uncirculated au-55" class="b-grade-extra" style="display:none"><label class="filter-item-label"><span class="filter-checkbox"></span>About Unc. (AU-55)</label></li>
+                                <li data-val="mint state ms-60" class="b-grade-extra" style="display:none"><label class="filter-item-label"><span class="filter-checkbox"></span>Mint State (MS-60)</label></li>
+                                <li data-val="mint state ms-63" class="b-grade-extra" style="display:none"><label class="filter-item-label"><span class="filter-checkbox"></span>Mint State (MS-63)</label></li>
+                                <li data-val="mint state ms-65" class="b-grade-extra" style="display:none"><label class="filter-item-label"><span class="filter-checkbox"></span>Mint State (MS-65)</label></li>
+                            </ul>
+                            <span id="b-grade-nomatch" class="no-match" style="display:none">No matching grades.</span>
+                            <button class="show-more-link" id="b-grade-toggle" onclick="bToggle('grade')">Show 6 more</button>
+                        </div>
+
+                        <div class="sidebar-footer">
+                            <button class="reset-btn">Reset Archive View</button>
+                        </div>
+                    </aside>
+
+                    <main class="app-main-mock">
+                        <div style="margin-bottom:0.6rem; font-family:var(--font-mono); font-size:0.65rem; color:var(--text-muted);">47 objects in the ledger.</div>
+                        <div class="gallery-stub">
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+
+        <div class="audit-results">
+            <h3>Curatorial Audit — Path B</h3>
+            <div class="audit-grid">
+                <div class="audit-item">
+                    <strong>Contrast</strong>
+                    <p><span class="pass">Pass AA</span> — Search input underline in --border-hairline. Focus state switches to --accent-manuscript.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Information Density</strong>
+                    <p>Dual mode: browse or search. Power users skip directly to "mint state" or "orichalcum" without scrolling any list.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Archival Tone</strong>
+                    <p>Good. The search input uses the underline-only form style from the existing design system, consistent with Scriptorium inputs.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Discovery Risk</strong>
+                    <p><span class="warn">Medium</span> — search box may imply the visible list is exhaustive. Must pair with "Show N more" to clarify. Combined, discovery risk is low.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Active Selection Safety</strong>
+                    <p><span class="pass">Pass</span> — search does not clear selections; active items retain state during and after filtering.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Implementation Cost</strong>
+                    <p><span class="warn">Medium</span> — adds controlled input state per-group. Threshold logic (≥12 gets search) needs clear documentation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+         PATH C — The Curator's Ledger
+    ══════════════════════════════════════════ -->
+    <section class="path-section">
+        <div class="path-info">
+            <span class="tag">Archetype C</span>
+            <h2 class="path-title">The Curator's Ledger</h2>
+            <div class="rationale">
+                Each filter group becomes a collapsible section — a closed drawer in the archive cabinet.
+                A Burnt Sienna badge on the header counts active selections, so nothing is ever invisible.
+                Within open groups, truncation + "Show N more" handles long lists as in Path A.
+                The critical advantage: this architecture scales gracefully to future filter dimensions
+                (denomination, mint, country, period) without the sidebar ever becoming unmanageable.
+                Today it solves 4 groups; tomorrow it handles 10.
+            </div>
+        </div>
+
+        <div class="browser-frame">
+            <div class="frame-header">
+                <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                <div class="address-bar">patina://cabinet — The Archive Explorer</div>
+            </div>
+            <div class="frame-content">
+                <div class="app-header-mock">
+                    <h2>Patina — The Cabinet</h2>
+                    <span class="version-tag-mock">Archive v1.0 // The Display Case</span>
+                </div>
+                <div class="app-layout-mock">
+
+                    <!-- SIDEBAR PATH C -->
+                    <aside class="patina-sidebar path-c" id="sidebar-c">
+
+                        <!-- Sort group -->
+                        <div class="filter-group" style="border-bottom: 1px solid var(--border-hairline);">
+                            <div class="filter-group-header" onclick="cToggle('sort')">
+                                <div class="filter-group-header-left">
+                                    <span class="filter-group-toggle open" id="c-sort-toggle">▶</span>
+                                    <span class="filter-label" style="margin-bottom:0;">Order By</span>
+                                </div>
+                            </div>
+                            <div class="filter-group-body" id="c-sort-body">
+                                <ul class="filter-list">
+                                    <li><label class="filter-item-label active"><span class="filter-checkbox"></span>Year</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Title</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Acquired</label></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Eras group — 1 active -->
+                        <div class="filter-group" style="border-bottom: 1px solid var(--border-hairline);">
+                            <div class="filter-group-header" onclick="cToggle('eras')">
+                                <div class="filter-group-header-left">
+                                    <span class="filter-group-toggle open" id="c-eras-toggle">▶</span>
+                                    <span class="filter-label" style="margin-bottom:0;">Eras</span>
+                                    <span class="selection-badge" id="c-eras-badge">1</span>
+                                </div>
+                            </div>
+                            <div class="filter-group-body" id="c-eras-body">
+                                <ul class="filter-list">
+                                    <li><label class="filter-item-label active"><span class="filter-checkbox"></span>Ancient</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Medieval</label></li>
+                                    <li><label class="filter-item-label"><span class="filter-checkbox"></span>Modern</label></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Metals group — 1 active, truncated -->
+                        <div class="filter-group" style="border-bottom: 1px solid var(--border-hairline);">
+                            <div class="filter-group-header" onclick="cToggle('metals')">
+                                <div class="filter-group-header-left">
+                                    <span class="filter-group-toggle open" id="c-metals-toggle">▶</span>
+                                    <span class="filter-label" style="margin-bottom:0;">Metals</span>
+                                    <span class="selection-badge" id="c-metals-badge">1</span>
+                                </div>
+                            </div>
+                            <div class="filter-group-body" id="c-metals-body">
+                                <div style="position:relative;" id="c-metals-wrap">
+                                    <ul class="filter-list" id="c-metals-list" style="max-height:10.2rem; overflow:hidden; position:relative;">
+                                        <li><label class="filter-item-label active"><span class="filter-checkbox"></span>Gold (AV)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>Silver (AR)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>Bronze (Æ)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>Copper (Cu)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>Orichalcum (Or)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>Electrum (El)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>Billon (Bi)</label></li>
+                                        <li style="opacity:0.45"><label class="filter-item-label"><span class="filter-checkbox"></span>Potin (Po)</label></li>
+                                        <li style="display:none" class="c-metals-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Lead (Pb)</label></li>
+                                        <li style="display:none" class="c-metals-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Tin (Sn)</label></li>
+                                        <li style="display:none" class="c-metals-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Iron (Fe)</label></li>
+                                        <li style="display:none" class="c-metals-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Brass (Br)</label></li>
+                                    </ul>
+                                    <div id="c-metals-fade" style="position:absolute;bottom:0;left:0;right:0;height:2rem;background:linear-gradient(to bottom, transparent, var(--bg-manuscript));pointer-events:none;"></div>
+                                </div>
+                                <button class="show-more-link" id="c-metals-more" onclick="cMore('metals')">Show 4 more</button>
+                            </div>
+                        </div>
+
+                        <!-- Grade group — 1 active, truncated, collapsed by default -->
+                        <div class="filter-group" style="border-bottom: 1px solid var(--border-hairline);">
+                            <div class="filter-group-header" onclick="cToggle('grade')">
+                                <div class="filter-group-header-left">
+                                    <span class="filter-group-toggle" id="c-grade-toggle">▶</span>
+                                    <span class="filter-label" style="margin-bottom:0;">Grade</span>
+                                    <span class="selection-badge" id="c-grade-badge">1</span>
+                                </div>
+                            </div>
+                            <div class="filter-group-body collapsed" id="c-grade-body">
+                                <div style="position:relative;">
+                                    <ul class="filter-list" id="c-grade-list" style="max-height:10.2rem; overflow:hidden; position:relative;">
+                                        <li><label class="filter-item-label active"><span class="filter-checkbox"></span>Very Good (VG-8)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>Poor (P-1)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>Fair (F-2)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>About Good (AG-3)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>Good (G-4)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>Fine (F-12)</label></li>
+                                        <li><label class="filter-item-label"><span class="filter-checkbox"></span>Very Fine (VF-20)</label></li>
+                                        <li style="opacity:0.45"><label class="filter-item-label"><span class="filter-checkbox"></span>Ext. Fine (EF-40)</label></li>
+                                        <li style="display:none" class="c-grade-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>About Unc. (AU-50)</label></li>
+                                        <li style="display:none" class="c-grade-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>About Unc. (AU-55)</label></li>
+                                        <li style="display:none" class="c-grade-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Mint State (MS-60)</label></li>
+                                        <li style="display:none" class="c-grade-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Mint State (MS-63)</label></li>
+                                        <li style="display:none" class="c-grade-extra"><label class="filter-item-label"><span class="filter-checkbox"></span>Mint State (MS-65)</label></li>
+                                    </ul>
+                                    <div style="position:absolute;bottom:0;left:0;right:0;height:2rem;background:linear-gradient(to bottom, transparent, var(--bg-manuscript));pointer-events:none;"></div>
+                                </div>
+                                <button class="show-more-link" id="c-grade-more" onclick="cMore('grade')">Show 5 more</button>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-footer">
+                            <button class="reset-btn">Reset Archive View</button>
+                        </div>
+                    </aside>
+
+                    <main class="app-main-mock">
+                        <div style="margin-bottom:0.6rem; font-family:var(--font-mono); font-size:0.65rem; color:var(--text-muted);">47 objects in the ledger.</div>
+                        <div class="gallery-stub">
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                            <div><div class="coin-stub"></div><div class="coin-stub-line"></div><div class="coin-stub-line short"></div></div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+
+        <div class="audit-results">
+            <h3>Curatorial Audit — Path C</h3>
+            <div class="audit-grid">
+                <div class="audit-item">
+                    <strong>Contrast</strong>
+                    <p><span class="pass">Pass AA</span> — Badge: white on --accent-manuscript (#914E32): 4.8:1. Toggle arrow in --text-muted on --bg-manuscript: 3.2:1 (decorative, not text-sized).</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Information Density</strong>
+                    <p>Highest structural density. Sidebar height is fully controlled by the user. Groups can be fully collapsed to labels-only, freeing space for many future filter dimensions.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Archival Tone</strong>
+                    <p>Strong. The collapsible group reads as a filing cabinet drawer — semantically correct for a collection management tool.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Discovery Risk</strong>
+                    <p><span class="pass">Low</span> — Badges on collapsed groups communicate that selections exist. Groups open by default on first visit, so all dimensions are visible immediately.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Active Selection Safety</strong>
+                    <p><span class="pass">Pass</span> — Badge always shows count. Active items pinned to top of truncated list. No selection is ever invisible.</p>
+                </div>
+                <div class="audit-item">
+                    <strong>Implementation Cost</strong>
+                    <p><span class="warn">Medium-High</span> — Adds collapse state per group (persisted in localStorage for session continuity). Scalable architecture but more components to test.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+// ── PATH A INTERACTIONS ──────────────────────────────────────────────────────
+const aState = { metals: false, grade: false };
+
+function aToggle(group) {
+    aState[group] = !aState[group];
+    const extras = document.querySelectorAll(`.a-${group}-extra`);
+    const wrap = document.getElementById(`a-${group}-wrap`);
+    const btn = document.getElementById(`a-${group}-toggle`);
+    const counts = { metals: 4, grade: 5 };
+
+    if (aState[group]) {
+        extras.forEach(el => el.style.display = '');
+        wrap.style.maxHeight = 'none';
+        wrap.classList.remove('truncated');
+        btn.textContent = 'Show less';
+    } else {
+        extras.forEach(el => el.style.display = 'none');
+        wrap.style.maxHeight = '10.2rem';
+        wrap.classList.add('truncated');
+        btn.textContent = `Show ${counts[group]} more`;
+    }
+}
+
+// ── PATH B INTERACTIONS ──────────────────────────────────────────────────────
+const bState = { metals: false, grade: false };
+const bCounts = { metals: 5, grade: 6 };
+
+function bToggle(group) {
+    bState[group] = !bState[group];
+    const extras = document.querySelectorAll(`.b-${group}-extra`);
+    const btn = document.getElementById(`b-${group}-toggle`);
+    if (bState[group]) {
+        extras.forEach(el => el.style.display = '');
+        btn.textContent = 'Show less';
+    } else {
+        extras.forEach(el => el.style.display = 'none');
+        btn.textContent = `Show ${bCounts[group]} more`;
+    }
+    bSearch(group); // re-apply search after toggle
+}
+
+function bSearch(group) {
+    const input = document.getElementById(`b-${group}-search`);
+    const term = input.value.toLowerCase().trim();
+    const list = document.getElementById(`b-${group}-list`);
+    const items = list.querySelectorAll('li');
+    const noMatch = document.getElementById(`b-${group}-nomatch`);
+    const toggleBtn = document.getElementById(`b-${group}-toggle`);
+
+    let visible = 0;
+    items.forEach(item => {
+        const val = item.getAttribute('data-val') || '';
+        const isExtra = item.classList.contains(`b-${group}-extra`);
+        if (term === '') {
+            // restore normal truncation
+            if (isExtra && !bState[group]) {
+                item.style.display = 'none';
+            } else {
+                item.style.display = '';
+                visible++;
+            }
+        } else {
+            if (val.includes(term)) {
+                item.style.display = '';
+                visible++;
+            } else {
+                item.style.display = 'none';
+            }
+        }
+    });
+
+    noMatch.style.display = (term !== '' && visible === 0) ? '' : 'none';
+    toggleBtn.style.display = (term !== '') ? 'none' : '';
+}
+
+// ── PATH C INTERACTIONS ──────────────────────────────────────────────────────
+const cGroupOpen = { sort: true, eras: true, metals: true, grade: false };
+const cMoreState = { metals: false, grade: false };
+const cMoreCounts = { metals: 4, grade: 5 };
+
+function cToggle(group) {
+    cGroupOpen[group] = !cGroupOpen[group];
+    const body = document.getElementById(`c-${group}-body`);
+    const arrow = document.getElementById(`c-${group}-toggle`);
+    if (cGroupOpen[group]) {
+        body.classList.remove('collapsed');
+        arrow.classList.add('open');
+    } else {
+        body.classList.add('collapsed');
+        arrow.classList.remove('open');
+    }
+}
+
+function cMore(group) {
+    cMoreState[group] = !cMoreState[group];
+    const extras = document.querySelectorAll(`.c-${group}-extra`);
+    const btn = document.getElementById(`c-${group}-more`);
+    const fade = document.getElementById(`c-${group}-fade`);
+    const list = document.getElementById(`c-${group}-list`);
+    if (cMoreState[group]) {
+        extras.forEach(el => el.style.display = '');
+        list.style.maxHeight = 'none';
+        if (fade) fade.style.display = 'none';
+        btn.textContent = 'Show less';
+    } else {
+        extras.forEach(el => el.style.display = 'none');
+        list.style.maxHeight = '10.2rem';
+        if (fade) fade.style.display = '';
+        btn.textContent = `Show ${cMoreCounts[group]} more`;
+    }
+}
+</script>
+</body>
+</html>

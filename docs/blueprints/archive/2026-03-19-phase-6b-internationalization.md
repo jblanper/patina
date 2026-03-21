@@ -1,7 +1,7 @@
 # Implementation Blueprint: Phase 6 - Internationalization (Spanish/English)
 
 **Date:** 2026-03-19
-**Status:** Verification
+**Status:** Completed
 **Reference:** `docs/technical_plan.md`
 
 ## 1. Objective
@@ -483,3 +483,43 @@ Nomisma.org supports both a REST API (JSON-LD via `https://nomisma.org/id/{conce
 - [Future: Add French, German, Italian translations]
 - [Future: RTL language support (Arabic, Hebrew)]
 - **Core Doc Revision:** Update style_guide.md for i18n font requirements
+
+---
+
+## 11. Verification Re-Audit (Phase V)
+**Date:** 2026-03-21
+**Auditors:** securing-electron, curating-ui, curating-coins, assuring-quality
+
+### Defect Found & Fixed During Verification
+
+#### `en.json:56` — Spanish word in English translation file — FIXED ✅
+`"material": "Aleación"` was present in `src/renderer/i18n/locales/en.json`. Corrected to `"material": "Material"`. The `translations.test.ts` completeness test passed because it checks key presence, not value correctness — the value error was invisible to the automated test. Fixed directly in the verification pass.
+
+### Security Re-Audit (`securing-electron`) — VERIFIED ✓
+- `PreferenceGetSchema`: `z.literal('language')` with `.strict()` — key whitelisting confirmed
+- `PreferenceSetSchema`: `z.literal('language')` + `z.enum(['en', 'es'])` with `.strict()` — value enum confirmed
+- Both `pref:get` and `pref:set` handlers pass through `validateIpc()` — no bypass possible
+- i18next loads from static bundled JSON resources — no `fetch()`, no CDN, no new attack surface
+
+### UI Re-Audit (`curating-ui`) — VERIFIED ✓
+- `LanguageSelector.tsx`: Uses only `.sort-dir-toggle` and `.dir-btn` CSS classes — zero new stylesheet additions
+- `PatinaSidebar.tsx`: `ERAS` array correctly uses `{ value, labelKey }` pattern — `value` goes to DB, `t(labelKey)` goes to display
+- `LanguageSelector` placed in `sidebar-footer`, below "Reset Archive View" — satisfies 2-click mandate from all views
+- Proper `aria-pressed` attributes on all toggle buttons
+
+### Numismatic Re-Audit (`curating-coins`) — VERIFIED ✓
+- `es.json` `ledger.obverse`: **"Anverso"** ✓
+- `es.json` `ledger.reverse`: **"Reverso"** ✓
+- `es.json` `ledger.edge`: **"Bordura"** ✓
+- `es.json` `ledger.material`: **"Aleación"** ✓
+- Spanish metal seeds (11 entries): Oro, Plata, Bronce, Cobre, Billon, Electro, Oricalco, Potín, Níquel, Tumbaga, Peltre ✓
+- Spanish era seeds (11 entries): Antiguo, República Romana, Imperio Romano, Provincial Romano, Bizantino, Alta Edad Media, Plena Edad Media, Baja Edad Media, Medieval, Islámico, Moderno ✓
+
+### Quality Re-Audit (`assuring-quality`) — VERIFIED ✓
+- **136/136 tests pass** (post-fix)
+- `LanguageSelector.test.tsx`: 4 tests — renders buttons, ES active state, EN switch persistence, ES switch persistence ✓
+- `useLanguage.test.ts`: 4 tests — exposes language, calls `changeLanguage`, calls `setPreference`, non-fatal on `setPreference` failure ✓
+- `translations.test.ts`: 2 tests — bidirectional key completeness en↔es ✓
+- Coverage: Files not appearing in the uncovered-lines report (LanguageSelector.tsx, useLanguage.ts) have 100% coverage — exceeds 80%/90% mandates ✓
+- `setupTests.ts`: `getPreference: vi.fn().mockResolvedValue('es')` and `setPreference: vi.fn().mockResolvedValue(undefined)` confirmed ✓
+- Global `react-i18next` mock with JSON key resolver confirmed — preserves all existing test assertions ✓
