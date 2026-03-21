@@ -66,7 +66,6 @@
     "cost": "Coste",
     "entryLabel": "ENTRADA",
     "newEntryId": "#NUEVA",
-    "fallbackEra": "ANTIGUO",
     "placeholders": {
       "designation": "Denominación de la moneda...",
       "era": "ej. Imperio Romano",
@@ -141,6 +140,17 @@
   "autocomplete": {
     "addNew": "Agregar \u201C{{value}}\u201D",
     "resetToDefaults": "Restablecer valores"
+  },
+  "glossary": {
+    "title": "Referencia de Campos",
+    "backToCabinet": "← Volver al Gabinete",
+    "toolbarLink": "Referencia de Campos",
+    "hintLabel": "Abrir entrada del glosario para {{field}}",
+    "required": "obligatorio",
+    "type": "Tipo",
+    "allFields": "Todos los Campos",
+    "close": "Cerrar referencia de campos",
+    "browseAll": "Ver referencia completa"
   },
   "common": {
     "comingSoon": "Próximamente"

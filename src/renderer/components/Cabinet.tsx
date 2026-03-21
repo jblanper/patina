@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCoins } from '../hooks/useCoins';
 import { useExport } from '../hooks/useExport';
@@ -55,6 +55,9 @@ export const Cabinet: React.FC = () => {
                 <button className="btn-action" onClick={() => exportToPdf()}>
                   {t('cabinet.generateCatalog')}
                 </button>
+                <Link to="/glossary" className="btn-action glossary-toolbar-link">
+                  {t('glossary.toolbarLink')}
+                </Link>
                 <button className="btn-action btn-primary" onClick={() => navigate('/scriptorium/add')}>
                   {t('cabinet.newEntry')}
                 </button>

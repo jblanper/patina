@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { NewCoin } from '../../common/types';
 import { AutocompleteField } from './AutocompleteField';
 import { useVocabularies } from '../hooks/useVocabularies';
+import { useGlossaryContext } from '../contexts/GlossaryContext';
 
 interface LedgerFormProps {
   formData: NewCoin;
@@ -13,6 +14,7 @@ interface LedgerFormProps {
 
 export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, updateField, coinId }) => {
   const { t } = useTranslation();
+  const { openField } = useGlossaryContext();
   const entryLabel = coinId ? `#${String(coinId).padStart(3, '0')}` : t('ledger.newEntryId');
 
   const eraVocab = useVocabularies('era');
@@ -25,7 +27,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
     <div className="right-folio">
       <div className="folio-header">
         <span className="meta-line">
-          {t('ledger.entryLabel')} {entryLabel} // {formData.era?.toUpperCase() || t('ledger.fallbackEra')} // {formData.metal?.toUpperCase() || '—'}
+          {t('ledger.entryLabel')} {entryLabel} // {formData.era?.toUpperCase() || '—'} // {formData.metal?.toUpperCase() || '—'}
         </span>
         <div className="input-group">
           <input
@@ -40,7 +42,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
 
         <div className="subtitle-stack">
           <div className="subtitle-item">
-            <span className="subtitle-label">{t('ledger.era')}</span>
+            <span className="subtitle-label">{t('ledger.era')}<button className="glossary-hint" onClick={() => openField('era')} aria-label={t('glossary.hintLabel', { field: 'era' })}>?</button></span>
             <AutocompleteField
               field="era"
               value={formData.era || ''}
@@ -53,7 +55,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             />
           </div>
           <div className="subtitle-item">
-            <span className="subtitle-label">{t('ledger.mintedAt')}</span>
+            <span className="subtitle-label">{t('ledger.mintedAt')}<button className="glossary-hint" onClick={() => openField('mint')} aria-label={t('glossary.hintLabel', { field: 'mint' })}>?</button></span>
             <AutocompleteField
               field="mint"
               value={formData.mint || ''}
@@ -66,7 +68,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             />
           </div>
           <div className="subtitle-item">
-            <span className="subtitle-label">{t('ledger.year')}</span>
+            <span className="subtitle-label">{t('ledger.year')}<button className="glossary-hint" onClick={() => openField('year_display')} aria-label={t('glossary.hintLabel', { field: 'year_display' })}>?</button></span>
             <input
               type="text"
               className="input-sub"
@@ -76,7 +78,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             />
           </div>
           <div className="subtitle-item">
-            <span className="subtitle-label">{t('ledger.issuer')}</span>
+            <span className="subtitle-label">{t('ledger.issuer')}<button className="glossary-hint" onClick={() => openField('issuer')} aria-label={t('glossary.hintLabel', { field: 'issuer' })}>?</button></span>
             <input
               type="text"
               className="input-sub"
@@ -86,7 +88,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             />
           </div>
           <div className="subtitle-item">
-            <span className="subtitle-label">{t('ledger.denomination')}</span>
+            <span className="subtitle-label">{t('ledger.denomination')}<button className="glossary-hint" onClick={() => openField('denomination')} aria-label={t('glossary.hintLabel', { field: 'denomination' })}>?</button></span>
             <AutocompleteField
               field="denomination"
               value={formData.denomination || ''}
@@ -99,7 +101,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             />
           </div>
           <div className="subtitle-item">
-            <span className="subtitle-label">{t('ledger.reference')}</span>
+            <span className="subtitle-label">{t('ledger.reference')}<button className="glossary-hint" onClick={() => openField('catalog_ref')} aria-label={t('glossary.hintLabel', { field: 'catalog_ref' })}>?</button></span>
             <input
               type="text"
               className="input-sub"
@@ -114,7 +116,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
       {/* Technical Metrics */}
       <div className="metrics-grid">
         <div className="metric-item">
-          <span className="metric-label">{t('ledger.weight')}</span>
+          <span className="metric-label">{t('ledger.weight')}<button className="glossary-hint" onClick={() => openField('weight')} aria-label={t('glossary.hintLabel', { field: 'weight' })}>?</button></span>
           <input
             type="number"
             step="0.01"
@@ -126,7 +128,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
           {errors.weight && <span className="error-hint">{errors.weight}</span>}
         </div>
         <div className="metric-item">
-          <span className="metric-label">{t('ledger.diameter')}</span>
+          <span className="metric-label">{t('ledger.diameter')}<button className="glossary-hint" onClick={() => openField('diameter')} aria-label={t('glossary.hintLabel', { field: 'diameter' })}>?</button></span>
           <input
             type="number"
             step="0.1"
@@ -138,7 +140,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
           {errors.diameter && <span className="error-hint">{errors.diameter}</span>}
         </div>
         <div className="metric-item">
-          <span className="metric-label">{t('ledger.dieAxis')}</span>
+          <span className="metric-label">{t('ledger.dieAxis')}<button className="glossary-hint" onClick={() => openField('die_axis')} aria-label={t('glossary.hintLabel', { field: 'die_axis' })}>?</button></span>
           <AutocompleteField
             field="die_axis"
             value={formData.die_axis || ''}
@@ -151,7 +153,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
           />
         </div>
         <div className="metric-item">
-          <span className="metric-label">{t('ledger.material')}</span>
+          <span className="metric-label">{t('ledger.material')}<button className="glossary-hint" onClick={() => openField('metal')} aria-label={t('glossary.hintLabel', { field: 'metal' })}>?</button></span>
           <AutocompleteField
             field="metal"
             value={formData.metal || ''}
@@ -164,7 +166,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
           />
         </div>
         <div className="metric-item">
-          <span className="metric-label">{t('ledger.fineness')}</span>
+          <span className="metric-label">{t('ledger.fineness')}<button className="glossary-hint" onClick={() => openField('fineness')} aria-label={t('glossary.hintLabel', { field: 'fineness' })}>?</button></span>
           <input
             type="text"
             className="input-metric"
@@ -174,7 +176,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
           />
         </div>
         <div className="metric-item">
-          <span className="metric-label">{t('ledger.grade')}</span>
+          <span className="metric-label">{t('ledger.grade')}<button className="glossary-hint" onClick={() => openField('grade')} aria-label={t('glossary.hintLabel', { field: 'grade' })}>?</button></span>
           <AutocompleteField
             field="grade"
             value={formData.grade || ''}
@@ -190,7 +192,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
 
       {/* Numismatic Data */}
       <div className="numismatic-section">
-        <span className="section-label">{t('ledger.obverse')}</span>
+        <span className="section-label">{t('ledger.obverse')}<button className="glossary-hint" onClick={() => openField('obverse_legend')} aria-label={t('glossary.hintLabel', { field: 'obverse_legend' })}>?</button></span>
         <input
           type="text"
           className="input-legend"
@@ -207,7 +209,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
       </div>
 
       <div className="numismatic-section">
-        <span className="section-label">{t('ledger.reverse')}</span>
+        <span className="section-label">{t('ledger.reverse')}<button className="glossary-hint" onClick={() => openField('reverse_legend')} aria-label={t('glossary.hintLabel', { field: 'reverse_legend' })}>?</button></span>
         <input
           type="text"
           className="input-legend"
@@ -225,7 +227,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
 
       {/* Curator's Note */}
       <div className="numismatic-section">
-        <span className="section-label">{t('ledger.curatorsNote')}</span>
+        <span className="section-label">{t('ledger.curatorsNote')}<button className="glossary-hint" onClick={() => openField('story')} aria-label={t('glossary.hintLabel', { field: 'story' })}>?</button></span>
         <textarea
           className="input-block input-block-tall"
           placeholder={t('ledger.placeholders.curatorsNote')}
@@ -236,7 +238,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
 
       {/* Provenance */}
       <div className="numismatic-section">
-        <span className="section-label">{t('ledger.provenance')}</span>
+        <span className="section-label">{t('ledger.provenance')}<button className="glossary-hint" onClick={() => openField('provenance')} aria-label={t('glossary.hintLabel', { field: 'provenance' })}>?</button></span>
         <input
           type="text"
           className="input-metric provenance-input"
@@ -250,7 +252,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
       <footer className="ledger-footer">
         <div className="metrics-grid">
           <div className="metric-item">
-            <span className="metric-label">{t('ledger.acquired')}</span>
+            <span className="metric-label">{t('ledger.acquired')}<button className="glossary-hint" onClick={() => openField('purchase_date')} aria-label={t('glossary.hintLabel', { field: 'purchase_date' })}>?</button></span>
             <input
               type="text"
               className="input-metric"
@@ -260,7 +262,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             />
           </div>
           <div className="metric-item">
-            <span className="metric-label">{t('ledger.source')}</span>
+            <span className="metric-label">{t('ledger.source')}<button className="glossary-hint" onClick={() => openField('purchase_source')} aria-label={t('glossary.hintLabel', { field: 'purchase_source' })}>?</button></span>
             <input
               type="text"
               className="input-metric"
@@ -270,7 +272,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             />
           </div>
           <div className="metric-item">
-            <span className="metric-label">{t('ledger.cost')}</span>
+            <span className="metric-label">{t('ledger.cost')}<button className="glossary-hint" onClick={() => openField('purchase_price')} aria-label={t('glossary.hintLabel', { field: 'purchase_price' })}>?</button></span>
             <input
               type="number"
               className="input-metric"

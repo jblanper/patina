@@ -1820,3 +1820,261 @@ main {
 .subtitle-stack .autocomplete-input {
   font-size: 1.4rem;
 }
+
+/* ── Glossary Page ─────────────────────────────────────────────────────────── */
+
+.glossary-back-link {
+  font: 0.75rem var(--font-mono);
+  color: var(--text-muted);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+.glossary-back-link:hover { color: var(--accent-manuscript); }
+
+.glossary-layout {
+  position: relative;
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.glossary-scroll {
+  flex: 1;
+  max-width: 780px;
+}
+
+/* Sticky section rail */
+.glossary-rail {
+  position: sticky;
+  top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  min-width: 2rem;
+}
+.glossary-rail-link {
+  font: 0.7rem var(--font-mono);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  line-height: 1.8;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+.glossary-rail-link:hover { color: var(--accent-manuscript); }
+
+/* Section headings */
+.glossary-section { margin-bottom: 3rem; }
+.glossary-section-heading {
+  font: 700 1.4rem var(--font-serif);
+  color: var(--text-ink);
+  border-bottom: 1px solid var(--border-hairline);
+  padding-bottom: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Field entries */
+.glossary-entry {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border-hairline);
+}
+.glossary-entry:last-child { border-bottom: none; }
+
+.glossary-entry-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+}
+.glossary-field-name {
+  font: 700 1rem var(--font-serif);
+  color: var(--text-ink);
+  margin: 0;
+}
+.glossary-field-id {
+  font: 0.78rem var(--font-mono);
+  color: var(--accent-manuscript);
+}
+.glossary-required {
+  font: 0.65rem var(--font-sans);
+  color: var(--accent-manuscript);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.glossary-type {
+  font: 0.75rem var(--font-mono);
+  color: var(--text-muted);
+}
+.glossary-description {
+  font: 0.9rem var(--font-sans);
+  color: var(--text-ink);
+  line-height: 1.65;
+  margin-bottom: 1rem;
+}
+
+/* Vocabulary tables */
+.glossary-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+}
+.glossary-table th {
+  font: 600 0.7rem var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-hairline);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+.glossary-table td {
+  font: 0.82rem var(--font-sans);
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--border-hairline);
+  vertical-align: top;
+}
+.glossary-table tr:nth-child(even) td { background: var(--stone-pedestal); }
+
+/* Further reading links */
+.glossary-further-reading {
+  list-style: none;
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.glossary-external-link {
+  font: 0.78rem var(--font-mono);
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.glossary-external-link:hover { color: var(--accent-manuscript); }
+
+/* Toolbar link */
+.glossary-toolbar-link {
+  text-decoration: none;
+}
+
+/* ── Glossary Drawer ───────────────────────────────────────────────────────── */
+
+.glossary-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 41, 38, 0.35);
+  z-index: 900;
+}
+
+.glossary-drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: min(600px, 90vw);
+  background: var(--bg-manuscript);
+  border-left: 1px solid var(--border-hairline);
+  z-index: 901;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+}
+.glossary-drawer[data-open="true"] { transform: translateX(0); }
+
+.glossary-drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-hairline);
+  flex-shrink: 0;
+}
+.glossary-drawer-title {
+  font: 600 0.8rem var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+.glossary-drawer-back {
+  font: 0.75rem var(--font-mono);
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+.glossary-drawer-back:hover { color: var(--accent-manuscript); }
+.glossary-drawer-field-id {
+  font: 0.8rem var(--font-mono);
+  color: var(--accent-manuscript);
+}
+.glossary-drawer-close {
+  margin-left: auto;
+  font: 1.4rem var(--font-mono);
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 0.25rem;
+  flex-shrink: 0;
+}
+.glossary-drawer-close:hover { color: var(--accent-manuscript); }
+
+.glossary-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+}
+
+/* Index list */
+.glossary-index-section { margin-bottom: 1.5rem; }
+.glossary-index-section-heading {
+  font: 600 0.65rem var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+.glossary-index-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: 0.875rem var(--font-sans);
+  color: var(--text-ink);
+  padding: 0.3rem 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+}
+.glossary-index-item:hover { color: var(--accent-manuscript); }
+
+.glossary-browse-all {
+  display: block;
+  margin-top: 2rem;
+  font: 0.75rem var(--font-mono);
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.glossary-browse-all:hover { color: var(--accent-manuscript); }
+
+/* ? hint link (Phase 1b button) */
+.glossary-hint {
+  font: 0.7rem var(--font-mono);
+  color: var(--text-muted);
+  margin-left: 0.4rem;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: inherit;
+}
+.glossary-hint:hover { color: var(--accent-manuscript); }

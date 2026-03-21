@@ -66,7 +66,6 @@
     "cost": "Cost",
     "entryLabel": "ENTRY",
     "newEntryId": "#NEW",
-    "fallbackEra": "ANCIENT",
     "placeholders": {
       "designation": "Designation of the coin...",
       "era": "e.g. Roman Imperial",
@@ -141,6 +140,17 @@
   "autocomplete": {
     "addNew": "Add \u201C{{value}}\u201D",
     "resetToDefaults": "Reset to defaults"
+  },
+  "glossary": {
+    "title": "Field Reference",
+    "backToCabinet": "← Back to Cabinet",
+    "toolbarLink": "Field Reference",
+    "hintLabel": "Open glossary entry for {{field}}",
+    "required": "required",
+    "type": "Type",
+    "allFields": "All Fields",
+    "close": "Close field reference",
+    "browseAll": "Browse full reference"
   },
   "common": {
     "comingSoon": "Coming soon"

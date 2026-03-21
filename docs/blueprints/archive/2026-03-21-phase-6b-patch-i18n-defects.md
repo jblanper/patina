@@ -522,6 +522,19 @@ All 9 defects resolved. TypeScript type-check: clean. Test suite: 138/138 passin
 - `lens-mobile.ts`: `document.body.dataset.strings` typed via intersection cast to avoid a non-existent `HTMLBodyElement.dataset` typings issue in the tsconfig target.
 - `Scriptorium.test.tsx` was also referencing the old "Establish Wireless Bridge" string and required updating.
 
+**Post-completion defect (D-10) — discovered and resolved 2026-03-21:**
+
+The `ledger.fallbackEra` translation key introduced in D-03 was counterproductive. When the era field was empty, the meta-line displayed `ANTIGUO` (ES) or `ANCIENT` (EN) as a fallback, making it appear as if the field had a value when it did not. This was first surfaced by verifying that the fallback was locale-aware (Spanish correctly showed "ANTIGUO", not "Ancient") — which confirmed the text was coming from the translation key, not from a stale `era: 'Ancient'` localStorage draft.
+
+Fix applied:
+- `LedgerForm.tsx` meta-line: `t('ledger.fallbackEra')` → `'—'` (consistent with the metal fallback)
+- `en.json` / `es.json`: `fallbackEra` key removed
+- `LedgerForm.test.tsx`: base fixture updated to `era: ''`; `MemoryRouter` wrapper added (glossary `<Link>` hints were present at the time); new test added for the `—` fallback; existing `shows ANCIENT` test retained as an explicit `era: 'Ancient'` case
+- Test suite: 139/139 passing
+
+A stale `patina_scriptorium_draft` in Electron's LevelDB (from a session when `DEFAULT_STATE.era` was `'Ancient'`) was also cleared. The current `DEFAULT_STATE.era = ''` is correct.
+
 **Patterns confirmed for AGENTS.md / style guide:**
 - Lens server locale pattern: read `dbService.getPreference('language')` in the IPC handler, cast to `'en' | 'es'`, pass into `createLensServer({ locale })`. Strings are static dictionaries in `server.ts`; client strings are embedded as `data-strings` JSON attribute on `<body>`.
 - Vocabulary cache key convention: always composite `"${field}:${locale}"` to prevent cross-locale stale hits.
+- Meta-line fallback convention: use `'—'` for all empty fields in the meta-line header. Do not use translation keys as fallbacks for fields that may be empty — they create the false impression of a set value.
