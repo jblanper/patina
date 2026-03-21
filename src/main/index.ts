@@ -5,7 +5,7 @@ import { dbService } from './db';
 import { createLensServer } from './server';
 import { getLocalIp } from './ip';
 import { NewCoin, NewCoinImage } from '../common/types';
-import { ExportOptionsSchema, VocabGetSchema, VocabAddSchema, VocabSearchSchema, VocabIncrementSchema, VocabResetSchema } from '../common/validation';
+import { ExportOptionsSchema, VocabGetSchema, VocabAddSchema, VocabSearchSchema, VocabIncrementSchema, VocabResetSchema, PreferenceGetSchema, PreferenceSetSchema } from '../common/validation';
 import { exportToZip } from './export/zip';
 import { exportToPdf } from './export/pdf';
 
@@ -197,8 +197,8 @@ app.whenReady().then(() => {
 
   // Vocabulary IPC Handlers
   ipcMain.handle('vocab:get', (_, data: unknown) => {
-    const { field } = validateIpc(VocabGetSchema, data);
-    return dbService.getVocabularies(field);
+    const { field, locale } = validateIpc(VocabGetSchema, data);
+    return dbService.getVocabularies(field, locale);
   });
 
   ipcMain.handle('vocab:add', (_, data: unknown) => {
@@ -207,8 +207,18 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle('vocab:search', (_, data: unknown) => {
-    const { field, query } = validateIpc(VocabSearchSchema, data);
-    return dbService.searchVocabularies(field, query);
+    const { field, query, locale } = validateIpc(VocabSearchSchema, data);
+    return dbService.searchVocabularies(field, query, locale);
+  });
+
+  ipcMain.handle('pref:get', (_, data: unknown) => {
+    const { key } = validateIpc(PreferenceGetSchema, data);
+    return dbService.getPreference(key);
+  });
+
+  ipcMain.handle('pref:set', (_, data: unknown) => {
+    const { key, value } = validateIpc(PreferenceSetSchema, data);
+    dbService.setPreference(key, value);
   });
 
   ipcMain.handle('vocab:increment', (_, data: unknown) => {

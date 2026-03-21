@@ -129,7 +129,7 @@ describe('CoinDetail Component', () => {
 
     render(<CoinDetail />);
 
-    const backBtn = screen.getByRole('button', { name: 'Close Ledger Entry' });
+    const backBtn = screen.getByRole('button', { name: '← Close Ledger Entry' });
     fireEvent.click(backBtn);
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
@@ -155,7 +155,7 @@ describe('CoinDetail Component', () => {
       isLoading: false,
       error: null,
     });
-    vi.mocked(window.electronAPI.deleteCoin).mockResolvedValue(undefined);
+    vi.mocked(window.electronAPI.deleteCoin).mockResolvedValue(true);
 
     render(<CoinDetail />);
 

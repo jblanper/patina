@@ -12,8 +12,9 @@ const idSchema = z.number().int().positive();
 
 function getSeedEntries(): Array<{ field: string; value: string; locale: string; usage_count: number }> {
   const en = 'en';
+  const es = 'es';
   return [
-    // Metals
+    // Metals (English)
     { field: 'metal', value: 'Gold', locale: en, usage_count: 40 },
     { field: 'metal', value: 'Silver', locale: en, usage_count: 80 },
     { field: 'metal', value: 'Bronze', locale: en, usage_count: 70 },
@@ -25,6 +26,18 @@ function getSeedEntries(): Array<{ field: string; value: string; locale: string;
     { field: 'metal', value: 'Nickel', locale: en, usage_count: 8 },
     { field: 'metal', value: 'Tumbaga', locale: en, usage_count: 5 },
     { field: 'metal', value: 'Pewter', locale: en, usage_count: 4 },
+    // Metals (Spanish)
+    { field: 'metal', value: 'Oro', locale: es, usage_count: 40 },
+    { field: 'metal', value: 'Plata', locale: es, usage_count: 80 },
+    { field: 'metal', value: 'Bronce', locale: es, usage_count: 70 },
+    { field: 'metal', value: 'Cobre', locale: es, usage_count: 30 },
+    { field: 'metal', value: 'Billon', locale: es, usage_count: 20 },
+    { field: 'metal', value: 'Electro', locale: es, usage_count: 15 },
+    { field: 'metal', value: 'Oricalco', locale: es, usage_count: 12 },
+    { field: 'metal', value: 'Potín', locale: es, usage_count: 10 },
+    { field: 'metal', value: 'Níquel', locale: es, usage_count: 8 },
+    { field: 'metal', value: 'Tumbaga', locale: es, usage_count: 5 },
+    { field: 'metal', value: 'Peltre', locale: es, usage_count: 4 },
     // Denominations
     { field: 'denomination', value: 'Aureus', locale: en, usage_count: 40 },
     { field: 'denomination', value: 'Denarius', locale: en, usage_count: 80 },
@@ -70,7 +83,7 @@ function getSeedEntries(): Array<{ field: string; value: string; locale: string;
     { field: 'grade', value: 'G-4', locale: en, usage_count: 8 },
     { field: 'grade', value: 'AG-3', locale: en, usage_count: 6 },
     { field: 'grade', value: 'FR-2', locale: en, usage_count: 4 },
-    // Eras
+    // Eras (English)
     { field: 'era', value: 'Ancient', locale: en, usage_count: 30 },
     { field: 'era', value: 'Roman Republic', locale: en, usage_count: 40 },
     { field: 'era', value: 'Roman Imperial', locale: en, usage_count: 80 },
@@ -82,6 +95,18 @@ function getSeedEntries(): Array<{ field: string; value: string; locale: string;
     { field: 'era', value: 'Medieval', locale: en, usage_count: 10 },
     { field: 'era', value: 'Islamic', locale: en, usage_count: 12 },
     { field: 'era', value: 'Modern', locale: en, usage_count: 20 },
+    // Eras (Spanish)
+    { field: 'era', value: 'Antiguo', locale: es, usage_count: 30 },
+    { field: 'era', value: 'República Romana', locale: es, usage_count: 40 },
+    { field: 'era', value: 'Imperio Romano', locale: es, usage_count: 80 },
+    { field: 'era', value: 'Provincial Romano', locale: es, usage_count: 25 },
+    { field: 'era', value: 'Bizantino', locale: es, usage_count: 30 },
+    { field: 'era', value: 'Alta Edad Media', locale: es, usage_count: 15 },
+    { field: 'era', value: 'Plena Edad Media', locale: es, usage_count: 20 },
+    { field: 'era', value: 'Baja Edad Media', locale: es, usage_count: 15 },
+    { field: 'era', value: 'Medieval', locale: es, usage_count: 10 },
+    { field: 'era', value: 'Islámico', locale: es, usage_count: 12 },
+    { field: 'era', value: 'Moderno', locale: es, usage_count: 20 },
     // Die Axis
     { field: 'die_axis', value: '1h', locale: en, usage_count: 5 },
     { field: 'die_axis', value: '2h', locale: en, usage_count: 5 },
@@ -243,13 +268,13 @@ export const dbService = {
   },
 
   // Vocabulary service methods
-  getVocabularies: (field: VocabField): string[] => {
+  getVocabularies: (field: VocabField, locale = 'en'): string[] => {
     if (!ALLOWED_VOCAB_FIELDS.includes(field)) {
       throw new Error(`Invalid vocabulary field: ${field}`);
     }
     const rows = db.prepare(
-      'SELECT value FROM vocabularies WHERE field = ? ORDER BY usage_count DESC, value ASC'
-    ).all(field) as { value: string }[];
+      'SELECT value FROM vocabularies WHERE field = ? AND locale = ? ORDER BY usage_count DESC, value ASC'
+    ).all(field, locale) as { value: string }[];
     return rows.map(r => r.value);
   },
 
@@ -262,19 +287,19 @@ export const dbService = {
     ).run(field, value, locale);
   },
 
-  searchVocabularies: (field: VocabField, query: string): string[] => {
+  searchVocabularies: (field: VocabField, query: string, locale = 'en'): string[] => {
     if (!ALLOWED_VOCAB_FIELDS.includes(field)) {
       throw new Error(`Invalid vocabulary field: ${field}`);
     }
     if (!query) {
       const rows = db.prepare(
-        'SELECT value FROM vocabularies WHERE field = ? ORDER BY usage_count DESC, value ASC'
-      ).all(field) as { value: string }[];
+        'SELECT value FROM vocabularies WHERE field = ? AND locale = ? ORDER BY usage_count DESC, value ASC'
+      ).all(field, locale) as { value: string }[];
       return rows.map(r => r.value);
     }
     const rows = db.prepare(
-      "SELECT value FROM vocabularies WHERE field = ? AND value LIKE ? ESCAPE '\\' ORDER BY usage_count DESC, value ASC"
-    ).all(field, `%${query.replace(/[%_\\]/g, '\\$&')}%`) as { value: string }[];
+      "SELECT value FROM vocabularies WHERE field = ? AND locale = ? AND value LIKE ? ESCAPE '\\' ORDER BY usage_count DESC, value ASC"
+    ).all(field, locale, `%${query.replace(/[%_\\]/g, '\\$&')}%`) as { value: string }[];
     return rows.map(r => r.value);
   },
 
@@ -307,8 +332,17 @@ export const dbService = {
     }
   },
 
+  getPreference: (key: 'language'): string | null => {
+    const row = db.prepare('SELECT value FROM preferences WHERE key = ?').get(key) as { value: string } | undefined;
+    return row?.value ?? null;
+  },
+
+  setPreference: (key: 'language', value: string): void => {
+    db.prepare('INSERT OR REPLACE INTO preferences (key, value) VALUES (?, ?)').run(key, value);
+  },
+
   seedVocabularies: (): void => {
-    const CURRENT_SEED_VERSION = '6a.1';
+    const CURRENT_SEED_VERSION = '6b.1';
     const row = db.prepare('SELECT value FROM preferences WHERE key = ?').get('vocab_seeded_version') as { value: string } | undefined;
     if (row?.value === CURRENT_SEED_VERSION) return;
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useCoins } from '../hooks/useCoins';
 import { useExport } from '../hooks/useExport';
 import { GalleryGrid } from './GalleryGrid';
@@ -9,11 +10,12 @@ import { ExportToast } from './ExportToast';
 
 export const Cabinet: React.FC = () => {
   const navigate = useNavigate();
-  const { 
+  const { t } = useTranslation();
+  const {
     coins,
-    filteredCoins, 
-    loading, 
-    error, 
+    filteredCoins,
+    loading,
+    error,
     filters,
     updateFilters,
     clearFilters,
@@ -27,19 +29,11 @@ export const Cabinet: React.FC = () => {
     throw error;
   }
 
-  const handleExportZip = () => {
-    exportToZip();
-  };
-
-  const handleExportPdf = () => {
-    exportToPdf();
-  };
-
   return (
     <>
       <header className="app-header">
-        <h1>Patina — The Cabinet</h1>
-        <div className="version-tag">Archive v1.0 // THE DISPLAY CASE</div>
+        <h1>{t('cabinet.header')}</h1>
+        <div className="version-tag">{t('cabinet.tagline')}</div>
       </header>
 
       <div className="app-layout">
@@ -55,42 +49,43 @@ export const Cabinet: React.FC = () => {
           <section className="cabinet-section">
             <header className="cabinet-header">
               <div className="cabinet-toolbar">
-                <button className="btn-action" onClick={handleExportZip}>
-                  Export Archive
+                <button className="btn-action" onClick={() => exportToZip()}>
+                  {t('cabinet.exportArchive')}
                 </button>
-                <button className="btn-action" onClick={handleExportPdf}>
-                  Generate Catalog
+                <button className="btn-action" onClick={() => exportToPdf()}>
+                  {t('cabinet.generateCatalog')}
                 </button>
                 <button className="btn-action btn-primary" onClick={() => navigate('/scriptorium/add')}>
-                  + New Entry
+                  {t('cabinet.newEntry')}
                 </button>
               </div>
               <p className="type-body cabinet-subtitle">
-                {loading 
-                  ? 'Synchronizing with the local archive...' 
-                  : `${filteredCoins.length} ${filteredCoins.length === 1 ? 'object' : 'objects'} in the ledger.`}
+                {loading
+                  ? t('cabinet.loading')
+                  : t('cabinet.objectCount', { count: filteredCoins.length })}
               </p>
             </header>
 
-            <SearchBar 
+            <SearchBar
               value={filters.searchTerm}
               onChange={(val) => updateFilters({ searchTerm: val })}
+              placeholder={t('cabinet.search')}
             />
 
-            <GalleryGrid 
-              coins={filteredCoins} 
-              loading={loading} 
+            <GalleryGrid
+              coins={filteredCoins}
+              loading={loading}
               isDatabaseEmpty={coins.length === 0}
-              onCoinClick={(id) => navigate(`/coin/${id}`)} 
+              onCoinClick={(id) => navigate(`/coin/${id}`)}
             />
           </section>
         </main>
       </div>
 
-      <ExportToast 
+      <ExportToast
         isVisible={status === 'success' || status === 'error'}
         type={status === 'success' ? 'success' : 'error'}
-        message={status === 'success' 
+        message={status === 'success'
           ? `Export complete: ${resultPath ? resultPath.split('/').pop() : 'file'}`
           : `Export failed: ${exportError || 'Unknown error'}`
         }

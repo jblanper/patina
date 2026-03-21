@@ -1,5 +1,7 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FilterState } from '../../common/validation';
+import { LanguageSelector } from './LanguageSelector';
 
 interface PatinaSidebarProps {
   filters: FilterState;
@@ -9,12 +11,10 @@ interface PatinaSidebarProps {
   availableGrades: string[];
 }
 
-const ERAS = ['Ancient', 'Medieval', 'Modern'] as const;
-
-const SORT_OPTIONS = [
-  { label: 'Year',     value: 'year_numeric'  },
-  { label: 'Title',    value: 'title'         },
-  { label: 'Acquired', value: 'purchase_date' },
+const ERAS = [
+  { value: 'Ancient',  labelKey: 'sidebar.era.ancient'  },
+  { value: 'Medieval', labelKey: 'sidebar.era.medieval' },
+  { value: 'Modern',   labelKey: 'sidebar.era.modern'   },
 ] as const;
 
 /**
@@ -30,6 +30,13 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
   availableMetals,
   availableGrades
 }) => {
+  const { t } = useTranslation();
+
+  const SORT_OPTIONS = [
+    { label: t('sidebar.sort.year'),     value: 'year_numeric'  },
+    { label: t('sidebar.sort.title'),    value: 'title'         },
+    { label: t('sidebar.sort.acquired'), value: 'purchase_date' },
+  ] as const;
 
   const toggleFilter = (key: 'era' | 'metal' | 'grade', value: string) => {
     const current = filters[key] as string[];
@@ -48,7 +55,7 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
     <aside className="patina-sidebar">
       {/* Sort Controls — Path B "The Ledger" */}
       <div className="filter-group">
-        <span className="type-meta filter-label">Order By</span>
+        <span className="type-meta filter-label">{t('sidebar.orderBy')}</span>
         <ul className="filter-list">
           {SORT_OPTIONS.map(({ label, value }) => (
             <li key={value}>
@@ -68,33 +75,33 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
             onClick={() => updateFilters({ sortAsc: true })}
             aria-pressed={filters.sortAsc}
           >
-            ↑ Asc
+            {t('sidebar.asc')}
           </button>
           <button
             className={`dir-btn ${!filters.sortAsc ? 'active' : ''}`}
             onClick={() => updateFilters({ sortAsc: false })}
             aria-pressed={!filters.sortAsc}
           >
-            ↓ Desc
+            {t('sidebar.desc')}
           </button>
         </div>
       </div>
 
       <div className="filter-group">
-        <span className="type-meta filter-label">Eras</span>
+        <span className="type-meta filter-label">{t('sidebar.eras')}</span>
         <ul className="filter-list">
-          {ERAS.map(era => (
-            <li key={era}>
-              <label className={`filter-item-label ${isSelected('era', era) ? 'active' : ''}`}>
+          {ERAS.map(({ value, labelKey }) => (
+            <li key={value}>
+              <label className={`filter-item-label ${isSelected('era', value) ? 'active' : ''}`}>
                 <input
                   type="checkbox"
                   className="filter-input"
-                  checked={isSelected('era', era)}
-                  onChange={() => toggleFilter('era', era)}
-                  aria-label={`Filter by ${era} era`}
+                  checked={isSelected('era', value)}
+                  onChange={() => toggleFilter('era', value)}
+                  aria-label={`Filter by ${t(labelKey)} era`}
                 />
                 <span className="filter-checkbox" aria-hidden="true"></span>
-                <span className="filter-text">{era}</span>
+                <span className="filter-text">{t(labelKey)}</span>
               </label>
             </li>
           ))}
@@ -102,7 +109,7 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
       </div>
 
       <div className="filter-group">
-        <span className="type-meta filter-label">Metals</span>
+        <span className="type-meta filter-label">{t('sidebar.metals')}</span>
         <ul className="filter-list">
           {availableMetals.length > 0 ? (
             availableMetals.map(metal => (
@@ -121,13 +128,13 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
               </li>
             ))
           ) : (
-            <li className="filter-item disabled">No metals indexed</li>
+            <li className="filter-item disabled">{t('sidebar.noMetals')}</li>
           )}
         </ul>
       </div>
 
       <div className="filter-group">
-        <span className="type-meta filter-label">Grade</span>
+        <span className="type-meta filter-label">{t('sidebar.grade')}</span>
         <ul className="filter-list">
           {availableGrades.length > 0 ? (
             availableGrades.map(grade => (
@@ -146,7 +153,7 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
               </li>
             ))
           ) : (
-            <li className="filter-item disabled">No grades recorded</li>
+            <li className="filter-item disabled">{t('sidebar.noGrades')}</li>
           )}
         </ul>
       </div>
@@ -162,8 +169,9 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
             !filters.searchTerm
           }
         >
-          Reset Archive View
+          {t('sidebar.reset')}
         </button>
+        <LanguageSelector />
       </div>
     </aside>
   );

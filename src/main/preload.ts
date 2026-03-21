@@ -26,18 +26,25 @@ contextBridge.exposeInMainWorld('electronAPI', {
   exportToPdf: () => ipcRenderer.invoke('export:toPdf'),
 
   // Vocabulary API
-  getVocab: (field: VocabField): Promise<string[]> =>
-    ipcRenderer.invoke('vocab:get', { field }),
+  getVocab: (field: VocabField, locale?: 'en' | 'es'): Promise<string[]> =>
+    ipcRenderer.invoke('vocab:get', { field, locale }),
 
   addVocabEntry: (field: VocabField, value: string): Promise<void> =>
     ipcRenderer.invoke('vocab:add', { field, value }),
 
-  searchVocab: (field: VocabField, query: string): Promise<string[]> =>
-    ipcRenderer.invoke('vocab:search', { field, query }),
+  searchVocab: (field: VocabField, query: string, locale?: 'en' | 'es'): Promise<string[]> =>
+    ipcRenderer.invoke('vocab:search', { field, query, locale }),
 
   incrementVocabUsage: (field: VocabField, value: string): Promise<void> =>
     ipcRenderer.invoke('vocab:increment', { field, value }),
 
   resetVocab: (field?: VocabField): Promise<void> =>
     ipcRenderer.invoke('vocab:reset', { field }),
+
+  // Preference API
+  getPreference: (key: 'language'): Promise<string | null> =>
+    ipcRenderer.invoke('pref:get', { key }),
+
+  setPreference: (key: 'language', value: 'en' | 'es'): Promise<void> =>
+    ipcRenderer.invoke('pref:set', { key, value }),
 });

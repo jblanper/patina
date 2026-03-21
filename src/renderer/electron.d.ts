@@ -25,11 +25,15 @@ export interface IElectronAPI {
   exportToPdf: () => Promise<{ success: boolean; path?: string; error?: string }>;
 
   // Vocabulary API
-  getVocab: (field: VocabField) => Promise<string[]>;
+  getVocab: (field: VocabField, locale?: 'en' | 'es') => Promise<string[]>;
   addVocabEntry: (field: VocabField, value: string) => Promise<void>;
-  searchVocab: (field: VocabField, query: string) => Promise<string[]>;
+  searchVocab: (field: VocabField, query: string, locale?: 'en' | 'es') => Promise<string[]>;
   incrementVocabUsage: (field: VocabField, value: string) => Promise<void>;
   resetVocab: (field?: VocabField) => Promise<void>;
+
+  // Preference API
+  getPreference: (key: 'language') => Promise<string | null>;
+  setPreference: (key: 'language', value: 'en' | 'es') => Promise<void>;
 }
 
 declare global {

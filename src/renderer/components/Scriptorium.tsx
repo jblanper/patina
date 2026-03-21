@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useCoin } from '../hooks/useCoin';
 import { useCoinForm } from '../hooks/useCoinForm';
 import { PlateEditor } from './PlateEditor';
@@ -8,14 +9,15 @@ import { LedgerForm } from './LedgerForm';
 export const Scriptorium: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { coin, images: existingImages, isLoading } = useCoin(id);
-  
-  const { 
-    formData, 
-    errors, 
-    isSaving, 
-    updateField, 
-    updateImage, 
+
+  const {
+    formData,
+    errors,
+    isSaving,
+    updateField,
+    updateImage,
     submit,
     setFormData
   } = useCoinForm(coin, existingImages);
@@ -30,7 +32,7 @@ export const Scriptorium: React.FC = () => {
           imageMap[label as 'obverse' | 'reverse' | 'edge'] = img.path;
         }
       });
-      
+
       setFormData(prev => ({
         ...prev,
         images: { ...prev.images, ...imageMap }
@@ -48,7 +50,7 @@ export const Scriptorium: React.FC = () => {
   if (id && isLoading) {
     return (
       <div className="ledger-layout">
-        <div className="loading-state">Consulting the archives...</div>
+        <div className="loading-state">{t('scriptorium.loading')}</div>
       </div>
     );
   }
@@ -57,26 +59,26 @@ export const Scriptorium: React.FC = () => {
     <div className="scriptorium-container">
       <header className="app-header">
         <button className="nav-back" onClick={() => navigate(-1)}>
-          ← Close Ledger Entry
+          {t('scriptorium.closeEntry')}
         </button>
         <div className="header-actions">
           <span className="draft-status">
-            {isSaving ? 'Indexing...' : 'Draft Preserved'}
+            {isSaving ? t('scriptorium.indexing') : t('scriptorium.draftPreserved')}
           </span>
-          <button 
-            className="btn-solid" 
+          <button
+            className="btn-solid"
             onClick={handleSubmit}
             disabled={isSaving}
           >
-            {id ? 'Update Ledger' : 'Index to Ledger'}
+            {id ? t('scriptorium.updateLedger') : t('scriptorium.indexToLedger')}
           </button>
         </div>
       </header>
 
       <div className="ledger-layout">
-        <PlateEditor 
-          images={formData.images} 
-          onImageCaptured={updateImage} 
+        <PlateEditor
+          images={formData.images}
+          onImageCaptured={updateImage}
         />
         <LedgerForm
           formData={formData}
@@ -88,4 +90,3 @@ export const Scriptorium: React.FC = () => {
     </div>
   );
 };
-

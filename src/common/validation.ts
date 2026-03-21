@@ -109,6 +109,7 @@ export type VocabField = typeof ALLOWED_VOCAB_FIELDS[number];
 
 export const VocabGetSchema = z.object({
   field: z.enum(ALLOWED_VOCAB_FIELDS),
+  locale: z.enum(['en', 'es']).optional(),
 }).strict();
 
 export const VocabAddSchema = z.object({
@@ -130,6 +131,19 @@ export const VocabSearchSchema = z.object({
   query: z
     .string()
     .max(100, 'Search query must be 100 characters or fewer'),
+  locale: z.enum(['en', 'es']).optional(),
+}).strict();
+
+/**
+ * Preference Schemas
+ */
+export const PreferenceGetSchema = z.object({
+  key: z.literal('language'),
+}).strict();
+
+export const PreferenceSetSchema = z.object({
+  key: z.literal('language'),
+  value: z.enum(['en', 'es']),
 }).strict();
 
 export const VocabIncrementSchema = z.object({

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SearchBarProps {
   value: string;
@@ -12,12 +13,14 @@ interface SearchBarProps {
  * Adheres to the "Archival Ledger" aesthetic from the Manuscript Hybrid (v3.3) guide.
  */
 export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, placeholder }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="search-bar-container">
       <input
         type="text"
         className="search-input"
-        placeholder={placeholder || "Title, issuer, or catalog reference..."}
+        placeholder={placeholder || t('cabinet.search')}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         maxLength={100}

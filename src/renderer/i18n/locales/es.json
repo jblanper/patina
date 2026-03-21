@@ -1,0 +1,119 @@
+{
+  "sidebar": {
+    "orderBy": "Ordenar Por",
+    "sort": {
+      "year": "Año",
+      "title": "Título",
+      "acquired": "Adquirida"
+    },
+    "asc": "↑ Asc",
+    "desc": "↓ Desc",
+    "eras": "Épocas",
+    "era": {
+      "ancient": "Antiguo",
+      "medieval": "Medieval",
+      "modern": "Moderno"
+    },
+    "metals": "Metales",
+    "grade": "Grado",
+    "noMetals": "Sin metales indexados",
+    "noGrades": "Sin grados registrados",
+    "reset": "Restablecer Filtros",
+    "language": "Idioma"
+  },
+  "cabinet": {
+    "header": "Patina — El Gabinete",
+    "tagline": "Archivo v1.0 // EL VITRINA",
+    "exportArchive": "Exportar Archivo",
+    "generateCatalog": "Generar Catálogo",
+    "newEntry": "+ Nueva Entrada",
+    "loading": "Sincronizando con el archivo local...",
+    "objectCount_one": "{{count}} objeto en el registro.",
+    "objectCount_other": "{{count}} objetos en el registro.",
+    "search": "Título, emisor o referencia de catálogo..."
+  },
+  "gallery": {
+    "loading": "Abriendo los archivos...",
+    "emptyTitle": "El Registro Aguarda",
+    "emptyDesc": "Tu archivo privado está vacío. Comienza registrando tu primer objeto histórico.",
+    "emptyStatus": "Estado: Índice Listo // Registro Vacío",
+    "filteredTitle": "El Archivo Silencioso",
+    "filteredDesc": "Ninguna entrada histórica coincide con los parámetros de búsqueda o filtro actuales.",
+    "filteredStatus": "Estado: Registro Listo // Filtrado Vacío",
+    "ariaLabel": "Galería de Monedas"
+  },
+  "ledger": {
+    "designation": "Denominación",
+    "era": "Época",
+    "mintedAt": "Acuñado en",
+    "year": "Año",
+    "issuer": "Emisor",
+    "denomination": "Denominación",
+    "reference": "Referencia",
+    "weight": "Peso",
+    "diameter": "Diámetro",
+    "dieAxis": "Eje de Cuño",
+    "material": "Aleación",
+    "fineness": "Fineza",
+    "grade": "Grado",
+    "obverse": "Anverso",
+    "reverse": "Reverso",
+    "edge": "Bordura",
+    "curatorsNote": "Nota del Curador",
+    "provenance": "Procedencia",
+    "acquired": "Adquirida",
+    "source": "Fuente",
+    "cost": "Coste",
+    "placeholders": {
+      "designation": "Denominación de la moneda...",
+      "era": "ej. Imperio Romano",
+      "mint": "Ciudad / Ceca",
+      "year": "ej. 440 a.C.",
+      "issuer": "ej. Probo",
+      "denomination": "ej. Antoniniano",
+      "reference": "ej. RIC II 218",
+      "weight": "00.00 g",
+      "diameter": "00.0 mm",
+      "dieAxis": "ej. 6h",
+      "material": "ej. Plata",
+      "fineness": "ej. .999",
+      "grade": "ej. EF-40",
+      "obverseLegend": "LEYENDA (ej. IMP CAES HADRIANVS)",
+      "obverseDesc": "Describe el motivo del anverso, la retratística y el estilo...",
+      "reverseLegend": "LEYENDA (ej. AOE)",
+      "reverseDesc": "Describe los símbolos del reverso, la deidad y el contexto...",
+      "curatorsNote": "Registra la importancia histórica o la narrativa única de este objeto...",
+      "provenance": "ej. Ex. Colección BCD; Adquirida 2024",
+      "acquired": "AAAA-MM-DD",
+      "source": "ej. CNG Auctions"
+    }
+  },
+  "detail": {
+    "loading": "Recuperando registro del archivo...",
+    "notFound": "Registro no encontrado.",
+    "returnToCabinet": "Volver al Gabinete",
+    "closeEntry": "← Cerrar Registro",
+    "editRecord": "Editar Registro",
+    "deleteRecord": "Eliminar Registro",
+    "noImage": "Sin Imagen Disponible",
+    "mintedAt": "Acuñado en",
+    "mintUnknown": "Ceca Desconocida",
+    "unknownDate": "Fecha Desconocida",
+    "acquired": "Adquirida",
+    "cost": "Coste",
+    "confirm": {
+      "title": "Confirmar Eliminación",
+      "message": "¿Está seguro de que desea eliminar este registro del archivo? Esta acción no se puede deshacer.",
+      "cancel": "Cancelar",
+      "delete": "Eliminar"
+    }
+  },
+  "scriptorium": {
+    "loading": "Consultando los archivos...",
+    "closeEntry": "← Cerrar Registro",
+    "draftPreserved": "Borrador Guardado",
+    "indexing": "Indexando...",
+    "indexToLedger": "Indexar al Registro",
+    "updateLedger": "Actualizar Registro"
+  }
+}

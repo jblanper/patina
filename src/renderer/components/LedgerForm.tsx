@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { NewCoin } from '../../common/types';
 import { AutocompleteField } from './AutocompleteField';
 import { useVocabularies } from '../hooks/useVocabularies';
@@ -11,6 +12,7 @@ interface LedgerFormProps {
 }
 
 export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, updateField, coinId }) => {
+  const { t } = useTranslation();
   const entryLabel = coinId ? `#${String(coinId).padStart(3, '0')}` : '#NEW';
 
   const eraVocab = useVocabularies('era');
@@ -29,79 +31,79 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
           <input
             type="text"
             className={`input-h1 ${errors.title ? 'error' : ''}`}
-            placeholder="Designation"
+            placeholder={t('ledger.designation')}
             value={formData.title}
             onChange={(e) => updateField('title', e.target.value)}
           />
           {errors.title && <span className="error-hint">{errors.title}</span>}
         </div>
-        
+
         <div className="subtitle-stack">
           <div className="subtitle-item">
-            <span className="subtitle-label">Era</span>
+            <span className="subtitle-label">{t('ledger.era')}</span>
             <AutocompleteField
               field="era"
               value={formData.era || ''}
               onChange={(v) => updateField('era', v)}
               onAddNew={(v) => { eraVocab.addVocabulary(v); updateField('era', v); }}
               options={eraVocab.options}
-              placeholder="e.g. Roman Imperial"
+              placeholder={t('ledger.placeholders.era')}
               onReset={eraVocab.resetVocabularies}
               hasUserValues={false}
             />
           </div>
           <div className="subtitle-item">
-            <span className="subtitle-label">Minted at</span>
+            <span className="subtitle-label">{t('ledger.mintedAt')}</span>
             <AutocompleteField
               field="mint"
               value={formData.mint || ''}
               onChange={(v) => updateField('mint', v)}
               onAddNew={(v) => { mintVocab.addVocabulary(v); updateField('mint', v); }}
               options={mintVocab.options}
-              placeholder="City / Mint"
+              placeholder={t('ledger.placeholders.mint')}
               onReset={mintVocab.resetVocabularies}
               hasUserValues={false}
             />
           </div>
           <div className="subtitle-item">
-            <span className="subtitle-label">Year</span>
+            <span className="subtitle-label">{t('ledger.year')}</span>
             <input
               type="text"
               className="input-sub"
-              placeholder="e.g. 440 BC"
+              placeholder={t('ledger.placeholders.year')}
               value={formData.year_display || ''}
               onChange={(e) => updateField('year_display', e.target.value)}
             />
           </div>
           <div className="subtitle-item">
-            <span className="subtitle-label">Issuer</span>
+            <span className="subtitle-label">{t('ledger.issuer')}</span>
             <input
               type="text"
               className="input-sub"
-              placeholder="e.g. Probus"
+              placeholder={t('ledger.placeholders.issuer')}
               value={formData.issuer || ''}
               onChange={(e) => updateField('issuer', e.target.value)}
             />
           </div>
           <div className="subtitle-item">
-            <span className="subtitle-label">Denomination</span>
+            <span className="subtitle-label">{t('ledger.denomination')}</span>
             <AutocompleteField
               field="denomination"
               value={formData.denomination || ''}
               onChange={(v) => updateField('denomination', v)}
               onAddNew={(v) => { denominationVocab.addVocabulary(v); updateField('denomination', v); }}
               options={denominationVocab.options}
-              placeholder="e.g. Antoninianus"
+              placeholder={t('ledger.placeholders.denomination')}
               onReset={denominationVocab.resetVocabularies}
               hasUserValues={false}
             />
           </div>
           <div className="subtitle-item">
-            <span className="subtitle-label">Reference</span>
+            <span className="subtitle-label">{t('ledger.reference')}</span>
             <input
               type="text"
               className="input-sub"
-              placeholder="e.g. RIC II 218"
+              placeholder={t('ledger.placeholders.reference')}
               value={formData.catalog_ref || ''}
               onChange={(e) => updateField('catalog_ref', e.target.value)}
             />
@@ -112,74 +114,74 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
       {/* Technical Metrics */}
       <div className="metrics-grid">
         <div className="metric-item">
-          <span className="metric-label">Weight</span>
+          <span className="metric-label">{t('ledger.weight')}</span>
           <input
             type="number"
             step="0.01"
             className={`input-metric ${errors.weight ? 'error' : ''}`}
-            placeholder="00.00 g"
+            placeholder={t('ledger.placeholders.weight')}
             value={formData.weight || ''}
             onChange={(e) => updateField('weight', e.target.value ? parseFloat(e.target.value) : null)}
           />
           {errors.weight && <span className="error-hint">{errors.weight}</span>}
         </div>
         <div className="metric-item">
-          <span className="metric-label">Diameter</span>
+          <span className="metric-label">{t('ledger.diameter')}</span>
           <input
             type="number"
             step="0.1"
             className={`input-metric ${errors.diameter ? 'error' : ''}`}
-            placeholder="00.0 mm"
+            placeholder={t('ledger.placeholders.diameter')}
             value={formData.diameter || ''}
             onChange={(e) => updateField('diameter', e.target.value ? parseFloat(e.target.value) : null)}
           />
           {errors.diameter && <span className="error-hint">{errors.diameter}</span>}
         </div>
         <div className="metric-item">
-          <span className="metric-label">Die Axis</span>
+          <span className="metric-label">{t('ledger.dieAxis')}</span>
           <AutocompleteField
             field="die_axis"
             value={formData.die_axis || ''}
             onChange={(v) => updateField('die_axis', v)}
             onAddNew={(v) => { dieAxisVocab.addVocabulary(v); updateField('die_axis', v); }}
             options={dieAxisVocab.options}
-            placeholder="e.g. 6h"
+            placeholder={t('ledger.placeholders.dieAxis')}
             onReset={dieAxisVocab.resetVocabularies}
             hasUserValues={false}
           />
         </div>
         <div className="metric-item">
-          <span className="metric-label">Material</span>
+          <span className="metric-label">{t('ledger.material')}</span>
           <AutocompleteField
             field="metal"
             value={formData.metal || ''}
             onChange={(v) => updateField('metal', v)}
             onAddNew={(v) => { metalVocab.addVocabulary(v); updateField('metal', v); }}
             options={metalVocab.options}
-            placeholder="e.g. Silver"
+            placeholder={t('ledger.placeholders.material')}
             onReset={metalVocab.resetVocabularies}
             hasUserValues={false}
           />
         </div>
         <div className="metric-item">
-          <span className="metric-label">Fineness</span>
+          <span className="metric-label">{t('ledger.fineness')}</span>
           <input
             type="text"
             className="input-metric"
-            placeholder="e.g. .999"
+            placeholder={t('ledger.placeholders.fineness')}
             value={formData.fineness || ''}
             onChange={(e) => updateField('fineness', e.target.value)}
           />
         </div>
         <div className="metric-item">
-          <span className="metric-label">Grade</span>
+          <span className="metric-label">{t('ledger.grade')}</span>
           <AutocompleteField
             field="grade"
             value={formData.grade || ''}
             onChange={(v) => updateField('grade', v)}
             onAddNew={(v) => { gradeVocab.addVocabulary(v); updateField('grade', v); }}
             options={gradeVocab.options}
-            placeholder="e.g. EF-40"
+            placeholder={t('ledger.placeholders.grade')}
             onReset={gradeVocab.resetVocabularies}
             hasUserValues={false}
           />
@@ -188,34 +190,34 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
 
       {/* Numismatic Data */}
       <div className="numismatic-section">
-        <span className="section-label">Obverse</span>
+        <span className="section-label">{t('ledger.obverse')}</span>
         <input
           type="text"
           className="input-legend"
-          placeholder="LEGEND (e.g. IMP CAES HADRIANVS)"
+          placeholder={t('ledger.placeholders.obverseLegend')}
           value={formData.obverse_legend || ''}
           onChange={(e) => updateField('obverse_legend', e.target.value)}
         />
         <textarea
           className="input-block"
-          placeholder="Describe the obverse motif, portraiture, and style..."
+          placeholder={t('ledger.placeholders.obverseDesc')}
           value={formData.obverse_desc || ''}
           onChange={(e) => updateField('obverse_desc', e.target.value)}
         />
       </div>
 
       <div className="numismatic-section">
-        <span className="section-label">Reverse</span>
+        <span className="section-label">{t('ledger.reverse')}</span>
         <input
           type="text"
           className="input-legend"
-          placeholder="LEGEND (e.g. AOE)"
+          placeholder={t('ledger.placeholders.reverseLegend')}
           value={formData.reverse_legend || ''}
           onChange={(e) => updateField('reverse_legend', e.target.value)}
         />
         <textarea
           className="input-block"
-          placeholder="Describe the reverse symbols, deity, and context..."
+          placeholder={t('ledger.placeholders.reverseDesc')}
           value={formData.reverse_desc || ''}
           onChange={(e) => updateField('reverse_desc', e.target.value)}
         />
@@ -223,10 +225,10 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
 
       {/* Curator's Note */}
       <div className="numismatic-section">
-        <span className="section-label">Curator's Note</span>
+        <span className="section-label">{t('ledger.curatorsNote')}</span>
         <textarea
           className="input-block input-block-tall"
-          placeholder="Record the historical significance or unique narrative of this object..."
+          placeholder={t('ledger.placeholders.curatorsNote')}
           value={formData.story || ''}
           onChange={(e) => updateField('story', e.target.value)}
         />
@@ -234,11 +236,11 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
 
       {/* Provenance */}
       <div className="numismatic-section">
-        <span className="section-label">Provenance</span>
+        <span className="section-label">{t('ledger.provenance')}</span>
         <input
           type="text"
           className="input-metric provenance-input"
-          placeholder="e.g. Ex. BCD Collection; Purchased 2024"
+          placeholder={t('ledger.placeholders.provenance')}
           value={formData.provenance || ''}
           onChange={(e) => updateField('provenance', e.target.value)}
         />
@@ -248,27 +250,27 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
       <footer className="ledger-footer">
         <div className="metrics-grid">
           <div className="metric-item">
-            <span className="metric-label">Acquired</span>
+            <span className="metric-label">{t('ledger.acquired')}</span>
             <input
               type="text"
               className="input-metric"
-              placeholder="YYYY-MM-DD"
+              placeholder={t('ledger.placeholders.acquired')}
               value={formData.purchase_date || ''}
               onChange={(e) => updateField('purchase_date', e.target.value)}
             />
           </div>
           <div className="metric-item">
-            <span className="metric-label">Source</span>
+            <span className="metric-label">{t('ledger.source')}</span>
             <input
               type="text"
               className="input-metric"
-              placeholder="e.g. CNG Auctions"
+              placeholder={t('ledger.placeholders.source')}
               value={formData.purchase_source || ''}
               onChange={(e) => updateField('purchase_source', e.target.value)}
             />
           </div>
           <div className="metric-item">
-            <span className="metric-label">Cost</span>
+            <span className="metric-label">{t('ledger.cost')}</span>
             <input
               type="number"
               className="input-metric"

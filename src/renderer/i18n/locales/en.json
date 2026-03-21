@@ -1,0 +1,119 @@
+{
+  "sidebar": {
+    "orderBy": "Order By",
+    "sort": {
+      "year": "Year",
+      "title": "Title",
+      "acquired": "Acquired"
+    },
+    "asc": "↑ Asc",
+    "desc": "↓ Desc",
+    "eras": "Eras",
+    "era": {
+      "ancient": "Ancient",
+      "medieval": "Medieval",
+      "modern": "Modern"
+    },
+    "metals": "Metals",
+    "grade": "Grade",
+    "noMetals": "No metals indexed",
+    "noGrades": "No grades recorded",
+    "reset": "Reset Archive View",
+    "language": "Language"
+  },
+  "cabinet": {
+    "header": "Patina — The Cabinet",
+    "tagline": "Archive v1.0 // THE DISPLAY CASE",
+    "exportArchive": "Export Archive",
+    "generateCatalog": "Generate Catalog",
+    "newEntry": "+ New Entry",
+    "loading": "Synchronizing with the local archive...",
+    "objectCount_one": "{{count}} object in the ledger.",
+    "objectCount_other": "{{count}} objects in the ledger.",
+    "search": "Title, issuer, or catalog reference..."
+  },
+  "gallery": {
+    "loading": "Opening the archives...",
+    "emptyTitle": "The Ledger Awaits",
+    "emptyDesc": "Your private archive is currently empty. Begin by recording your first historical object.",
+    "emptyStatus": "Status: Index Ready // Ledger Empty",
+    "filteredTitle": "The Silent Archive",
+    "filteredDesc": "No historical entries match your current search or filter parameters.",
+    "filteredStatus": "Status: Ledger Ready // Filtered Empty",
+    "ariaLabel": "Coin Gallery"
+  },
+  "ledger": {
+    "designation": "Designation",
+    "era": "Era",
+    "mintedAt": "Minted at",
+    "year": "Year",
+    "issuer": "Issuer",
+    "denomination": "Denomination",
+    "reference": "Reference",
+    "weight": "Weight",
+    "diameter": "Diameter",
+    "dieAxis": "Die Axis",
+    "material": "Aleación",
+    "fineness": "Fineness",
+    "grade": "Grade",
+    "obverse": "Obverse",
+    "reverse": "Reverse",
+    "edge": "Edge",
+    "curatorsNote": "Curator's Note",
+    "provenance": "Provenance",
+    "acquired": "Acquired",
+    "source": "Source",
+    "cost": "Cost",
+    "placeholders": {
+      "designation": "Designation of the coin...",
+      "era": "e.g. Roman Imperial",
+      "mint": "City / Mint",
+      "year": "e.g. 440 BC",
+      "issuer": "e.g. Probus",
+      "denomination": "e.g. Antoninianus",
+      "reference": "e.g. RIC II 218",
+      "weight": "00.00 g",
+      "diameter": "00.0 mm",
+      "dieAxis": "e.g. 6h",
+      "material": "e.g. Silver",
+      "fineness": "e.g. .999",
+      "grade": "e.g. EF-40",
+      "obverseLegend": "LEGEND (e.g. IMP CAES HADRIANVS)",
+      "obverseDesc": "Describe the obverse motif, portraiture, and style...",
+      "reverseLegend": "LEGEND (e.g. AOE)",
+      "reverseDesc": "Describe the reverse symbols, deity, and context...",
+      "curatorsNote": "Record the historical significance or unique narrative of this object...",
+      "provenance": "e.g. Ex. BCD Collection; Purchased 2024",
+      "acquired": "YYYY-MM-DD",
+      "source": "e.g. CNG Auctions"
+    }
+  },
+  "detail": {
+    "loading": "Retrieving archival record...",
+    "notFound": "Record not found.",
+    "returnToCabinet": "Return to Cabinet",
+    "closeEntry": "← Close Ledger Entry",
+    "editRecord": "Edit Record",
+    "deleteRecord": "Delete Record",
+    "noImage": "No Image Available",
+    "mintedAt": "Minted at",
+    "mintUnknown": "Mint Unknown",
+    "unknownDate": "Unknown Date",
+    "acquired": "Acquired",
+    "cost": "Cost",
+    "confirm": {
+      "title": "Confirm Deletion",
+      "message": "Are you certain you wish to remove this record from the archive? This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    }
+  },
+  "scriptorium": {
+    "loading": "Consulting the archives...",
+    "closeEntry": "← Close Ledger Entry",
+    "draftPreserved": "Draft Preserved",
+    "indexing": "Indexing...",
+    "indexToLedger": "Index to Ledger",
+    "updateLedger": "Update Ledger"
+  }
+}
