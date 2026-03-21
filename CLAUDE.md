@@ -85,6 +85,10 @@ All pages are wrapped in `.app-container` from `App.tsx` (the "Sanctuary" layout
 
 All database interaction and bridge state must be encapsulated in custom hooks (`useCoins`, `useCoin`, `useCoinForm`, `useExport`, `useLens`, `useLanguage`). Components should not call `window.electronAPI` directly.
 
+- **IPC listener ownership:** A hook that registers an IPC event listener must also remove it on cleanup (`useEffect` return). Never register the same listener in multiple places — duplicate listeners cause double-fires.
+- **Derived arrays:** Use `useMemo`, not `useState`, for arrays derived from props or other state. `useState` for derived data goes stale between renders.
+- **Vocabulary cache keys** must always be `"${field}:${locale}"` — a bare `field` key causes cross-locale stale hits.
+
 ## Testing Standards
 
 **Colocation Rule:** Test files live next to the source they test.
@@ -110,6 +114,9 @@ All database interaction and bridge state must be encapsulated in custom hooks (
 - Core palette: Parchment `#FCF9F2`, Iron Gall Ink `#2D2926`, Burnt Sienna `#914E32`.
 - Typography: Cormorant Garamond (serif/headings), Montserrat (sans/UI), JetBrains Mono (metrics).
 - Use `grid-template-columns: repeat(auto-fit, minmax(min(100%, <breakpoint>), 1fr))` for responsive grids — not media query breakpoints.
+- **Grid overflow:** Always set `min-width: 0` on direct grid children. Pair with `overflow-wrap: anywhere` on text and `object-fit: contain` on images to prevent content from breaking layout.
+- **Touch targets:** Minimum 44px — use at least `0.75rem` padding on action buttons.
+- **No inline styles.** `<style jsx>` blocks caused a build failure in this project (missing peer dependency). All styles go in `index.css`.
 - Use `React.memo` and `useCallback` strategically in the Gallery grid for scroll performance.
 
 ## Core Mandates
@@ -121,6 +128,7 @@ All database interaction and bridge state must be encapsulated in custom hooks (
 - The Lens Express server: binds to local network only, UUID session token auth, validates MIME types (jpeg/png/webp), enforces 10 MB limit.
 - Nomisma.org vocabulary is fetched **once at seed time** and stored locally — no external network calls during runtime.
 - **Default language is Spanish (`'es'`).** The UI is bilingual (ES/EN) via `react-i18next`. Language preference is persisted to SQLite via `pref:get`/`pref:set` IPC. Never add hardcoded English UI strings — use translation keys.
+- **Accessibility:** Use native `<button>` for clickable items (not `<li onClick>`). In confirmation modals, Cancel must precede the destructive action in DOM order and tab sequence (WCAG 3.2.4).
 - **Single-Click Rule:** Every feature must be reachable within two clicks.
 
 ## Development Workflow
