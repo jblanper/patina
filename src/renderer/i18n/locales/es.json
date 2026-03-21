@@ -23,7 +23,7 @@
   },
   "cabinet": {
     "header": "Patina — El Gabinete",
-    "tagline": "Archivo v1.0 // EL VITRINA",
+    "tagline": "Archivo v1.0 // LA VITRINA",
     "exportArchive": "Exportar Archivo",
     "generateCatalog": "Generar Catálogo",
     "newEntry": "+ Nueva Entrada",
@@ -64,6 +64,9 @@
     "acquired": "Adquirida",
     "source": "Fuente",
     "cost": "Coste",
+    "entryLabel": "ENTRADA",
+    "newEntryId": "#NUEVA",
+    "fallbackEra": "ANTIGUO",
     "placeholders": {
       "designation": "Denominación de la moneda...",
       "era": "ej. Imperio Romano",
@@ -101,6 +104,8 @@
     "unknownDate": "Fecha Desconocida",
     "acquired": "Adquirida",
     "cost": "Coste",
+    "entryLabel": "Entrada",
+    "unknownIssuer": "Emisor Desconocido",
     "confirm": {
       "title": "Confirmar Eliminación",
       "message": "¿Está seguro de que desea eliminar este registro del archivo? Esta acción no se puede deshacer.",
@@ -115,5 +120,32 @@
     "indexing": "Indexando...",
     "indexToLedger": "Indexar al Registro",
     "updateLedger": "Actualizar Registro"
+  },
+  "plateEditor": {
+    "slots": {
+      "obverse": "Anverso (Principal)",
+      "reverse": "Reverso",
+      "edge": "Bordura"
+    },
+    "replace": "Reemplazar",
+    "establishBridge": "Activar Conexión",
+    "importArchive": "Importar del Archivo Digital",
+    "plateCaption": {
+      "obverse": "LÁMINA I",
+      "reverse": "LÁMINA II",
+      "edge": "LÁMINA III"
+    },
+    "scanHint": "Escanea con el móvil para capturar {{slot}}",
+    "closeQr": "Cerrar código QR"
+  },
+  "autocomplete": {
+    "addNew": "Agregar \u201C{{value}}\u201D",
+    "resetToDefaults": "Restablecer valores"
+  },
+  "common": {
+    "comingSoon": "Próximamente"
+  },
+  "lens": {
+    "scanPrompt": "Escanea con tu móvil\npara capturar una imagen."
   }
 }

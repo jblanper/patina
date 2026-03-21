@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLens } from '../hooks/useLens';
 import { QRCodeDisplay } from './Lens/QRCodeDisplay';
 
@@ -12,6 +13,7 @@ interface PlateEditorProps {
 }
 
 export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, images }) => {
+  const { t } = useTranslation();
   const [activeSlot, setActiveSlot] = useState<'obverse' | 'reverse' | 'edge'>('obverse');
   const [showQR, setShowQR] = useState(false);
 
@@ -28,10 +30,10 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, image
     setShowQR(true);
   };
 
-  const slots: Array<{ id: 'obverse' | 'reverse' | 'edge'; label: string }> = [
-    { id: 'obverse', label: 'Obverse (Primary)' },
-    { id: 'reverse', label: 'Reverse' },
-    { id: 'edge', label: 'Edge' }
+  const slots: Array<{ id: 'obverse' | 'reverse' | 'edge' }> = [
+    { id: 'obverse' },
+    { id: 'reverse' },
+    { id: 'edge' }
   ];
 
   return (
@@ -42,20 +44,20 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, image
             <div className="plate-frame-edit">
               {images[slot.id] ? (
                 <>
-                  <img 
-                    src={`patina-img://${images[slot.id]}`} 
-                    alt={slot.label} 
+                  <img
+                    src={`patina-img://${images[slot.id]}`}
+                    alt={t(`plateEditor.slots.${slot.id}`)}
                     className="plate-preview-img"
                   />
                   <div className="lens-cta-overlay">
-                    <button 
+                    <button
                       className="btn-lens-primary"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleStartLens(slot.id);
                       }}
                     >
-                      Replace
+                      {t('plateEditor.replace')}
                     </button>
                   </div>
                 </>
@@ -67,21 +69,21 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, image
                       <circle cx="12" cy="13" r="4" />
                     </svg>
                   </div>
-                  <button 
+                  <button
                     className="btn-lens-primary"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleStartLens(slot.id);
                     }}
                   >
-                    Establish Wireless Bridge
+                    {t('plateEditor.establishBridge')}
                   </button>
-                  <button className="btn-lens-minimal" disabled title="Coming soon">Import from Digital Archive</button>
+                  <button className="btn-lens-minimal" disabled title={t('common.comingSoon')}>{t('plateEditor.importArchive')}</button>
                 </div>
               )}
             </div>
             <div className="plate-caption">
-              {slot.id === 'obverse' ? 'PLATE I' : slot.id === 'reverse' ? 'PLATE II' : 'PLATE III'} // {slot.label.toUpperCase()}
+              {t(`plateEditor.plateCaption.${slot.id}`)} // {t(`plateEditor.slots.${slot.id}`).toUpperCase()}
             </div>
           </div>
         ))}
@@ -90,9 +92,9 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ onImageCaptured, image
       {showQR && url && (
         <div className="qr-overlay" role="dialog" aria-modal="true" onClick={() => setShowQR(false)}>
           <div className="qr-container" onClick={(e) => e.stopPropagation()}>
-            <button className="qr-close" onClick={() => setShowQR(false)} aria-label="Close QR code">×</button>
+            <button className="qr-close" onClick={() => setShowQR(false)} aria-label={t('plateEditor.closeQr')}>×</button>
             <QRCodeDisplay url={url} />
-            <p className="qr-hint">Scan with mobile to capture <strong>{activeSlot.toUpperCase()}</strong></p>
+            <p className="qr-hint">{t('plateEditor.scanHint', { slot: t(`plateEditor.slots.${activeSlot}`).toUpperCase() })}</p>
           </div>
         </div>
       )}

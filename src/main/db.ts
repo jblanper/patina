@@ -136,6 +136,22 @@ function getSeedEntries(): Array<{ field: string; value: string; locale: string;
     { field: 'mint', value: 'Aquileia', locale: en, usage_count: 15 },
     { field: 'mint', value: 'Carthage', locale: en, usage_count: 12 },
     { field: 'mint', value: 'Ephesus', locale: en, usage_count: 12 },
+
+    { field: 'mint', value: 'Roma', locale: es, usage_count: 100 },
+    { field: 'mint', value: 'Constantinopla', locale: es, usage_count: 60 },
+    { field: 'mint', value: 'Antioquía', locale: es, usage_count: 45 },
+    { field: 'mint', value: 'Alejandría', locale: es, usage_count: 40 },
+    { field: 'mint', value: 'Lugdunum', locale: es, usage_count: 30 },
+    { field: 'mint', value: 'Siscia', locale: es, usage_count: 25 },
+    { field: 'mint', value: 'Mediolanum', locale: es, usage_count: 22 },
+    { field: 'mint', value: 'Tesalónica', locale: es, usage_count: 20 },
+    { field: 'mint', value: 'Nicomedia', locale: es, usage_count: 20 },
+    { field: 'mint', value: 'Atenas', locale: es, usage_count: 20 },
+    { field: 'mint', value: 'Cízico', locale: es, usage_count: 18 },
+    { field: 'mint', value: 'Ticinum', locale: es, usage_count: 15 },
+    { field: 'mint', value: 'Aquileya', locale: es, usage_count: 15 },
+    { field: 'mint', value: 'Cartago', locale: es, usage_count: 12 },
+    { field: 'mint', value: 'Éfeso', locale: es, usage_count: 12 },
   ];
 }
 
@@ -272,9 +288,15 @@ export const dbService = {
     if (!ALLOWED_VOCAB_FIELDS.includes(field)) {
       throw new Error(`Invalid vocabulary field: ${field}`);
     }
-    const rows = db.prepare(
+    const stmt = db.prepare(
       'SELECT value FROM vocabularies WHERE field = ? AND locale = ? ORDER BY usage_count DESC, value ASC'
-    ).all(field, locale) as { value: string }[];
+    );
+    const rows = stmt.all(field, locale) as { value: string }[];
+    if (rows.length === 0 && locale !== 'en') {
+      // Field has no locale-specific entries — fall back to English
+      const fallback = stmt.all(field, 'en') as { value: string }[];
+      return fallback.map(r => r.value);
+    }
     return rows.map(r => r.value);
   },
 
@@ -291,15 +313,23 @@ export const dbService = {
     if (!ALLOWED_VOCAB_FIELDS.includes(field)) {
       throw new Error(`Invalid vocabulary field: ${field}`);
     }
+    const resolvedLocale = ((): 'en' | 'es' => {
+      if (locale === 'en') return 'en';
+      // Check whether this field has any locale-specific entries
+      const probe = db.prepare(
+        'SELECT 1 FROM vocabularies WHERE field = ? AND locale = ? LIMIT 1'
+      ).get(field, locale);
+      return probe ? locale as 'en' | 'es' : 'en';
+    })();
     if (!query) {
       const rows = db.prepare(
         'SELECT value FROM vocabularies WHERE field = ? AND locale = ? ORDER BY usage_count DESC, value ASC'
-      ).all(field, locale) as { value: string }[];
+      ).all(field, resolvedLocale) as { value: string }[];
       return rows.map(r => r.value);
     }
     const rows = db.prepare(
       "SELECT value FROM vocabularies WHERE field = ? AND locale = ? AND value LIKE ? ESCAPE '\\' ORDER BY usage_count DESC, value ASC"
-    ).all(field, locale, `%${query.replace(/[%_\\]/g, '\\$&')}%`) as { value: string }[];
+    ).all(field, resolvedLocale, `%${query.replace(/[%_\\]/g, '\\$&')}%`) as { value: string }[];
     return rows.map(r => r.value);
   },
 
@@ -342,7 +372,7 @@ export const dbService = {
   },
 
   seedVocabularies: (): void => {
-    const CURRENT_SEED_VERSION = '6b.1';
+    const CURRENT_SEED_VERSION = '6b.2';
     const row = db.prepare('SELECT value FROM preferences WHERE key = ?').get('vocab_seeded_version') as { value: string } | undefined;
     if (row?.value === CURRENT_SEED_VERSION) return;
 

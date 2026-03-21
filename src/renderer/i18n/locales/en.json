@@ -53,7 +53,7 @@
     "weight": "Weight",
     "diameter": "Diameter",
     "dieAxis": "Die Axis",
-    "material": "Aleación",
+    "material": "Material",
     "fineness": "Fineness",
     "grade": "Grade",
     "obverse": "Obverse",
@@ -64,6 +64,9 @@
     "acquired": "Acquired",
     "source": "Source",
     "cost": "Cost",
+    "entryLabel": "ENTRY",
+    "newEntryId": "#NEW",
+    "fallbackEra": "ANCIENT",
     "placeholders": {
       "designation": "Designation of the coin...",
       "era": "e.g. Roman Imperial",
@@ -101,6 +104,8 @@
     "unknownDate": "Unknown Date",
     "acquired": "Acquired",
     "cost": "Cost",
+    "entryLabel": "Entry",
+    "unknownIssuer": "Unknown Issuer",
     "confirm": {
       "title": "Confirm Deletion",
       "message": "Are you certain you wish to remove this record from the archive? This action cannot be undone.",
@@ -115,5 +120,32 @@
     "indexing": "Indexing...",
     "indexToLedger": "Index to Ledger",
     "updateLedger": "Update Ledger"
+  },
+  "plateEditor": {
+    "slots": {
+      "obverse": "Obverse (Primary)",
+      "reverse": "Reverse",
+      "edge": "Edge"
+    },
+    "replace": "Replace",
+    "establishBridge": "Activate Connection",
+    "importArchive": "Import from Digital Archive",
+    "plateCaption": {
+      "obverse": "PLATE I",
+      "reverse": "PLATE II",
+      "edge": "PLATE III"
+    },
+    "scanHint": "Scan with mobile to capture {{slot}}",
+    "closeQr": "Close QR code"
+  },
+  "autocomplete": {
+    "addNew": "Add \u201C{{value}}\u201D",
+    "resetToDefaults": "Reset to defaults"
+  },
+  "common": {
+    "comingSoon": "Coming soon"
+  },
+  "lens": {
+    "scanPrompt": "Scan with your mobile device\nto capture an image."
   }
 }

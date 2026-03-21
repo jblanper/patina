@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { VocabField } from '../../common/validation';
 
 interface AutocompleteFieldProps {
@@ -24,6 +25,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   onReset,
   hasUserValues,
 }) => {
+  const { t } = useTranslation();
   const id = useId();
   const listboxId = `autocomplete-listbox-${id}`;
 
@@ -243,7 +245,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
               handleAddNew();
             }}
           >
-            Add &ldquo;{inputValue.trim()}&rdquo;
+            {t('autocomplete.addNew', { value: inputValue.trim() })}
           </li>
         )}
 
@@ -258,7 +260,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
                 close();
               }}
             >
-              Reset to defaults
+              {t('autocomplete.resetToDefaults')}
             </button>
           </li>
         )}

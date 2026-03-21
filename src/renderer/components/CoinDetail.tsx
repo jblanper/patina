@@ -120,7 +120,7 @@ export const CoinDetail: React.FC = () => {
         <div className="right-folio">
            <header className="folio-header">
              <span className="meta-line">
-               Entry #{String(coin.id).padStart(3, '0')} // {coin.era} // {coin.issuer || 'Unknown Issuer'}
+               {t('detail.entryLabel')} #{String(coin.id).padStart(3, '0')} // {coin.era} // {coin.issuer || t('detail.unknownIssuer')}
              </span>
              <h1 className="folio-title">{coin.title}</h1>
              <div className="subtitle">

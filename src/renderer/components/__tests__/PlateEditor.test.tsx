@@ -4,7 +4,7 @@ import * as useLensHook from '../../hooks/useLens';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 vi.mock('../../hooks/useLens');
-vi.mock('./Lens/QRCodeDisplay', () => ({
+vi.mock('../Lens/QRCodeDisplay', () => ({
   QRCodeDisplay: ({ url }: { url: string }) => <div data-testid="qr-code">{url}</div>
 }));
 
@@ -30,7 +30,7 @@ describe('PlateEditor', () => {
     expect(screen.getAllByText(/PLATE III/)[0]).toBeInTheDocument();
   });
 
-  it('should show "Establish Wireless Bridge" buttons when no images exist', () => {
+  it('should show "Activate Connection" buttons when no images exist', () => {
     (useLensHook.useLens as any).mockReturnValue({
       status: 'idle',
       url: null,
@@ -40,7 +40,7 @@ describe('PlateEditor', () => {
 
     render(<PlateEditor onImageCaptured={mockOnImageCaptured} images={{}} />);
 
-    const buttons = screen.getAllByText('Establish Wireless Bridge');
+    const buttons = screen.getAllByText('Activate Connection');
     expect(buttons).toHaveLength(3);
   });
 
@@ -53,14 +53,14 @@ describe('PlateEditor', () => {
     });
 
     render(
-      <PlateEditor 
-        onImageCaptured={mockOnImageCaptured} 
-        images={{ obverse: 'path/to/obverse.jpg' }} 
+      <PlateEditor
+        onImageCaptured={mockOnImageCaptured}
+        images={{ obverse: 'path/to/obverse.jpg' }}
       />
     );
 
     expect(screen.getByText('Replace')).toBeInTheDocument();
-    expect(screen.getAllByText('Establish Wireless Bridge')).toHaveLength(2);
+    expect(screen.getAllByText('Activate Connection')).toHaveLength(2);
   });
 
   it('should render disabled "Import from Digital Archive" buttons', () => {
@@ -81,7 +81,7 @@ describe('PlateEditor', () => {
     });
   });
 
-  it('should call startLens when "Establish Wireless Bridge" is clicked', async () => {
+  it('should call startLens when "Activate Connection" is clicked', async () => {
     const mockStartLens = vi.fn().mockResolvedValue(undefined);
     (useLensHook.useLens as any).mockReturnValue({
       status: 'idle',
@@ -92,7 +92,7 @@ describe('PlateEditor', () => {
 
     render(<PlateEditor onImageCaptured={mockOnImageCaptured} images={{}} />);
 
-    const buttons = screen.getAllByText('Establish Wireless Bridge');
+    const buttons = screen.getAllByText('Activate Connection');
     fireEvent.click(buttons[0]);
 
     await waitFor(() => {
@@ -146,7 +146,7 @@ describe('PlateEditor', () => {
       stopLens: vi.fn()
     });
 
-    const buttons = screen.getAllByText('Establish Wireless Bridge');
+    const buttons = screen.getAllByText('Activate Connection');
     fireEvent.click(buttons[0]);
 
     rerender(<PlateEditor onImageCaptured={mockOnImageCaptured} images={{}} />);

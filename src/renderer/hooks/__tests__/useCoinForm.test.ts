@@ -16,7 +16,7 @@ describe('useCoinForm', () => {
   it('should initialize with default state', () => {
     const { result } = renderHook(() => useCoinForm());
     expect(result.current.formData.title).toBe('');
-    expect(result.current.formData.era).toBe('Ancient');
+    expect(result.current.formData.era).toBe('');
   });
 
   it('should update fields correctly', () => {
@@ -79,6 +79,7 @@ describe('useCoinForm', () => {
 
     act(() => {
       result.current.updateField('title', 'Valid Coin');
+      result.current.updateField('era', 'Roman Imperial');
       result.current.updateImage('obverse', 'path/to/img.jpg');
     });
 

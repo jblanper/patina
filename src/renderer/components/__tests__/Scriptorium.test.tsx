@@ -46,7 +46,7 @@ describe('Scriptorium', () => {
 
     // Left folio: Plate Editor
     expect(screen.getAllByText(/PLATE I/i)).toBeDefined();
-    expect(screen.getAllByText(/Establish Wireless Bridge/i)).toBeDefined();
+    expect(screen.getAllByText(/Activate Connection/i)).toBeDefined();
 
     // Right folio: Ledger Form
     expect(screen.getByPlaceholderText(/Designation/i)).toBeDefined();

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { QRCodeSVG } from 'qrcode.react';
 
 interface QRCodeDisplayProps {
@@ -6,6 +7,8 @@ interface QRCodeDisplayProps {
 }
 
 export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ url }) => {
+  const { t } = useTranslation();
+  const [line1, line2] = t('lens.scanPrompt').split('\n');
   return (
     <div style={{
       display: 'flex',
@@ -33,7 +36,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ url }) => {
         fontSize: '1.1rem',
         textAlign: 'center'
       }}>
-        Scan with your mobile device<br/>to capture an image.
+        {line1}<br/>{line2}
       </p>
     </div>
   );

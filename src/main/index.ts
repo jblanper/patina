@@ -137,7 +137,10 @@ app.whenReady().then(() => {
       lensServer.stop();
     }
 
+    const locale = (dbService.getPreference('language') ?? 'es') as 'en' | 'es';
+
     lensServer = createLensServer({
+      locale,
       onUpload: (filePath) => {
         // Notify all windows (usually just one)
         BrowserWindow.getAllWindows().forEach(win => {

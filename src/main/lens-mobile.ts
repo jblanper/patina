@@ -1,3 +1,24 @@
+interface LensStrings {
+  uploading: string;
+  success: string;
+  scriptError: string;
+}
+
+function getLensStrings(): LensStrings {
+  try {
+    const raw = (document.body as HTMLElement & { dataset: DOMStringMap }).dataset.strings;
+    if (raw) return JSON.parse(raw) as LensStrings;
+  } catch { /* fall through */ }
+  // Fallback to Spanish (app default) if attribute missing or unparseable
+  return {
+    uploading: 'Subiendo...',
+    success: 'Añadido al Registro.',
+    scriptError: 'Error al cargar el script. Recarga e inténtalo de nuevo.',
+  };
+}
+
+const STRINGS = getLensStrings();
+
 async function uploadFile(input: HTMLInputElement) {
   const file = input.files?.[0];
   if (!file) return;
@@ -8,23 +29,23 @@ async function uploadFile(input: HTMLInputElement) {
   const formData = new FormData();
   formData.append('image', file);
 
-  statusEl.innerText = 'Uploading...';
+  statusEl.innerText = STRINGS.uploading;
   statusEl.className = '';
   statusEl.style.display = 'block';
 
   try {
     const token = window.location.pathname.split('/')[2];
     const uploadUrl = window.location.origin + '/lens/' + token + '/upload';
-    
+
     const res = await fetch(uploadUrl, {
       method: 'POST',
       body: formData
     });
-    
+
     const responseText = await res.text();
-    
+
     if (res.ok) {
-      statusEl.innerText = 'Added to Ledger.';
+      statusEl.innerText = STRINGS.success;
       statusEl.className = 'success';
       input.value = '';
     } else {
@@ -58,7 +79,7 @@ window.addEventListener('error', function(e: Event) {
   if (target?.src?.includes('lens-script')) {
     const statusEl = document.getElementById('status');
     if (statusEl) {
-      statusEl.innerText = 'Script failed to load. Refresh and try again.';
+      statusEl.innerText = STRINGS.scriptError;
       statusEl.className = 'error';
     }
   }

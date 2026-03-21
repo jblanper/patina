@@ -2,6 +2,9 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useVocabularies, clearVocabCache } from '../useVocabularies';
 
+// useLanguage depends on react-i18next which is mocked globally in setupTests.ts
+// The global mock returns language: 'en', so all vocab cache keys will be 'field:en'
+
 const mockGetVocab = window.electronAPI.getVocab as ReturnType<typeof vi.fn>;
 const mockAddVocabEntry = window.electronAPI.addVocabEntry as ReturnType<typeof vi.fn>;
 const mockIncrementVocabUsage = window.electronAPI.incrementVocabUsage as ReturnType<typeof vi.fn>;
@@ -188,8 +191,8 @@ describe('useVocabularies — caching', () => {
     await waitFor(() => expect(r2.current.isLoading).toBe(false));
 
     expect(mockGetVocab).toHaveBeenCalledTimes(2);
-    expect(mockGetVocab).toHaveBeenCalledWith('metal');
-    expect(mockGetVocab).toHaveBeenCalledWith('grade');
+    expect(mockGetVocab).toHaveBeenCalledWith('metal', 'en');
+    expect(mockGetVocab).toHaveBeenCalledWith('grade', 'en');
   });
 });
 

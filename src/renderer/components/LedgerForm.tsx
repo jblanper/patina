@@ -13,7 +13,7 @@ interface LedgerFormProps {
 
 export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, updateField, coinId }) => {
   const { t } = useTranslation();
-  const entryLabel = coinId ? `#${String(coinId).padStart(3, '0')}` : '#NEW';
+  const entryLabel = coinId ? `#${String(coinId).padStart(3, '0')}` : t('ledger.newEntryId');
 
   const eraVocab = useVocabularies('era');
   const mintVocab = useVocabularies('mint');
@@ -25,7 +25,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
     <div className="right-folio">
       <div className="folio-header">
         <span className="meta-line">
-          ENTRY {entryLabel} // {formData.era?.toUpperCase() || 'ANCIENT'} // {formData.metal?.toUpperCase() || '—'}
+          {t('ledger.entryLabel')} {entryLabel} // {formData.era?.toUpperCase() || t('ledger.fallbackEra')} // {formData.metal?.toUpperCase() || '—'}
         </span>
         <div className="input-group">
           <input

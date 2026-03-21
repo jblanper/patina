@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { VocabField } from '../../common/validation';
+import { useLanguage } from './useLanguage';
 
 interface UseVocabulariesReturn {
   options: string[];
@@ -10,21 +11,26 @@ interface UseVocabulariesReturn {
   resetVocabularies: () => Promise<void>;
 }
 
-// Simple in-memory cache keyed by field name
-const cache = new Map<VocabField, string[]>();
+// Module-level cache — composite key prevents stale locale entries
+const cache = new Map<string, string[]>();
 
-/** Clears the vocabulary cache — use in tests only. */
+/** Clears the vocabulary cache for a field (all locales) or entirely. */
 export function clearVocabCache(field?: VocabField) {
   if (field) {
-    cache.delete(field);
+    for (const key of cache.keys()) {
+      if (key.startsWith(`${field}:`)) cache.delete(key);
+    }
   } else {
     cache.clear();
   }
 }
 
 export function useVocabularies(field: VocabField): UseVocabulariesReturn {
-  const [options, setOptions] = useState<string[]>(() => cache.get(field) ?? []);
-  const [isLoading, setIsLoading] = useState(!cache.has(field));
+  const { language } = useLanguage();
+  const cacheKey = `${field}:${language}`;
+
+  const [options, setOptions] = useState<string[]>(() => cache.get(cacheKey) ?? []);
+  const [isLoading, setIsLoading] = useState(!cache.has(cacheKey));
   const [error, setError] = useState<string | null>(null);
   const isMounted = useRef(true);
 
@@ -36,9 +42,9 @@ export function useVocabularies(field: VocabField): UseVocabulariesReturn {
   const fetchOptions = useCallback(async () => {
     setIsLoading(true);
     try {
-      const result = await window.electronAPI.getVocab(field);
+      const result = await window.electronAPI.getVocab(field, language);
       if (!isMounted.current) return;
-      cache.set(field, result);
+      cache.set(cacheKey, result);
       setOptions(result);
       setError(null);
     } catch (err) {
@@ -47,21 +53,22 @@ export function useVocabularies(field: VocabField): UseVocabulariesReturn {
     } finally {
       if (isMounted.current) setIsLoading(false);
     }
-  }, [field]);
+  }, [field, language, cacheKey]);
 
   useEffect(() => {
-    if (!cache.has(field)) {
+    if (!cache.has(cacheKey)) {
       fetchOptions();
     } else {
+      setOptions(cache.get(cacheKey)!);
       setIsLoading(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [field]);
+  }, [field, language, cacheKey]);
 
   const addVocabulary = useCallback(
     async (value: string) => {
       await window.electronAPI.addVocabEntry(field, value);
-      cache.delete(field);
+      clearVocabCache(field);
       await fetchOptions();
     },
     [field, fetchOptions],
@@ -77,7 +84,7 @@ export function useVocabularies(field: VocabField): UseVocabulariesReturn {
   const resetVocabularies = useCallback(async () => {
     try {
       await window.electronAPI.resetVocab(field);
-      cache.delete(field);
+      clearVocabCache(field);
       await fetchOptions();
     } catch (err) {
       if (isMounted.current) {

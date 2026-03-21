@@ -12,7 +12,7 @@ interface CoinFormState extends NewCoin {
 
 const DEFAULT_STATE: CoinFormState = {
   title: '',
-  era: 'Ancient',
+  era: '',
   images: {}
 };
 
