@@ -50,7 +50,7 @@ src/common/      ← Shared types and validation (used by both)
 
 **The Bridge:** `src/main/preload.ts` exposes `window.electronAPI` via `contextBridge`. The Renderer may ONLY communicate with Main through this typed API — never through raw IPC or Node.js.
 
-**Image Protocol:** Images are served via the custom `patina-img://` protocol, not `file://`. This preserves the sandbox and CSP. Store image paths as relative paths from `data/images/coins/` — never as absolute paths.
+**Image Protocol:** Images are served via the custom `patina-img://` protocol, not `file://`. This preserves the sandbox and CSP. Store image paths as relative paths from `data/images/coins/` — never as absolute paths. Protocol handlers must use async file reads (`fs.promises.readFile`) — never block the main process with sync reads.
 
 ### Key Files
 
@@ -88,6 +88,7 @@ All database interaction and bridge state must be encapsulated in custom hooks (
 - **IPC listener ownership:** A hook that registers an IPC event listener must also remove it on cleanup (`useEffect` return). Never register the same listener in multiple places — duplicate listeners cause double-fires.
 - **Derived arrays:** Use `useMemo`, not `useState`, for arrays derived from props or other state. `useState` for derived data goes stale between renders.
 - **Vocabulary cache keys** must always be `"${field}:${locale}"` — a bare `field` key causes cross-locale stale hits.
+- **Glossary drawer state** is managed by `GlossaryContext` + `useGlossaryDrawer`. `App.tsx` provides the context and renders `GlossaryDrawer` at the root. Components call `useGlossaryDrawer().open(fieldId)` — never manage drawer state locally.
 
 ## Testing Standards
 
@@ -107,6 +108,10 @@ All database interaction and bridge state must be encapsulated in custom hooks (
 
 **Express server testing:** Use `supertest` against the exported `createApp()` factory from `src/main/server.ts` to test the Lens in isolation without starting Electron.
 
+**Vocabulary tests:** Call `clearVocabCache()` (exported for tests only) in `beforeEach` when testing any component that uses `useVocabularies` — the hook uses a module-level cache that persists across tests.
+
+**i18n composition:** `src/renderer/i18n/__tests__/translations.test.ts` enforces key parity between `en.json` and `es.json`. When adding keys to one locale, always add them to both.
+
 ## Styling Rules
 
 - **Vanilla CSS only** in `src/renderer/styles/index.css`. No Tailwind, styled-components, or CSS modules.
@@ -121,23 +126,72 @@ All database interaction and bridge state must be encapsulated in custom hooks (
 
 ## Core Mandates
 
+### Security
 - `contextIsolation: true` and `sandbox: true` are non-negotiable.
-- `strict: true` in TypeScript. No `any` — use `unknown` with type guards.
+- Only expose specific, validated functions through `contextBridge`. Never expose raw IPC or Node.js modules.
+- Protocol handlers must implement strict path sanitization (block `..` traversal).
+- The Lens Express server: binds to local network only, UUID session token auth, `helmet` middleware, CORS restricted to localhost. MIME allowlist: `image/jpeg`, `image/png`, `image/webp` only — SVG is explicitly blocked (script injection risk). 10 MB file size limit. All multipart data validated with Zod.
+
+### TypeScript
+- `strict: true` is mandatory. No `any` — use `unknown` with type guards.
+- Prefer `const` and `readonly`. Use functional patterns for data transformations.
 - All domain models in `src/common/types.ts`; all Zod schemas in `src/common/validation.ts`.
+
+### Dependencies
+- Always commit `package-lock.json`. Never use `--no-package-lock`.
+- Use caret (`^`) versioning. Run `npm audit` regularly; address HIGH/CVE issues within 48 hours.
 - Native module `better-sqlite3` must be rebuilt for Electron ABI using `@electron/rebuild` after version changes.
-- The Lens Express server: binds to local network only, UUID session token auth, validates MIME types (jpeg/png/webp), enforces 10 MB limit.
+- Electron, better-sqlite3, express, zod, and react-error-boundary require extended testing before upgrade.
+
+### Database & Files
+- SQLite: WAL mode, `foreign_keys = ON` (required for cascade deletes).
+- Add new tables to the `SCHEMA` array in `src/common/schema.ts` — never as raw SQL in `db.ts`.
+- New coins default to `era: 'Ancient'` — enforced in both `schema.ts` and `useCoinForm.ts`.
+- Store image paths as relative to `data/images/`. Never use absolute paths in the database.
+- When deleting a coin, clean up associated image files from the filesystem (`deleteCoin()` handles this).
+- Lens file saves must use atomic move/write operations to prevent data loss.
+
+### Vocabulary System
+- Six fields use the vocabulary system: `metal`, `denomination`, `grade`, `era`, `die_axis`, `mint`. `ALLOWED_VOCAB_FIELDS` in `src/common/validation.ts` is the single source of truth — never interpolate a `field` string directly into SQL.
+- Bump `CURRENT_SEED_VERSION` to trigger a re-seed on next launch. `INSERT OR IGNORE` preserves user-modified values across re-seeds.
+- Vocab-backed form fields use `AutocompleteField` + `useVocabularies(field)`. `incrementUsage` is fire-and-forget — never block the UI on it.
+
+### Internationalization
+- Default language is Spanish (`'es'`). Never add hardcoded English UI strings — use `t('namespace.key')`.
+- Use `useLanguage` hook to change language. Never call `i18n.changeLanguage` directly from components.
+- Use `'—'` for empty header/meta-line fields. Never use a translation key as a fallback — it falsely implies a value is set.
+- Lens server locale: read preference in `lens:start`, pass to `createLensServer()`, embed client strings as JSON in `data-strings` on `<body>` (CSP-compliant).
 - Nomisma.org vocabulary is fetched **once at seed time** and stored locally — no external network calls during runtime.
-- **Default language is Spanish (`'es'`).** The UI is bilingual (ES/EN) via `react-i18next`. Language preference is persisted to SQLite via `pref:get`/`pref:set` IPC. Never add hardcoded English UI strings — use translation keys.
-- **Accessibility:** Use native `<button>` for clickable items (not `<li onClick>`). In confirmation modals, Cancel must precede the destructive action in DOM order and tab sequence (WCAG 3.2.4).
-- **Single-Click Rule:** Every feature must be reachable within two clicks.
+
+### Accessibility
+- Use native `<button>` for clickable items (not `<li onClick>`).
+- In confirmation modals, Cancel must precede the destructive action in DOM order and tab sequence (WCAG 3.2.4).
+
+### Single-Click Rule
+Every feature must be reachable within two clicks.
+
+## Error Handling
+
+All async operations must use try/catch with descriptive messages. Never use empty catch blocks.
+
+```typescript
+try {
+  const result = await someAsyncOperation();
+  return result;
+} catch (error) {
+  throw new Error(`Operation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+}
+```
+
+Wrap critical component trees in `ErrorBoundary` (from `react-error-boundary`). Use `resetErrorBoundary()` for scoped recovery — never `window.location.reload()`.
 
 ## Development Workflow
 
-New features require a blueprint in `docs/blueprints/` following the 7-stage lifecycle (`Draft → Proposed → Approved → In-Progress → Verification → Completed → Archived`). Blueprints undergo multi-disciplinary audits at **Proposed** (design) and **Verification** (post-implementation) stages. See `docs/workflows_and_skills.md` for the full workflow and `docs/reference/cli_extensions.md` for the specialized skills available to assist with each domain.
+New features require a blueprint in `docs/blueprints/` following the 7-stage lifecycle (`Draft → Proposed → Approved → In-Progress → Verification → Completed → Archived`). Blueprints undergo multi-disciplinary audits at **Proposed** (design) and **Verification** (post-implementation) stages. Before implementing any numismatic feature, research historical standards (Numista, PCGS, museum cataloging). See `docs/workflows_and_skills.md` for the full workflow and `docs/reference/cli_extensions.md` for the specialized skills available to assist with each domain.
 
 ## Relevant Documentation
 
-- `AGENTS.md` — Engineering mandates (authoritative)
+- `AGENTS.md` — Engineering mandates (authoritative, full detail)
 - `docs/technical_plan.md` — Implementation roadmap and current phase status
 - `docs/style_guide.md` — Design system reference
 - `docs/architecture/security_data_flow.md` — "The Filter" security pattern
