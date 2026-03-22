@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FilterState } from '../../common/validation';
 import { LanguageSelector } from './LanguageSelector';
@@ -10,6 +10,8 @@ interface PatinaSidebarProps {
   availableMetals: string[];
   availableGrades: string[];
 }
+
+const TRUNCATION_THRESHOLD = 8;
 
 const ERAS = [
   { value: 'Ancient',  labelKey: 'sidebar.era.ancient'  },
@@ -32,6 +34,9 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const [metalsExpanded, setMetalsExpanded] = useState(false);
+  const [gradeExpanded,  setGradeExpanded]  = useState(false);
+
   const SORT_OPTIONS = [
     { label: t('sidebar.sort.year'),     value: 'year_numeric'  },
     { label: t('sidebar.sort.title'),    value: 'title'         },
@@ -49,6 +54,57 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
 
   const isSelected = (key: 'era' | 'metal' | 'grade', value: string) => {
     return (filters[key] as string[]).includes(value);
+  };
+
+  const renderOverflowGroup = (
+    key: 'metal' | 'grade',
+    values: string[],
+    expanded: boolean,
+    setExpanded: (v: boolean) => void,
+    ariaLabel: (v: string) => string
+  ) => {
+    const active   = values.filter(v => isSelected(key, v));
+    const inactive = values.filter(v => !isSelected(key, v));
+    const ordered  = [...active, ...inactive];
+
+    const shouldTruncate = ordered.length > TRUNCATION_THRESHOLD;
+    const visible        = shouldTruncate && !expanded
+      ? ordered.slice(0, TRUNCATION_THRESHOLD)
+      : ordered;
+    const hiddenCount    = ordered.length - TRUNCATION_THRESHOLD;
+
+    return (
+      <>
+        <div className={`filter-overflow-wrap${shouldTruncate && !expanded ? ' truncated' : ''}`}>
+          <ul className="filter-list">
+            {visible.map(value => (
+              <li key={value}>
+                <label className={`filter-item-label ${isSelected(key, value) ? 'active' : ''}`}>
+                  <input
+                    type="checkbox"
+                    className="filter-input"
+                    checked={isSelected(key, value)}
+                    onChange={() => toggleFilter(key, value)}
+                    aria-label={ariaLabel(value)}
+                  />
+                  <span className="filter-checkbox" aria-hidden="true"></span>
+                  <span className="filter-text">{key === 'metal' ? value.toUpperCase() : value}</span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {shouldTruncate && (
+          <button
+            className="filter-show-more"
+            onClick={() => setExpanded(!expanded)}
+            aria-expanded={expanded}
+          >
+            {expanded ? t('sidebar.showLess') : t('sidebar.showMore', { count: hiddenCount })}
+          </button>
+        )}
+      </>
+    );
   };
 
   return (
@@ -110,52 +166,36 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
 
       <div className="filter-group">
         <span className="type-meta filter-label">{t('sidebar.metals')}</span>
-        <ul className="filter-list">
-          {availableMetals.length > 0 ? (
-            availableMetals.map(metal => (
-              <li key={metal}>
-                <label className={`filter-item-label ${isSelected('metal', metal) ? 'active' : ''}`}>
-                  <input
-                    type="checkbox"
-                    className="filter-input"
-                    checked={isSelected('metal', metal)}
-                    onChange={() => toggleFilter('metal', metal)}
-                    aria-label={`Filter by ${metal} metal`}
-                  />
-                  <span className="filter-checkbox" aria-hidden="true"></span>
-                  <span className="filter-text">{metal.toUpperCase()}</span>
-                </label>
-              </li>
-            ))
-          ) : (
+        {availableMetals.length > 0 ? (
+          renderOverflowGroup(
+            'metal',
+            availableMetals,
+            metalsExpanded,
+            setMetalsExpanded,
+            v => `Filter by ${v} metal`
+          )
+        ) : (
+          <ul className="filter-list">
             <li className="filter-item disabled">{t('sidebar.noMetals')}</li>
-          )}
-        </ul>
+          </ul>
+        )}
       </div>
 
       <div className="filter-group">
         <span className="type-meta filter-label">{t('sidebar.grade')}</span>
-        <ul className="filter-list">
-          {availableGrades.length > 0 ? (
-            availableGrades.map(grade => (
-              <li key={grade}>
-                <label className={`filter-item-label ${isSelected('grade', grade) ? 'active' : ''}`}>
-                  <input
-                    type="checkbox"
-                    className="filter-input"
-                    checked={isSelected('grade', grade)}
-                    onChange={() => toggleFilter('grade', grade)}
-                    aria-label={`Filter by grade ${grade}`}
-                  />
-                  <span className="filter-checkbox" aria-hidden="true"></span>
-                  <span className="filter-text">{grade}</span>
-                </label>
-              </li>
-            ))
-          ) : (
+        {availableGrades.length > 0 ? (
+          renderOverflowGroup(
+            'grade',
+            availableGrades,
+            gradeExpanded,
+            setGradeExpanded,
+            v => `Filter by grade ${v}`
+          )
+        ) : (
+          <ul className="filter-list">
             <li className="filter-item disabled">{t('sidebar.noGrades')}</li>
-          )}
-        </ul>
+          </ul>
+        )}
       </div>
 
       <div className="sidebar-footer">

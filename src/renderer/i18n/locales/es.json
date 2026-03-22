@@ -18,6 +18,8 @@
     "grade": "Grado",
     "noMetals": "Sin metales indexados",
     "noGrades": "Sin grados registrados",
+    "showMore": "Mostrar {{count}} más",
+    "showLess": "Mostrar menos",
     "reset": "Restablecer Filtros",
     "language": "Idioma"
   },

@@ -355,6 +355,43 @@ main {
   color: var(--text-ink);
 }
 
+/* ── Filter Overflow: The Soft Reveal ─────────────────────── */
+
+.filter-overflow-wrap {
+  position: relative;
+}
+
+.filter-overflow-wrap.truncated::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2rem;
+  background: linear-gradient(to bottom, transparent, var(--bg-manuscript));
+  pointer-events: none;
+}
+
+.filter-show-more {
+  display: inline-block;
+  margin-top: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--accent-manuscript);
+  text-decoration: underline;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 1.4;
+}
+
+.filter-show-more:hover {
+  opacity: 0.7;
+}
+
 .filter-checkbox {
   width: 16px;
   height: 16px;
@@ -454,7 +491,7 @@ main {
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 280px));
   gap: 2rem;
   padding-bottom: 4rem;
 }

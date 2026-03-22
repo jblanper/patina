@@ -121,16 +121,19 @@ Vocabulary autocomplete for standardized fields; Spanish/English i18n with local
 
 **Glossary**
 Bilingual field reference page (`/glossary`) and contextual `?` drawer surfacing definitions inline during data entry.
-- [Glossary Page — The Contextual Interlude](./blueprints/2026-03-21-glossary-page.md) *(Verification)*
+- [Glossary Page — The Contextual Interlude](./blueprints/archive/2026-03-21-glossary-page.md)
+
+**Prestige PDF & Year Input (Phase 6D)**
+Redesigned full-collection PDF catalog with Manuscript Hybrid branding, two coins per page, era-grouped TOC, and locale-aware labels. Year Numeric input surfaced in Scriptorium; era vocabulary corrected to historical-period classifier.
+- [PDF Export Redesign — The Prestige Catalog](./blueprints/archive/2026-03-22-pdf-export-redesign.md)
+- [Year Numeric Input & Era Glossary Correction](./blueprints/archive/2026-03-22-year-numeric-input.md)
 
 ### Active
 
 | Blueprint | Status |
 |---|---|
-| [PDF Export Redesign — The Prestige Catalog](./blueprints/2026-03-22-pdf-export-redesign.md) | In Progress |
 | [Phase 6C: Field Visibility Settings](./blueprints/2026-03-19-phase-6c-field-visibility.md) | Approved |
-| [Sidebar Filter Overflow — The Soft Reveal](./blueprints/2026-03-21-sidebar-filter-overflow.md) | Proposed |
-| [Year Numeric Input & Era Glossary Correction](./blueprints/2026-03-22-year-numeric-input.md) | Verification |
+| [Sidebar Filter Overflow — The Soft Reveal](./blueprints/2026-03-21-sidebar-filter-overflow.md) | Verification |
 
 ---
 

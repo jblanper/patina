@@ -1,7 +1,7 @@
 # Implementation Blueprint: Sidebar Filter Overflow — The Soft Reveal
 
 **Date:** 2026-03-21
-**Status:** Proposed
+**Status:** Verification
 **Reference:** UI proposal approved via `docs/curating-ui/proposal_filter_overflow_2026-03-21.html` (Path A selected). Design rationale documented in conversation of 2026-03-21; research report consulted Baymard Institute, Omeka S, CollectiveAccess, and Algolia InstantSearch benchmarks.
 
 ---
@@ -355,3 +355,17 @@ Replace the existing `<ul className="filter-list">` block inside the Metals `<di
 - Path B (search-within-filter) should be revisited if/when a Denomination or Country filter is added — those groups may reach 30–50 values where search becomes essential.
 - Path C (group-level collapse) should be revisited if the sidebar grows to 6+ filter dimensions (e.g., after Phase 6a adds Mint and Die Axis filters).
 - **Core Doc Revision:** Update `docs/style_guide.md §5` ("Archival Filters") to document the `.filter-overflow-wrap` + `.filter-show-more` pattern after Verification passes.
+
+### Incidental Fix — Gallery Grid Card Size
+During implementation testing, the gallery grid was found to stretch coin cards to fill empty row space when few results were visible (e.g. filtering to 1–2 coins). The root cause was `auto-fit` + `1fr` on `.gallery-grid`, which collapses phantom tracks and expands remaining cards.
+
+Fixed in the same session by changing `.gallery-grid` in `src/renderer/styles/index.css`:
+```css
+/* Before */
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
+/* After */
+grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 280px));
+```
+
+`auto-fill` preserves empty tracks so cards always remain 280px. The `min(100%, 280px)` floor prevents overflow on narrow viewports.

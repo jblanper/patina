@@ -18,6 +18,8 @@
     "grade": "Grade",
     "noMetals": "No metals indexed",
     "noGrades": "No grades recorded",
+    "showMore": "Show {{count}} more",
+    "showLess": "Show less",
     "reset": "Reset Archive View",
     "language": "Language"
   },
