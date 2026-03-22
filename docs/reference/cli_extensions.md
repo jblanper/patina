@@ -14,6 +14,7 @@ For the rationale and philosophy behind these tools, see [Explanation: The Curat
 | **`curating-ui`** | Manages archival ledger aesthetic via Three-Path Protocol and interactive mockups | When creating or refactoring React components |
 | **`evaluating-skills`** | Audits extensions against AgentSkills.io Open Standard | When creating or reviewing skills in `.claude/skills/` or `.opencode/skills/` |
 | **`saving-context`** | Preserves session state and creates milestone snapshots | Before clearing a session or documenting changes |
+| **`scouting-ideas`** | Research scout for ideas in Ideas Under Discussion; searches competitive landscape, coin community, and numismatic standards to produce a structured report | When validating a feature idea before committing to a blueprint |
 | **`securing-electron`** | Enforces "The Filter" principle with strict Zod validation for IPC | When modifying IPC handlers, preload scripts, or Main process logic |
 | **`tracking-progress`** | Syncs code state with blueprints and changelogs | To verify implementation status against documentation |
 | **`writing-tech-docs`** | Enforces Diátaxis framework for all project documentation | When drafting or refactoring guides in `docs/` |

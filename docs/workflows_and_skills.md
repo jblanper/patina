@@ -13,6 +13,10 @@ The extension layer is built on two pillars of specialized oversight:
 1.  **Domain-Specific Agents:** Skilled specialists ensure system integrity across security, quality, numismatics, UI, and documentation.
 2.  **Automated Quality Hooks:** Background scripts provide real-time feedback—schema context, build status, and style compliance—after every tool call.
 
+## From Idea to Blueprint
+
+Before a feature enters the blueprint lifecycle, rough ideas live in the **Ideas Under Discussion** section of `docs/technical_plan.md`. The `scouting-ideas` skill turns these into research reports: it searches the competitive landscape, numismatic community forums, and relevant standards, then saves a structured report to `docs/research/`. That report feeds directly into Phase 0 of `curating-blueprints`.
+
 ## The Blueprint Lifecycle
 
 Every feature follows a strict lifecycle that enforces architectural integrity through mandatory multi-disciplinary audits at both the **Design** and **Implementation** stages. This prevents drift from our "Curator-First" philosophy and the "Single-Click Rule".
