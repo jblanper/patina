@@ -117,7 +117,28 @@ beforeEach(() => {
 });
 ```
 
-### 5.3 Asynchronous Testing
+### 5.3 Vocabulary-Backed Components
+
+Components that use `useVocabularies` or `AutocompleteField` read from an in-memory cache keyed as `"${field}:${locale}"`. Clear this cache in `beforeEach` to prevent cross-test stale hits:
+
+```typescript
+import { clearVocabCache } from '../../hooks/useVocabularies';
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  clearVocabCache();
+});
+```
+
+Failure to clear the cache can cause a test that sets one locale to pollute a subsequent test that expects a different locale's values.
+
+### 5.4 i18n Key Parity
+
+`src/renderer/i18n/__tests__/translations.test.ts` enforces that every key present in `en.json` also exists in `es.json` and vice versa. This test runs automatically with `npm test`.
+
+When adding any new UI string, add the key to **both** locale files before the test run. If only one locale file is updated, the parity test will fail with a clear diff of missing keys.
+
+### 5.5 Asynchronous Testing
 Always use `waitFor` or `findBy*` queries when asserting on async state changes (like data fetching).
 
 ```typescript

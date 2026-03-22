@@ -121,21 +121,24 @@ The database schema has been finalized and approved following a research phase i
 ### Phase 6: Enhancement Suite (Approved)
 **Objective:** Enhance the curator experience with standardized data entry, internationalization, and customizable views.
 
-#### Phase 6A: Standardized Values with Autocomplete (Approved)
-**Detailed Blueprint:** [2026-03-19-phase-6a-standardized-values.md](./blueprints/2026-03-19-phase-6a-standardized-values.md)
-- [ ] **Vocabulary Tables:** Create `vocabularies` and `preferences` tables for standardized field values.
-- [ ] **Numismatic Vocabularies:** Seed metals (Gold, Silver, Bronze, Electrum), denominations (Aureus, Denarius, Antoninianus), grades (NGC/PCGS scale), eras, and die axis values.
-- [ ] **Autocomplete Component:** Build `AutocompleteField` with dropdown, filtering, and "Add new value" functionality.
-- [ ] **IPC Handlers:** Implement `vocab:get`, `vocab:add`, `vocab:search` with Zod validation.
-- [ ] **Usage Tracking:** Track `usage_count` for sorting by frequency.
+#### Phase 6A: Standardized Values with Autocomplete (Completed)
+**Detailed Blueprint:** [2026-03-19-phase-6a-standardized-values.md](./blueprints/archive/2026-03-19-phase-6a-standardized-values.md)
+- [x] **Vocabulary Tables:** Create `vocabularies` and `preferences` tables for standardized field values.
+- [x] **Numismatic Vocabularies:** Seed metals (Gold, Silver, Bronze, Electrum), denominations (Aureus, Denarius, Antoninianus), grades (NGC/PCGS scale), eras, and die axis values.
+- [x] **Autocomplete Component:** Build `AutocompleteField` with dropdown, filtering, and "Add new value" functionality.
+- [x] **IPC Handlers:** Implement `vocab:get`, `vocab:add`, `vocab:search` with Zod validation.
+- [x] **Usage Tracking:** Track `usage_count` for sorting by frequency.
 
-#### Phase 6B: Internationalization - Spanish/English (Approved)
-**Detailed Blueprint:** [2026-03-19-phase-6b-internationalization.md](./blueprints/2026-03-19-phase-6b-internationalization.md)
-- [ ] **i18n Foundation:** Integrate `react-i18next` for translation management.
-- [ ] **Translation Files:** Create `en.json` and `es.json` with complete UI translations.
-- [ ] **Language Selector:** Build `LanguageSelector` component with immediate language switch.
-- [ ] **Numismatic Translations:** Translate field labels (Anverso, Reverso, Bordura) and use "Aleación" for metal.
-- [ ] **Locale Formats:** Support DD/MM/YYYY for Spanish.
+#### Phase 6B: Internationalization - Spanish/English (Completed)
+**Detailed Blueprint:** [2026-03-19-phase-6b-internationalization.md](./blueprints/archive/2026-03-19-phase-6b-internationalization.md)
+- [x] **i18n Foundation:** Integrate `react-i18next` for translation management.
+- [x] **Translation Files:** Create `en.json` and `es.json` with complete UI translations.
+- [x] **Language Selector:** Build `LanguageSelector` component with immediate language switch.
+- [x] **Numismatic Translations:** Translate field labels (Anverso, Reverso, Bordura) and use "Aleación" for metal.
+- [x] **Locale Formats:** Support DD/MM/YYYY for Spanish.
+
+**Phase 6B.2 — i18n Defect Patch (Completed 2026-03-21):** [Blueprint](./blueprints/archive/2026-03-21-phase-6b-patch-i18n-defects.md)
+- [x] Fixed 9 post-completion i18n defects: hardcoded English strings in CoinDetail, LedgerForm, and PlateEditor; vocabulary locale gap (`getVocab(field)` → `getVocab(field, locale)`); Lens mobile interface localization via `data-strings` JSON attribute; meta-line fallback convention (`'—'` not a translation key).
 
 #### Phase 6C: Field Visibility Settings (Approved)
 **Detailed Blueprint:** [2026-03-19-phase-6c-field-visibility.md](./blueprints/2026-03-19-phase-6c-field-visibility.md)
@@ -145,14 +148,14 @@ The database schema has been finalized and approved following a research phase i
 - [ ] **Conditional Rendering:** Update `CoinDetail` and `CoinCard` to respect visibility settings.
 - [ ] **Reset Function:** Allow users to restore default visibility.
 
-### Phase 7: Code Review Remediation (Approved)
-**Detailed Blueprint:** [2026-03-20-code-review-remediation.md](./blueprints/2026-03-20-code-review-remediation.md)
+### Phase 7: Code Review Remediation (Completed)
+**Detailed Blueprint:** [2026-03-20-code-review-remediation.md](./blueprints/archive/2026-03-20-code-review-remediation.md)
 **Objective:** Remediate 38 issues across Security, Performance, UX/Accessibility, Code Quality, and Testing identified in the 2026-03-20 code review.
-- [ ] **Security:** Enable SQLite foreign keys, fix MIME allowlist, remove `bypassCSP`, fix type annotations.
-- [ ] **Performance:** Convert sync file reads to async; optimize N+1 export queries.
-- [ ] **UX/Accessibility:** Add Era selector, Delete button, keyboard navigation, ARIA compliance, contrast fixes.
-- [ ] **Code Quality:** Eliminate `any` types, move inline styles to CSS, remove dead code.
-- [ ] **Testing:** Add missing tests for validation, hooks, and components.
+- [x] **Security:** Enable SQLite foreign keys, fix MIME allowlist, remove `bypassCSP`, fix type annotations.
+- [x] **Performance:** Convert sync file reads to async; optimize N+1 export queries.
+- [x] **UX/Accessibility:** Add Era selector, Delete button, keyboard navigation, ARIA compliance, contrast fixes.
+- [x] **Code Quality:** Eliminate `any` types, move inline styles to CSS, remove dead code.
+- [x] **Testing:** Add missing tests for validation, hooks, and components.
 
 #### UX/UI Refinements (Completed)
 **Detailed Blueprint:** [2026-03-20-ux-ui-ledger-edit-refinements.md](./blueprints/archive/2026-03-20-ux-ui-ledger-edit-refinements.md)
@@ -161,16 +164,22 @@ The database schema has been finalized and approved following a research phase i
 - [x] Redesigned filters with visible checkbox controls
 - [x] Aligned Edit Coin form fields vertically via CSS grid
 
-#### Cabinet UI Refinements (Proposed)
-**Detailed Blueprint:** [2026-03-20-cabinet-ui-refinements.md](./blueprints/2026-03-20-cabinet-ui-refinements.md)
+#### Cabinet Sort & Grade Filter (Completed)
+**Detailed Blueprint:** [2026-03-20-cabinet-sort-grade-filter.md](./blueprints/archive/2026-03-20-cabinet-sort-grade-filter.md)
+- [x] **Order By group:** Sort controls (Year, Title, Acquired) with Asc/Desc toggle (`.sort-dir-toggle` / `.dir-btn`).
+- [x] **Grade filter:** Dynamic multi-select derived from collection data; added `grade` to `FilterStateSchema`.
+- [x] **`availableGrades` memo** added to `useCoins` hook.
+
+#### Cabinet UI Refinements (Completed)
+**Detailed Blueprint:** [2026-03-20-cabinet-ui-refinements.md](./blueprints/archive/2026-03-20-cabinet-ui-refinements.md)
 **Reference Audit:** [audit_cabinet_2026-03-20.md](./curating-ui/audit_cabinet_2026-03-20.md)
-- [ ] Fix `btn-action` color contrast (C1) — `--text-muted` → `--text-ink`
-- [ ] Fix toolbar gap and right-anchor primary CTA (H1)
-- [ ] Fix metric divider `//` legibility (H2) — `--border-hairline` → `--text-muted`
-- [ ] Increase `btn-action` click target padding (M3)
-- [ ] Remove redundant "SEARCH THE LEDGER" visible label (M1)
-- [ ] Switch gallery grid to `auto-fit` (M2)
-- [ ] Polish collection count copy and sidebar gap (L1, L2)
+- [x] Fix `btn-action` color contrast (C1) — `--text-muted` → `--text-ink`
+- [x] Fix toolbar gap and right-anchor primary CTA (H1)
+- [x] Fix metric divider `//` legibility (H2) — `--border-hairline` → `--text-muted`
+- [x] Increase `btn-action` click target padding (M3)
+- [x] Remove redundant "SEARCH THE LEDGER" visible label (M1)
+- [x] Switch gallery grid to `auto-fit` (M2)
+- [x] Polish collection count copy and sidebar gap (L1, L2)
 
 #### Sidebar Filter Overflow — The Soft Reveal (Proposed)
 **Detailed Blueprint:** [2026-03-21-sidebar-filter-overflow.md](./blueprints/2026-03-21-sidebar-filter-overflow.md)
@@ -180,25 +189,25 @@ The database schema has been finalized and approved following a research phase i
 - [ ] Implement `renderOverflowGroup` helper in `PatinaSidebar` with active-selection pinning
 - [ ] Replace Metals and Grade filter lists with overflow-aware rendering (threshold: 8)
 
-#### Coin Detail & Scriptorium UI Refinements (Approved)
-**Detailed Blueprint:** [2026-03-20-detail-scriptorium-ui-refinements.md](./blueprints/2026-03-20-detail-scriptorium-ui-refinements.md)
+#### Coin Detail & Scriptorium UI Refinements (Completed)
+**Detailed Blueprint:** [2026-03-20-detail-scriptorium-ui-refinements.md](./blueprints/archive/2026-03-20-detail-scriptorium-ui-refinements.md)
 **Reference Audit:** [audit_detail_and_scriptorium_2026-03-20.md](./curating-ui/audit_detail_and_scriptorium_2026-03-20.md)
 **Visual Mockup:** [mockup_detail_scriptorium_refinements_2026-03-20.html](./curating-ui/archive/mockup_detail_scriptorium_refinements_2026-03-20.html)
-- [ ] Add zoom affordance overlay to plate frame — CD-C1
-- [ ] Reverse header button order; add `.btn-delete` hover signal — CD-H1
-- [ ] Add `border-bottom` to `.metrics-grid` for zone separation — CD-H2
-- [ ] Remove hardcoded "PLATE V" from plate caption — CD-H3
-- [ ] Separate Provenance into its own `numismatic-section` — CD-M1
-- [ ] Unify footer font family to `var(--font-mono)` — CD-M2
-- [ ] Replace `.export-result` in delete modal with `.modal-actions` — CD-L1
-- [ ] Replace `[AUTO-ISSUE]` / `#001` with `—` / `#NEW` fallbacks — SC-C1
-- [ ] Convert Scriptorium footer to `metrics-grid` pattern — SC-H1
-- [ ] Fix `input-legend` to `width: 100%; max-width: 320px` — SC-H2
-- [ ] Reduce `.plate-stack` gap to `2rem` — SC-M1
-- [ ] Give first plate slot full opacity (obverse primacy) — SC-M2
-- [ ] Widen subtitle label column to `130px` — SC-M3
-- [ ] Add `border-top` to `.ledger-footer` — SC-L1
-- [ ] Improve empty plate frame border to `var(--text-muted)` — SC-L2
+- [x] Add zoom affordance overlay to plate frame — CD-C1
+- [x] Reverse header button order; add `.btn-delete` hover signal — CD-H1
+- [x] Add `border-bottom` to `.metrics-grid` for zone separation — CD-H2
+- [x] Remove hardcoded "PLATE V" from plate caption — CD-H3
+- [x] Separate Provenance into its own `numismatic-section` — CD-M1
+- [x] Unify footer font family to `var(--font-mono)` — CD-M2
+- [x] Replace `.export-result` in delete modal with `.modal-actions` — CD-L1
+- [x] Replace `[AUTO-ISSUE]` / `#001` with `—` / `#NEW` fallbacks — SC-C1
+- [x] Convert Scriptorium footer to `metrics-grid` pattern — SC-H1
+- [x] Fix `input-legend` to `width: 100%; max-width: 320px` — SC-H2
+- [x] Reduce `.plate-stack` gap to `2rem` — SC-M1
+- [x] Give first plate slot full opacity (obverse primacy) — SC-M2
+- [x] Widen subtitle label column to `130px` — SC-M3
+- [x] Add `border-top` to `.ledger-footer` — SC-L1
+- [x] Improve empty plate frame border to `var(--text-muted)` — SC-L2
 
 ---
 

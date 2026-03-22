@@ -206,6 +206,130 @@ const { success, path } = await window.electronAPI.exportToPdf();
 
 ---
 
+## Vocabulary Handlers
+
+### `vocab:get`
+
+Retrieves all vocabulary values for a field, filtered by locale.
+
+```typescript
+const values = await window.electronAPI.getVocab(field: VocabField, locale?: 'en' | 'es');
+```
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `field` | `VocabField` | Yes | One of the allowed vocab fields |
+| `locale` | `'en' \| 'es'` | No | Filters results to the given locale. Defaults to all locales. |
+
+**Returns:** `Promise<string[]>`
+
+> Always pass the current locale to avoid cross-locale stale hits. See the [Vocabulary System reference](./vocabulary-system.md).
+
+---
+
+### `vocab:add`
+
+Adds a new custom vocabulary entry.
+
+```typescript
+await window.electronAPI.addVocabEntry(field: VocabField, value: string);
+```
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `field` | `VocabField` | Yes | One of the allowed vocab fields |
+| `value` | `string` | Yes | The new value (max 200 characters) |
+
+**Returns:** `Promise<void>`
+
+---
+
+### `vocab:search`
+
+Searches vocabulary values for a field matching a query string.
+
+```typescript
+const results = await window.electronAPI.searchVocab(field: VocabField, query: string, locale?: 'en' | 'es');
+```
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `field` | `VocabField` | Yes | One of the allowed vocab fields |
+| `query` | `string` | Yes | Search string (prefix match) |
+| `locale` | `'en' \| 'es'` | No | Filters results to the given locale |
+
+**Returns:** `Promise<string[]>`
+
+---
+
+### `vocab:increment-usage`
+
+Increments the usage counter for a vocabulary entry. **Fire-and-forget** — do not `await` or handle rejections in the UI.
+
+```typescript
+window.electronAPI.incrementVocabUsage(field: VocabField, value: string);
+```
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `field` | `VocabField` | Yes | One of the allowed vocab fields |
+| `value` | `string` | Yes | The value whose counter to increment |
+
+**Returns:** `Promise<void>` (not awaited in UI)
+
+---
+
+### `vocab:reset`
+
+Resets vocabulary entries to built-in defaults for a field, or all fields if omitted.
+
+```typescript
+await window.electronAPI.resetVocab(field?: VocabField);
+```
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `field` | `VocabField` | No | If omitted, resets all vocab fields |
+
+**Returns:** `Promise<void>`
+
+---
+
+## Preference Handlers
+
+### `pref:get`
+
+Retrieves a stored application preference.
+
+```typescript
+const lang = await window.electronAPI.getPreference('language');
+```
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `key` | `'language'` | Yes | The only whitelisted preference key |
+
+**Returns:** `Promise<string | null>`
+
+---
+
+### `pref:set`
+
+Persists an application preference.
+
+```typescript
+await window.electronAPI.setPreference('language', 'es');
+```
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `key` | `'language'` | Yes | The only whitelisted preference key |
+| `value` | `'en' \| 'es'` | Yes | The locale to persist |
+
+**Returns:** `Promise<void>`
+
+---
+
 ## Type Definitions
 
 ```typescript
@@ -257,5 +381,17 @@ interface ExportOptions {
   targetPath?: string;
   includeImages?: boolean;
   includeCsv?: boolean;
+}
+
+type VocabField = 'metal' | 'denomination' | 'grade' | 'era' | 'die_axis' | 'mint';
+
+interface Vocabulary {
+  id: number;
+  field: VocabField;
+  value: string;
+  locale: 'en' | 'es';
+  is_builtin: boolean;
+  usage_count: number;
+  created_at: string;
 }
 ```

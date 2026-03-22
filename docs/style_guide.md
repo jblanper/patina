@@ -97,6 +97,14 @@ Maintain a strict horizontal breath around the central divider:
 - **Validation:** Use `var(--error-red)` for `border-color` and helper text.
 - **Schema Guard:** All inputs are guarded by **Zod validation** to ensure technical precision (e.g., `ERR_INVALID_METRIC`).
 
+### Destructive Action Modals (WCAG 3.2.4)
+Confirmation modals for irreversible actions (deleting a coin, removing an image) must follow this button order:
+
+1. **Cancel** — primary position (left or top), styled as a minimal action.
+2. **Destructive action** — secondary position (right or bottom), styled with `.btn-delete`.
+
+This ordering prevents accidental destructive actions by making the safe path the default. Use `.modal-actions` as the container class. Never reverse the order.
+
 ### Error Handling
 - **Alerts:** Use high-contrast banners with `4px` left borders in `var(--error-red)`.
 - **Tone:** Maintain a somber, technical tone even in failure states.
@@ -127,3 +135,7 @@ The sidebar's first group. Controls the sort order of the Cabinet gallery.
 - **Sidebar order:** Order By → Era → Metals → Grade.
 
 > **Exception:** Filter controls use visible checkbox indicators (1px hairline border, accent fill on checked state) rather than pure "Archival Labels" text-only approach. This trade-off prioritizes user clarity for multi-select operations while maintaining the archival aesthetic through hairline borders and accent color states.
+
+#### Filter Checkbox CSS Classes
+- **`.filter-checkbox`** — Custom 16×16px ring (1px hairline border, 50% radius). On checked state: accent fill with 8×8px `--accent-manuscript` dot inside. The native `<input type="checkbox">` is visually hidden but remains in the DOM for screen readers.
+- **`.filter-item-label`** — Wraps the checkbox and label text. On active (checked) state: left border in `--accent-manuscript`, bold weight, and soft background fill.

@@ -2,8 +2,8 @@
 
 This document defines the absolute standards for the Patina project. All development must rigorously adhere to these rules to maintain the "Curator-First" experience and ensure system integrity.
 
-**Version:** 1.2  
-**Last Updated:** 2026-03-20
+**Version:** 1.3
+**Last Updated:** 2026-03-22
 
 ---
 
@@ -60,6 +60,7 @@ This document defines the absolute standards for the Patina project. All develop
 - **Optimization:** Use `React.memo` and `useCallback` strategically in the Gallery grid to ensure smooth scrolling and interaction.
 
 ### Vocabulary System (Phase 6a)
+> See `docs/reference/vocabulary-system.md` for the full reference (schema, IPC API, seed procedure, component pattern).
 - **Managed Fields:** Six coin fields use the vocabulary system: `metal`, `denomination`, `grade`, `era`, `die_axis`, `mint`. Valid field names are the single source of truth in `ALLOWED_VOCAB_FIELDS` in `src/common/validation.ts`.
 - **Defence-in-Depth:** Vocabulary IPC handlers validate input with `.strict()` Zod schemas at the IPC boundary. DB service methods perform a redundant `ALLOWED_VOCAB_FIELDS` allowlist check before any field string is used in SQL. Never interpolate a `field` parameter directly into SQL — use only parameterized queries.
 - **Seed Versioning:** `seedVocabularies()` is called from `app.whenReady()` — never via IPC. Bump `CURRENT_SEED_VERSION` (e.g. `'6a.1'` → `'6b.1'`) to trigger a re-seed on next launch. The `INSERT OR IGNORE` pattern preserves user-modified `usage_count` values and user-added entries across re-seeds.
@@ -67,6 +68,7 @@ This document defines the absolute standards for the Patina project. All develop
 - **AutocompleteField Pattern:** Vocab-backed form fields use the `AutocompleteField` component + `useVocabularies(field)` hook. The hook holds a module-level cache keyed as `"${field}:${locale}"` — always include locale in the cache key to prevent cross-locale stale hits. Call `clearVocabCache()` (exported for tests only) in `beforeEach` to prevent cross-test contamination. Usage increment (`incrementUsage`) is fire-and-forget — never block the UI on it.
 
 ### Internationalization (Phase 6b)
+> See `docs/guides/internationalization.md` for a step-by-step how-to guide (adding keys, using `useLanguage`, locale-aware vocab calls, test setup).
 - **Library:** `react-i18next` with static JSON resources — no external CDN, no runtime network calls. Translation files live in `src/renderer/i18n/locales/en.json` and `es.json`.
 - **Default Language:** Spanish (`'es'`). Never add hardcoded English strings to UI components — always use `t('namespace.key')`. Namespaces: `common`, `ledger`, `cabinet`, `plateEditor`, `autocomplete`.
 - **Language Preference Bridge:** User language selection is persisted to SQLite via `pref:get`/`pref:set` IPC handlers. Schemas `PreferenceGetSchema` and `PreferenceSetSchema` use a strict key allowlist — never accept arbitrary preference keys.

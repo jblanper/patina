@@ -125,5 +125,8 @@ New features require a blueprint in `docs/blueprints/` (lifecycle: `Draft → Pr
 - `docs/style_guide.md` — Design system
 - `docs/architecture/security_data_flow.md` — The Filter
 - `docs/guides/testing_standards.md` — Testing patterns
+- `docs/guides/internationalization.md` — How to add/modify translations (i18n)
+- `docs/reference/ipc_api.md` — Full IPC handler reference (DB, Lens, Export, Vocab, Preferences)
+- `docs/reference/vocabulary-system.md` — Vocabulary system (fields, schema, cache key, fire-and-forget)
 - `docs/workflows_and_skills.md` — Blueprint lifecycle
 - `docs/blueprints/` — Check status before starting work

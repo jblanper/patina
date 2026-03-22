@@ -24,9 +24,23 @@ A lightweight Express.js server hosted within the Main process. It is only activ
 A minimal, responsive HTML template served directly by the Main process.
 
 #### Styling
-- Follows the "Manuscript Hybrid" aesthetic (Parchment background, Iron Gall Ink text).
-- Uses `Cormorant Garamond` and `Montserrat` (served locally if possible, or fallback).
+- Follows the "Manuscript Hybrid" aesthetic (Parchment `#FCF9F2` background, Iron Gall Ink `#2D2926` text).
+- Uses `Cormorant Garamond` and `Montserrat` (loaded via Google Fonts); WCAG AA contrast maintained.
 - Responsive grid for image previews.
+
+#### Locale Injection
+
+The mobile web app is localized server-side. The Lens server reads the `language` preference from the database, selects a static string dictionary (English or Spanish), and embeds it in the served HTML:
+
+```html
+<body data-strings='{"upload":"Subir imagen","confirm":"Confirmar","...":"..."}'>
+```
+
+Client-side JavaScript on the mobile page reads `document.body.dataset.strings` to populate all UI text. No translation library is loaded on the mobile client; no CDN calls are made. This keeps the mobile page offline-capable within the local Wi-Fi session.
+
+#### UX Behaviours
+- **QR modal auto-close:** When a `lens:image-received` event fires, the QR code modal closes automatically so the curator can immediately see the captured image.
+- **"Replace" overlay:** If an image slot already contains an image, a "Replace" affordance overlays the thumbnail. Capturing a new image via Lens replaces the existing one in that slot.
 
 ---
 

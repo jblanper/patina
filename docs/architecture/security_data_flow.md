@@ -30,11 +30,28 @@ We use **Zod** to define strict schemas that are shared between both processes. 
 **Location:** `src/common/validation.ts`
 
 ### 2.1 Shared Schemas
--   **`NewCoinSchema`:** Used for creating or updating coins. It uses `.strict()` to forbid any unknown properties, preventing "mass assignment" attacks where a malicious renderer might try to inject fields like `is_admin` or overwrite protected metadata.
--   **`idSchema`:** A simple `z.number().int().positive()` used to validate all ID arguments.
--   **Numismatic Refiners:** We enforce domain-specific logic at the schema level:
-    -   **Weight:** Max 2 decimal places (e.g., `17.20`).
-    -   **Diameter:** Max 1 decimal place (e.g., `19.5`).
+
+| Schema | Purpose |
+| :--- | :--- |
+| `NewCoinSchema` | Coin creation/update. Uses `.strict()` to forbid unknown properties (prevents mass assignment). |
+| `NewCoinImageSchema` | Image creation. Uses `.strict()` and validates path format. |
+| `FilterStateSchema` | Gallery filter state (era, metal, grade arrays, searchTerm, sortBy, sortAsc). |
+| `ExportOptionsSchema` | ZIP export options with path traversal prevention via `z.refine()`. |
+| `VocabGetSchema` | Vocabulary retrieval: `field` (allowlisted) + optional `locale`. |
+| `VocabAddSchema` | Vocabulary entry creation: `field` + `value` (max 200 chars, regex validated) + `locale`. |
+| `VocabSearchSchema` | Vocabulary search: `field` + `query` + `locale`. |
+| `VocabIncrementSchema` | Usage counter increment: `field` + `value`. |
+| `VocabResetSchema` | Vocabulary reset: optional `field`. |
+| `PreferenceGetSchema` | Preference retrieval: `key` whitelisted to `'language'` only. |
+| `PreferenceSetSchema` | Preference write: `key: 'language'`, `value: 'en' \| 'es'`. |
+
+All schemas use `.strict()` where applicable. `ALLOWED_VOCAB_FIELDS` (`metal`, `denomination`, `grade`, `era`, `die_axis`, `mint`) is enforced via `z.enum()` — unknown field names are rejected.
+
+**Numismatic Refiners:** Domain-specific logic enforced at schema level:
+-   **Weight:** Max 2 decimal places (e.g., `17.20`).
+-   **Diameter:** Max 1 decimal place (e.g., `19.5`).
+
+**Preference key whitelisting:** `PreferenceGetSchema` and `PreferenceSetSchema` constrain `key` to the string literal `'language'`. Any other key string is rejected before reaching the database.
 
 ### 2.2 Implementation in Main
 In `src/main/db.ts`, every exposed method wraps its logic in a validation step:
@@ -89,7 +106,17 @@ The database (`patina.db`) is managed exclusively by the Main process using `bet
 -   **Relative Paths:** The database stores image paths relative to the `data/images` directory (e.g., `ancient/athens_owl.jpg`).
 -   **Path Resolution:** The Main process resolves these paths against the user's data directory. The Renderer never sees or manipulates full system paths.
 
-### 4.2 Atomic Transactions
+### 4.2 Image Deduplication — Defense-in-Depth
+
+Preventing duplicate image records requires three coordinated layers:
+
+1. **Hook-level guard:** `useCoinForm` maintains an `existingImagePaths` Set. Before submission, new image paths are filtered against this set — already-stored paths are excluded from the `addImage` call.
+2. **Database constraint:** The `images` table has a `UNIQUE(coin_id, path)` index. Any duplicate that slips through the hook layer is rejected by the DB.
+3. **Safe insert:** `db.addImage()` uses `INSERT OR IGNORE` and returns the existing row's ID on conflict, so callers receive a valid ID without an error.
+
+This pattern — hook filter → DB constraint → safe insert — should be applied to any future relation that risks duplication on repeated saves.
+
+### 4.3 Atomic Transactions
 All write operations are synchronous and atomic within the Main process, ensuring data integrity even if the Renderer crashes.
 
 ---
