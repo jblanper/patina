@@ -78,6 +78,53 @@ describe('LedgerForm', () => {
     });
   });
 
+  describe('year CE input', () => {
+    it('renders year CE input in metrics grid', () => {
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      expect(screen.getByPlaceholderText('e.g. −44 or 134')).toBeInTheDocument();
+    });
+
+    it('calls updateField with integer on change', () => {
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      fireEvent.change(screen.getByPlaceholderText('e.g. −44 or 134'), {
+        target: { value: '134' },
+      });
+      expect(updateField).toHaveBeenCalledWith('year_numeric', 134);
+    });
+
+    it('calls updateField with negative integer on change', () => {
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      fireEvent.change(screen.getByPlaceholderText('e.g. −44 or 134'), {
+        target: { value: '-44' },
+      });
+      expect(updateField).toHaveBeenCalledWith('year_numeric', -44);
+    });
+
+    it('calls updateField with null when cleared', () => {
+      renderForm(<LedgerForm formData={{ ...baseFormData, year_numeric: 134 }} errors={{}} updateField={updateField} />);
+      fireEvent.change(screen.getByPlaceholderText('e.g. −44 or 134'), {
+        target: { value: '' },
+      });
+      expect(updateField).toHaveBeenCalledWith('year_numeric', null);
+    });
+
+    it('renders empty when formData.year_numeric is null', () => {
+      renderForm(<LedgerForm formData={{ ...baseFormData, year_numeric: null }} errors={{}} updateField={updateField} />);
+      expect(screen.getByPlaceholderText('e.g. −44 or 134')).toHaveValue(null);
+    });
+
+    it('renders empty when formData.year_numeric is undefined', () => {
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      expect(screen.getByPlaceholderText('e.g. −44 or 134')).toHaveValue(null);
+    });
+
+    it('calls openField with year_numeric when glossary hint is clicked', () => {
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      fireEvent.click(screen.getByLabelText(/year_numeric/i));
+      expect(mockGlossaryContext.openField).toHaveBeenCalledWith('year_numeric');
+    });
+  });
+
   describe('acquisition footer', () => {
     it('renders Acquired, Source, and Cost inputs', () => {
       renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);

@@ -130,6 +130,7 @@ Bilingual field reference page (`/glossary`) and contextual `?` drawer surfacing
 | [PDF Export Redesign — The Prestige Catalog](./blueprints/2026-03-22-pdf-export-redesign.md) | In Progress |
 | [Phase 6C: Field Visibility Settings](./blueprints/2026-03-19-phase-6c-field-visibility.md) | Approved |
 | [Sidebar Filter Overflow — The Soft Reveal](./blueprints/2026-03-21-sidebar-filter-overflow.md) | Proposed |
+| [Year Numeric Input & Era Glossary Correction](./blueprints/2026-03-22-year-numeric-input.md) | Verification |
 
 ---
 
@@ -144,4 +145,4 @@ To research any of these ideas before committing to a blueprint, use `/scouting-
 - **Advanced Full-Text Search** — extend search to cover the Story field and provenance notes, not just structured metadata.
 - **Loan & Exhibition Tracking** — record when a coin leaves the collection temporarily (loaned to a museum, sent for grading). Adds a status field and return date without altering the core schema.
 - **Multi-Collection Support** — allow the curator to maintain separate collections (personal, inherited, investment) within one installation, each with its own SQLite file.
-- **Coin Research Panel** — a contextual panel within the Scriptorium that lets the curator look up numismatic references (Numista, PCGS, museum databases) without leaving the app. The goal is to reduce context-switching during cataloguing and help populate fields accurately from authoritative sources.
+- **Coin Research Panel** — a contextual panel within the Scriptorium that lets the curator look up numismatic references (Numista, PCGS, museum databases) without leaving the app. The goal is to reduce context-switching during cataloguing and help populate fields accurately from authoritative sources. → [Research report](./research/2026-03-22-coin-research-panel-research.md) (Ready for blueprint)

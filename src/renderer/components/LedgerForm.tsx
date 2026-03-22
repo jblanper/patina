@@ -224,6 +224,23 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             hasUserValues={false}
           />
         </div>
+        <div className="metric-item">
+          <button className="metric-label" onClick={() => openField('year_numeric')} aria-label={t('glossary.hintLabel', { field: 'year_numeric' })}>
+            <span className="label-text">{t('ledger.yearCe')}</span>
+            <span className="glossary-hint" aria-hidden="true">†</span>
+          </button>
+          <input
+            type="number"
+            className="input-metric"
+            placeholder={t('ledger.placeholders.yearCe')}
+            value={formData.year_numeric ?? ''}
+            onChange={(e) => {
+              const raw = e.target.value;
+              const parsed = parseInt(raw, 10);
+              updateField('year_numeric', raw === '' || isNaN(parsed) ? null : parsed);
+            }}
+          />
+        </div>
       </div>
 
       {/* Numismatic Data */}
