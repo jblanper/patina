@@ -627,6 +627,12 @@ The numismatic terminology corrections from the PDF export were applied to the r
 - `src/renderer/i18n/locales/es.json`: `"fineness": "Fineza"` → `"Ley"`
 - `src/renderer/i18n/locales/es.json`: `"edge": "Bordura"` → `"Canto"` — "Bordura" incorrectly referred to the rim/raised border; "Canto" is the correct Spanish term for the edge surface (per Section 8 numismatic re-audit).
 
+### Decision: Main Process Test Files Deleted (2026-03-22)
+
+`src/main/export/pdf.test.ts`, `src/main/export/zip.test.ts`, and `vitest.config.main.ts` were deleted. The `test:main` script was removed from `package.json`.
+
+**Rationale:** These tests mocked jsPDF and the filesystem so heavily that they verified plumbing ("`addPage` called N times") rather than outcomes. Every real bug found during verification — progressive JPEG rendering, missing italic font, date format, cover layout — was caught by running the app and inspecting the PDF, not by tests. The mock infrastructure was also fragile: a Vitest version bump broke constructor mock syntax and triggered vi.mock hoisting failures. The parts of this feature worth unit-testing (schema validation, translation key coverage) are already covered in the renderer suite. Deleting these files reduces maintenance burden with no loss of meaningful coverage.
+
 ### Things to Consider
 - Allow collector to pin a cover coin via a preference
 - Use FONT_HEADING italic for obverse/reverse legend text (ancient scripts)

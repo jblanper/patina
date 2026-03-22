@@ -23,6 +23,10 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './setupTests.ts',
+    include: [
+      '**/*.{test,spec}.?(c|m)[jt]s?(x)',
+      path.resolve(__dirname, 'src/common/__tests__/**/*.{test,spec}.?(c|m)[jt]s?(x)'),
+    ],
     coverage: {
       provider: 'v8',
       include: [

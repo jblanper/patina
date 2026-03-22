@@ -46,14 +46,14 @@ describe('validation.ts', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should reject invalid era', () => {
+    it('should accept any non-empty era string (era is a vocabulary field)', () => {
       const result = CoinSchema.safeParse({
         id: 1,
         title: 'Test',
-        era: 'Invalid',
+        era: 'Custom Era',
         created_at: '2026-01-01'
       });
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
 
     it('should accept all valid eras', () => {
@@ -246,16 +246,16 @@ describe('validation.ts', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should reject invalid era value', () => {
+    it('should accept any era string values (era is a vocabulary field)', () => {
       const result = FilterStateSchema.safeParse({
-        era: ['Invalid'],
+        era: ['Custom Era'],
         metal: [],
         grade: [],
         searchTerm: '',
         sortBy: null,
         sortAsc: true
       });
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
 
     it('should reject missing required fields', () => {
