@@ -1,7 +1,16 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Scriptorium } from '../Scriptorium';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { GlossaryContext } from '../../contexts/GlossaryContext';
+
+const mockGlossaryContext = {
+  drawerState: { open: false, field: null },
+  openField: vi.fn(),
+  openIndex: vi.fn(),
+  close: vi.fn(),
+};
 import * as useCoinHook from '../../hooks/useCoin';
 
 // Mock hooks
@@ -37,11 +46,13 @@ describe('Scriptorium', () => {
 
   it('renders dual-folio layout', () => {
     render(
-      <MemoryRouter initialEntries={['/scriptorium/add']}>
-        <Routes>
-          <Route path="/scriptorium/add" element={<Scriptorium />} />
-        </Routes>
-      </MemoryRouter>
+      <GlossaryContext.Provider value={mockGlossaryContext}>
+        <MemoryRouter initialEntries={['/scriptorium/add']}>
+          <Routes>
+            <Route path="/scriptorium/add" element={<Scriptorium />} />
+          </Routes>
+        </MemoryRouter>
+      </GlossaryContext.Provider>
     );
 
     // Left folio: Plate Editor
@@ -55,11 +66,13 @@ describe('Scriptorium', () => {
 
   it('navigates back on close button click', () => {
     render(
-      <MemoryRouter initialEntries={['/scriptorium/add']}>
-        <Routes>
-          <Route path="/scriptorium/add" element={<Scriptorium />} />
-        </Routes>
-      </MemoryRouter>
+      <GlossaryContext.Provider value={mockGlossaryContext}>
+        <MemoryRouter initialEntries={['/scriptorium/add']}>
+          <Routes>
+            <Route path="/scriptorium/add" element={<Scriptorium />} />
+          </Routes>
+        </MemoryRouter>
+      </GlossaryContext.Provider>
     );
 
     const backButton = screen.getByText(/Close Ledger Entry/i);
@@ -76,11 +89,13 @@ describe('Scriptorium', () => {
     });
 
     render(
-      <MemoryRouter initialEntries={['/scriptorium/edit/42']}>
-        <Routes>
-          <Route path="/scriptorium/edit/:id" element={<Scriptorium />} />
-        </Routes>
-      </MemoryRouter>
+      <GlossaryContext.Provider value={mockGlossaryContext}>
+        <MemoryRouter initialEntries={['/scriptorium/edit/42']}>
+          <Routes>
+            <Route path="/scriptorium/edit/:id" element={<Scriptorium />} />
+          </Routes>
+        </MemoryRouter>
+      </GlossaryContext.Provider>
     );
 
     expect(screen.getByText(/ENTRY #042/)).toBeInTheDocument();

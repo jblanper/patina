@@ -9,6 +9,7 @@
   --accent-manuscript: #914E32; /* Action states and primary accents (Burnt Sienna) */
   --stone-pedestal: #F0EDE6;    /* Soft background for coin frames and containers */
   --error-red: #B22222;        /* Error states, validation messages, and critical alerts */
+  --overlay-glossary: rgba(45, 41, 38, 0.35); /* Glossary drawer backdrop — lighter than modal (0.6) to keep context perceptible */
 
   /* Typography */
   --font-serif: 'Cormorant Garamond', serif;
@@ -1878,10 +1879,12 @@ main {
   font: 0.7rem var(--font-mono);
   color: var(--text-muted);
   text-transform: uppercase;
-  line-height: 1.8;
   background: none;
   border: none;
-  padding: 0;
+  padding: 0.75rem 0.5rem;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
   cursor: pointer;
   text-decoration: none;
 }
@@ -1988,7 +1991,7 @@ main {
 .glossary-drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(45, 41, 38, 0.35);
+  background: var(--overlay-glossary);
   z-index: 900;
   opacity: 0;
   transition: opacity 0.25s ease;
@@ -2034,7 +2037,8 @@ main {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
+  padding: 0.75rem 0.5rem;
+  min-height: 44px;
   flex-shrink: 0;
 }
 .glossary-drawer-back:hover { color: var(--accent-manuscript); }
@@ -2050,7 +2054,9 @@ main {
   border: none;
   cursor: pointer;
   line-height: 1;
-  padding: 0 0.25rem;
+  padding: 0.75rem 0.5rem;
+  min-height: 44px;
+  min-width: 44px;
   flex-shrink: 0;
 }
 .glossary-drawer-close:hover { color: var(--accent-manuscript); }

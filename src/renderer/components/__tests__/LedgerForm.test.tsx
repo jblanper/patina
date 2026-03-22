@@ -4,9 +4,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { LedgerForm } from '../LedgerForm';
 import { NewCoin } from '../../../common/types';
+import { GlossaryContext } from '../../contexts/GlossaryContext';
+
+const mockGlossaryContext = {
+  drawerState: { open: false, field: null },
+  openField: vi.fn(),
+  openIndex: vi.fn(),
+  close: vi.fn(),
+};
 
 const renderForm = (ui: React.ReactElement) =>
-  render(<MemoryRouter>{ui}</MemoryRouter>);
+  render(
+    <GlossaryContext.Provider value={mockGlossaryContext}>
+      <MemoryRouter>{ui}</MemoryRouter>
+    </GlossaryContext.Provider>
+  );
 
 const baseFormData: NewCoin = {
   title: '',

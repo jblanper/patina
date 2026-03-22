@@ -1,7 +1,7 @@
 # Implementation Blueprint: Glossary Page (The Contextual Interlude)
 
 **Date:** 2026-03-21
-**Status:** Verification
+**Status:** Completed
 **Reference:** `docs/curating-ui/proposal_glossary_page_2026-03-21.md`
 
 ---
@@ -475,7 +475,7 @@ For language switching tests: use `i18n.changeLanguage('es')` in `beforeEach` / 
 ---
 
 ## 5. Security Assessment (`securing-electron`)
-**Status:** Verified
+**Status:** Verified — Re-audited 2026-03-22
 
 ### Audit Findings
 
@@ -508,10 +508,24 @@ For language switching tests: use `i18n.changeLanguage('es')` in `beforeEach` / 
 - `preload.ts` exposes: `openExternalUrl: (url: string) => ipcRenderer.invoke('open-external-url', url)`.
 - The `Further Reading` links in `GlossaryField` should be stored as `furtherReading?: { label: string; url: string }[]` on the field type — not as raw strings embedded in the `description` body.
 
+### Re-Audit Findings (2026-03-22) — PASS-WITH-DEFERRED-ITEMS
+
+All implemented code is clean against the audited security mandates:
+- No new `window.electronAPI` calls introduced. ✓
+- No `innerHTML` / `dangerouslySetInnerHTML`. ✓
+- No raw `ipcRenderer` in renderer. ✓
+- `contextIsolation: true`, `sandbox: true` untouched. ✓
+- No new `contextBridge` API surface. ✓
+- No CDN resources — all content bundled at build time. ✓
+- `will-navigate` / `setWindowOpenHandler` deny-all policy intact. ✓
+- Further Reading links correctly use `<a target="_blank" rel="noreferrer">` (deferral confirmed). ✓
+
+**Deferred item (medium risk):** `open-external-url` IPC handler not implemented. Further Reading `<a target="_blank">` links are silently blocked by `setWindowOpenHandler`'s deny-all rule — users cannot reach reference material. Acceptable for this phase; must be resolved before feature is considered production-complete.
+
 ---
 
 ## 6. Quality Assessment (`assuring-quality`)
-**Status:** Verified
+**Status:** Verified — Re-audited 2026-03-22
 
 ### Audit Findings
 
@@ -532,10 +546,24 @@ For language switching tests: use `i18n.changeLanguage('es')` in `beforeEach` / 
 - Snapshot tests are **not recommended** for `GlossaryDrawer` — the content is data-driven and snapshots would be brittle. Prefer `getByRole` / `getByText` assertions.
 - Verify that `document.body.style.overflow` is correctly restored in the `useEffect` cleanup when the component unmounts while the drawer is open (edge case: navigating away mid-open).
 
+### Re-Audit Findings (2026-03-22) — PASS (after fixes)
+
+Two issues found and resolved before Completion:
+
+1. **Hardcoded hex in backdrop CSS (resolved):** `.glossary-drawer-backdrop` used `rgba(45, 41, 38, 0.35)` — the Iron Gall colour as a raw numeric value. Fixed by adding `--overlay-glossary` to `:root` and replacing the hardcoded value with `var(--overlay-glossary)`.
+2. **Touch targets below 44px (resolved):** `.glossary-drawer-close`, `.glossary-drawer-back`, and `.glossary-rail-link` had padding of `0` or minimal values, yielding ~20px hit areas. Fixed by adding `min-height: 44px` and `padding: 0.75rem 0.5rem` to all three.
+
+All ARIA attributes, focus management, two-phase mount, Esc-close, backdrop behaviour, LedgerForm dagger pattern, and Cabinet toolbar placement verified correct. ✓
+
+Additionally, two test gaps resolved:
+- TC-GL-14 added: full `<Glossary />` Spanish section heading render using `vi.hoisted` + async `vi.mock` factory.
+- TC-GDW-19 added: `document.body.style.paddingRight` restore verified on drawer close.
+- Pre-existing `useExport.test.ts` gap fixed: `exportToPdf` locale assertion updated to match the committed hook signature.
+
 ---
 
 ## 7. UI Assessment (`curating-ui`)
-**Status:** Verified
+**Status:** Verified — Re-audited 2026-03-22 (issues found, resolved)
 
 ### Audit Findings
 
@@ -567,7 +595,7 @@ For language switching tests: use `i18n.changeLanguage('es')` in `beforeEach` / 
 ---
 
 ## 8. Numismatic & UX Assessment (`curating-coins`)
-**Status:** Verified
+**Status:** Verified — Re-audited 2026-03-22
 
 ### Audit Findings
 
@@ -584,6 +612,21 @@ For language switching tests: use `i18n.changeLanguage('es')` in `beforeEach` / 
 - The `rarity` field glossary entry must include both the **RIC scale** (C3–R5), the **Cohen scale** (C, R, RR, RRR, RRRR), and the **General/Modern scale** (Common → Unique). All three are present in the source glossary — ensure none are omitted in the TS data file.
 - The `grade` entry is the longest in the glossary (two full grading scales: Adjectival and Sheldon 70-point). In the drawer's single-field view, consider rendering the two scales as labelled subsections (`<h4>`) rather than a single undifferentiated block. This is a rendering decision for Phase 1b implementation.
 - The Spanish translation (`glossary_coin_fields_es.md`) preserves English abbreviations for all catalog codes (RIC, RPC, BMC, SNG, DOC), metal codes (AV, AR, AE), and grade codes (MS-65, EF-40, FDC). The `GLOSSARY_FIELDS` TS constant should do the same — these are internationally standardized identifiers, not translatable strings.
+
+### Re-Audit Findings (2026-03-22) — PASS
+
+All 12 numismatic verification objectives confirmed against `glossaryFields.ts`:
+- **25 fields** present, all snake_case IDs matching the `Coin` interface. ✓
+- **6 sections** (`identity`, `dating`, `physical`, `inscriptions`, `cataloging`, `provenance`). ✓
+- **Required fields:** only `title` and `era`. ✓
+- **Spanish `title` correction:** `nameKey: 'ledger.designation'` — distinct from `ledger.denomination`, correctly resolves to "Designación". ✓
+- **Denomination vocabulary:** all 16 Modern-era additions present (Thaler, Escudo, Real de a Ocho, Guinea, Sovereign, Shilling, Eagle, Franc, Peso, Peseta, Mark, Krone/Krona, Lira, Rouble, Rupee, Maravedi) plus Crown and Dollar bonus. ✓
+- **Rarity field:** RIC (C3–R5), Cohen (C/R/RR/RRR/RRRR), and General/Modern (Common → Unique) all present. ✓
+- **Grade field:** both Adjectival (11 grades) and Sheldon 70-point (20 grades) present. ✓
+- **Bilingual coverage:** every field has `description.en` and `description.es`. ✓
+- **Metal codes** (AV, AR, AE, BI, EL, OR, POT, PB) untranslated in both locales. ✓
+- **Catalog codes** (RIC, RPC, BMC, SNG, DOC) preserved verbatim in Spanish. ✓
+- **Grade codes** (MS-65, EF-40, FDC, etc.) preserved verbatim in Spanish. ✓
 
 ---
 
