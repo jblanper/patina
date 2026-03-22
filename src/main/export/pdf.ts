@@ -45,7 +45,7 @@ type TranslationKey =
   | 'inscriptions' | 'denomination'
   | 'byMetal' | 'byEra' | 'byGrade'
   | 'totalValue' | 'imageUnavailable'
-  | 'era' | 'rarity';
+  | 'era' | 'rarity' | 'edge';
 
 const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -60,12 +60,12 @@ const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     inscriptions: 'Inscriptions', denomination: 'Denomination',
     byMetal: 'By Metal', byEra: 'By Era', byGrade: 'By Grade',
     totalValue: 'Total Value', imageUnavailable: '[Image unavailable]',
-    era: 'Era', rarity: 'Rarity',
+    era: 'Era', rarity: 'Rarity', edge: 'Edge',
   },
   es: {
     specifications: 'Especificaciones', obverse: 'Anverso', reverse: 'Reverso',
     metal: 'Metal', grade: 'Grado', mint: 'Ceca', weight: 'Peso',
-    diameter: 'Diámetro', dieAxis: 'Eje de Cuño', fineness: 'Fineza',
+    diameter: 'Diámetro', dieAxis: 'Eje de Cuño', fineness: 'Ley',
     catalogRef: 'Referencia de Catálogo', provenance: 'Procedencia',
     story: 'Nota del Curador', acquisition: 'Adquisición',
     tableOfContents: 'Índice de Contenidos',
@@ -74,7 +74,7 @@ const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
     inscriptions: 'Inscripciones', denomination: 'Denominación',
     byMetal: 'Por Metal', byEra: 'Por Época', byGrade: 'Por Grado',
     totalValue: 'Valor Total', imageUnavailable: '[Imagen no disponible]',
-    era: 'Época', rarity: 'Rareza',
+    era: 'Época', rarity: 'Rareza', edge: 'Canto',
   },
 };
 
@@ -168,8 +168,8 @@ function drawSectionHeader(doc: jsPDF, label: string, x: number, y: number, font
   return y + 7;
 }
 
-function drawPageFooter(doc: jsPDF, pageNum: number, total: number, locale: Locale): void {
-  doc.setFont('helvetica', 'normal');
+function drawPageFooter(doc: jsPDF, pageNum: number, total: number, locale: Locale, fonts: Fonts): void {
+  doc.setFont(fonts.body, 'normal');
   doc.setFontSize(9);
   doc.setTextColor(IRON_GALL);
   doc.text(`${t(locale, 'page')} ${pageNum} / ${total}`, 105, 287, { align: 'center' });
@@ -281,7 +281,7 @@ function drawCoinSlot(
   if (coin.obverse_desc)   metaRows.push([`${t(locale, 'obverse')} Desc.`, coin.obverse_desc]);
   if (coin.reverse_legend) metaRows.push([t(locale, 'reverse'), coin.reverse_legend]);
   if (coin.reverse_desc)   metaRows.push([`${t(locale, 'reverse')} Desc.`, coin.reverse_desc]);
-  if (coin.edge_desc)      metaRows.push(['Edge', coin.edge_desc]);
+  if (coin.edge_desc)      metaRows.push([t(locale, 'edge'), coin.edge_desc]);
   if (coin.provenance)     metaRows.push([t(locale, 'provenance'), coin.provenance]);
   if (coin.story)          metaRows.push([t(locale, 'story'), coin.story]);
 
@@ -591,7 +591,7 @@ export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Pr
       const yPos = MARGIN;
       drawCoinSlot(doc, plan.coins[0], allImages.get(plan.coins[0].id) ?? [], yPos, locale, fonts);
 
-      drawPageFooter(doc, docPage, doc.getNumberOfPages(), locale);
+      drawPageFooter(doc, docPage, doc.getNumberOfPages(), locale, fonts);
     }
 
     // 8. Back-fill TOC (grouped by era, alphabetical)
@@ -614,7 +614,7 @@ export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Pr
     doc.setPage(statsPageNum);
     applyPageBackground(doc);
     drawStatsPage(doc, coins, locale, fonts);
-    drawPageFooter(doc, statsPageNum, doc.getNumberOfPages(), locale);
+    drawPageFooter(doc, statsPageNum, doc.getNumberOfPages(), locale, fonts);
 
     // 10. Write to disk
     const buf = doc.output('arraybuffer');

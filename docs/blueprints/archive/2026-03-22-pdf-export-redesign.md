@@ -1,7 +1,7 @@
 # Implementation Blueprint: PDF Export Redesign — The Prestige Catalog
 
 **Date:** 2026-03-22
-**Status:** Verification
+**Status:** Completed
 **Reference:** `docs/style_guide.md` v3.3 "Manuscript Hybrid"
 
 ---
@@ -374,11 +374,17 @@ New test cases:
 - No PDF logic leaks into the Electron bridge. The `preload.ts` change is a pure parameter addition. The renderer hook has no knowledge of font names, palette values, or layout constants — all encapsulated in `pdf.ts`.
 - The two-pass TOC (`setPage` back-fill) is entirely within `pdf.ts`; no new IPC channels required.
 
-### Review Notes
+### Review Notes (Phase I — Pre-Implementation)
 
 - Wrap the entire `FONT_DEFS` loop in a **single** try/catch so that if any one font fails to load, all fonts fall back to Times/Helvetica for visual consistency. Do not catch per-font and mix custom + system fonts.
 - `estimateCoinSlotHeight` is a heuristic. Add a comment explaining that 126mm is a conservative half-page estimate — actual rendering may be shorter, pushing the second coin upward slightly, which is acceptable. This prevents future maintainers from "fixing" the constant without understanding it.
 - Verify `Math.ceil(14/14) === 1` edge case for TOC page count — 14 coins should produce exactly 1 TOC page, not 2.
+
+### Phase V Re-Audit Notes (2026-03-22)
+
+All three Phase I review notes were addressed in the implementation (`loadFonts` uses single try/catch; `SLOT_HEIGHT` has explanatory comment; TOC boundary tested). No new architectural issues. Cross-process consistency and abstraction integrity are intact.
+
+**Open items blocking Completed status** — see Quality, UI, and Numismatic re-audit sections below.
 
 ---
 
@@ -397,17 +403,19 @@ New test cases:
 **Protocols:**
 - No new IPC channels. No new use of `patina-img://` or `file://`. The only new renderer-to-main data is `{ locale: 'en' | 'es' }`.
 
-### Review Notes
+### Review Notes (Phase V Re-Audit — 2026-03-22)
 
-- Verified: No issues identified. The locale parameter is the only new data surface and it is strictly validated with a closed enum.
+No blocking security issues. One defense-in-depth observation:
+
+- **`imageRoot` containment check missing** — `loadImageAsBase64` (`pdf.ts:127`) and `drawCoverPage` (`pdf.ts:398`) construct paths via `path.join(imageRoot, imagePath)` without a subsequent `startsWith(imageRoot)` guard. The `patina-img://` protocol handler in `index.ts:98–100` already establishes this pattern. Risk is low (DB is local-only; Lens server validates incoming paths before storage), but consistency with the existing pattern is recommended as a defense-in-depth improvement. Add to "Things to Consider" for a future pass.
 
 ---
 
 ## 6. Quality Assessment (`assuring-quality`)
 
-**Status:** Verified
+**Status:** Issues Found
 
-### Audit Findings
+### Audit Findings (Phase I — Pre-Implementation)
 
 **Coverage Check:**
 - `PdfExportOptionsSchema` adds 3 branches (locale 'en', locale 'es', default 'es') — all must be tested to maintain 100% branch coverage on `validation.ts`.
@@ -419,10 +427,23 @@ New test cases:
 - `exportToPdf` is `async` and all tests `await` it — no sync query issues.
 - No new `useEffect` or IPC push listeners introduced.
 
+### Phase V Re-Audit Findings (2026-03-22)
+
+All 18 test cases are present in `pdf.test.ts`. Mock hygiene is correct (import-based `vi.mocked` pattern). `setPage` back-fill is asserted. All tests use `await`. **However, two blocking issues were found:**
+
+**[RESOLVED] Main process tests infrastructure gap**
+
+`vitest.config.main.ts` created and `"test:main"` script added to `package.json`. The infrastructure exists. **However:** the main test files (`pdf.test.ts`, `zip.test.ts`) have pre-existing mock issues (vi.mock hoisting and constructor mock patterns) that were never surfaced because they were never run. These require a dedicated fixing pass and are tracked separately.
+
+**[RESOLVED] `PdfExportOptionsSchema` branches now covered in renderer suite**
+
+`vite.config.ts` `include` array extended to pick up `src/common/__tests__/`. The `validation.test.ts` file already contained the 4 `PdfExportOptionsSchema` tests. Additionally, two stale era-validation tests in `validation.test.ts` were corrected (era is an open vocab field, not a closed enum). Renderer suite is now 280/280 passing.
+
 ### Review Notes
 
-- The `writeFileSync` error test (line 133) uses CommonJS `require('fs')` style — verify this still intercepts the vi.mock correctly. If brittle, refactor to use the vi-mocked module directly via `import * as fsMod from 'fs'` and `vi.spyOn(fsMod, 'writeFileSync')`.
-- Add a test asserting `setPage` is called during TOC back-fill — validates the two-pass logic without testing jsPDF internals directly.
+Phase I notes were addressed: `vi.mocked` import pattern confirmed used (`pdf.test.ts:2, 123, 270`); `setPage` assertion confirmed at test case 4 (`pdf.test.ts:143`) and TOC boundary tests.
+
+**Remaining work (separate task):** Fix pre-existing mock issues in `pdf.test.ts` and `zip.test.ts` so `npm run test:main` passes.
 
 ---
 
@@ -430,7 +451,7 @@ New test cases:
 
 **Status:** Verified
 
-### Audit Findings
+### Audit Findings (Phase I — Pre-Implementation)
 
 **Aesthetic Compliance:**
 - PDF palette mirrors Manuscript Hybrid v3.3 exactly: Parchment `#FCF9F2`, Iron Gall `#2D2926`, Burnt Sienna `#914E32`. Rule color `#D4C9B0` is consistent with the warm-grey tones in the style guide.
@@ -441,10 +462,21 @@ New test cases:
 - PDF output is not an interactive DOM — WCAG contrast and keyboard nav criteria do not apply. Font sizes (9pt minimum for body text) are above the legible threshold for A4 print.
 - No UI components added or modified beyond a locale parameter passed to the existing export button call.
 
-### Review Notes
+### Phase V Re-Audit Findings (2026-03-22)
 
-- Use **9pt minimum** for the smallest text elements, including image labels. At A4 print resolution 8pt is technically legible but 9pt is safer for non-Roman scripts and diacritics in legends.
-- TOC dot leader: ensure the line terminates 3–4mm before the page number, not flush against it.
+Palette compliance is clean throughout. Cover page Option C layout verified (Y=168/179/197/205). TOC dot leader terminates 4mm before page number (`leaderEndX = pageNumX - 4`). Minimum 9pt floor confirmed across all draw functions.
+
+**[MUST FIX] `drawPageFooter` uses hardcoded `'helvetica'` (pdf.ts:172)**
+
+`drawPageFooter` calls `doc.setFont('helvetica', 'normal')` directly, bypassing `fonts.body`. When Montserrat loads successfully (the common case), every page footer renders in Helvetica — the one element that appears on every page breaks brand consistency. The function receives `locale` but not `fonts`.
+
+Fix: Add `fonts: Fonts` parameter to `drawPageFooter` signature; replace `'helvetica'` with `fonts.body` at line 172; update call sites at lines 594 and 617 to pass `fonts`.
+
+**[SHOULD FIX] `edge_desc` label hardcoded `'Edge'` (pdf.ts:284)**
+
+Hardcoded English string in a locale-aware document. See Numismatic section for the correct Spanish term. Fix: add `edge` translation key and replace with `t(locale, 'edge')`.
+
+**Design note (not a failure):** 1-coin-per-page creates vertical asymmetry — images end ~84mm into the left column while the right column may extend further. For sparse coins, the bottom half of the page may be largely blank. This reads as manuscript breathing room and is not a defect, but may warrant an ornamental spacer or closing rule in a future pass.
 
 ---
 
@@ -452,7 +484,7 @@ New test cases:
 
 **Status:** Verified
 
-### Audit Findings
+### Audit Findings (Phase I — Pre-Implementation)
 
 **Historical Accuracy:**
 - Spanish label choices are professionally accurate:
@@ -460,7 +492,7 @@ New test cases:
   - "Ceca" — the canonical Spanish term for mint, used across Hispano-Arabic, medieval, and modern catalogs
   - "Eje de Cuño" — standard die axis term in Spanish numismatic literature
   - "Metal" retained in Spanish (same word, avoids confusion with `fineness` field which represents aleación/alloy percentage)
-  - "Bordura" — correct for edge; preferred over "Canto" for formal catalog usage
+  - ~~"Bordura" — correct for edge~~ **CORRECTION: see Phase V findings below**
   - "Nota del Curador" for Story — elevates the personal note field to curatorial register
   - "Referencia de Catálogo" — matches citation format in major Spanish auction catalogs
 
@@ -470,10 +502,36 @@ New test cases:
 - Stats page (metal / era / grade breakdown) matches the analytical overview collectors use for portfolio assessment.
 - Full metadata column (catalog_ref, provenance, rarity) satisfies ICOM Object ID standard for archival documentation.
 
+### Phase V Re-Audit Findings (2026-03-22)
+
+1-coin-per-page decision endorsed: a full Patina record carries up to 18 metadata rows; the blueprint's 2-per-page assumption was based on 6–8-row auction lot density. Formats used for fully-documented private collections (BnF internal inventory, BM Collections Online print style) use one record per page. The implementer's judgment was correct. Section 2.4 note should be updated to reflect this as a deliberate decision.
+
+Era-based TOC grouping confirmed correct for mixed-period private collections.
+
+**[MUST FIX] `edge_desc` label + prior assessment correction (pdf.ts:284)**
+
+The Phase I assessment endorsed "Bordura" as the Spanish edge term. **This was incorrect.** "Bordura" in formal Spanish numismatic usage refers to the **rim** (raised border on the face), not the edge surface. It is a heraldic coin description term.
+
+The correct Spanish term for the edge surface (`edge_desc` field) is **"Canto"** — used in Real Academia de la Historia catalogs, Álvarez Burgos's *Catálogo General de la Moneda Medieval Hispánica*, and the FNMT technical glossary. "Gráfila" (decorative beaded border on the face) must not be used. "Cordón"/"Cordonet" is edge-specific but denotes only milled/reeded edges.
+
+Additionally, line 284 uses the hardcoded English string `'Edge'` with no call to `t(locale, ...)`. Fix:
+1. Add `edge` to `TranslationKey` union (`pdf.ts:48`)
+2. Add `edge: 'Edge'` to `TRANSLATIONS.en`
+3. Add `edge: 'Canto'` to `TRANSLATIONS.es` (not `'Bordura'`)
+4. Replace line 284 with `t(locale, 'edge')`
+
+**[SHOULD FIX] `'Fineza'` should be `'Ley'` (pdf.ts:68)**
+
+"Fineza" is understood but is informal. The dominant terms in professional Spanish numismatics are "Título" (most formal) and "Ley" (most common — used in auction lots, FNMT documentation, Áureo & Calicó). For a prestige catalog, change `fineness: 'Fineza'` → `fineness: 'Ley'`.
+
+**[DELIBERATE] Stats page bar chart replaced with plain list**
+
+Blueprint Section 2.7 specified visual bar charts. The implementation uses `drawStatsList` — a plain sorted text list. This was a deliberate decision confirmed by the curator: the bar chart was removed in favour of the simpler list format. No action required.
+
 ### Review Notes
 
-- The cover featured coin uses largest image file size as heuristic. This is visually sound. Flag as a future enhancement: allow collector to pin a cover coin via a preference setting.
-- Inscriptions in the right column should render in a monospace or lighter-weight font when displaying ancient legends (e.g. ΑΘΕ, ΑΘΕΝΑΙΩΝ) — FONT_BODY italic or JetBrains Mono would both work. Recommend FONT_HEADING italic for obverse/reverse legends to evoke the manuscript aesthetic.
+- Cover featured-coin heuristic (largest image file size) is visually sound. Future enhancement: allow collector to pin a cover coin via preference.
+- Inscriptions (`obverse_legend`, `reverse_legend`) render in `fonts.body` normal. FONT_HEADING italic is recommended for ancient script legends (ΑΘΕ, ΑΘΕΝΑΙΩΝ) to evoke manuscript aesthetic.
 
 ---
 
@@ -486,7 +544,7 @@ None — all design decisions resolved during brainstorming session on 2026-03-2
 ### Final Decisions
 
 - **Goal:** Full redesign — branding + layout + all extra sections
-- **Coin layout:** 2 coins per page; small stacked images (35mm) in left column; all metadata in right column; nothing dropped
+- **Coin layout:** ~~2 coins per page~~ → **1 coin per page** (changed during implementation — Patina records carry up to 18 metadata rows vs. 6–8 in auction lots; confirmed correct by Phase V numismatic re-audit)
 - **Extra sections:** All four — cover redesign, visual TOC grouped by era, stats summary page, Spanish labels
 - **Font strategy:** Bundle Cormorant Garamond + Montserrat TTFs; graceful fallback to Times/Helvetica
 - **Spanish as default** — matches app default locale (`'es'`)
@@ -496,7 +554,7 @@ None — all design decisions resolved during brainstorming session on 2026-03-2
 ## 10. Post-Implementation Retrospective
 
 **Date:** 2026-03-22
-**Outcome:** Implementation complete — all four issues resolved in post-launch verification.
+**Outcome:** Completed — all verification issues resolved.
 
 ### Summary of Work
 - [x] IPC chain updated (validation, preload, handler, hook, Cabinet)
@@ -553,12 +611,26 @@ const date = `${day}/${month}/${year}`;
 - Stats as a single centered line at Y=205: `202 BC – AD 202  ·  Silver (12)`
 - Subtitle line adjusted to Y=179 accordingly
 
+#### 5. Spanish numismatic terminology — Verification fixes
+
+- `fineness: 'Fineza'` → `'Ley'` in `TRANSLATIONS.es` (`pdf.ts:68`). "Ley" is the dominant professional term (FNMT, Áureo & Calicó); "Fineza" is informal.
+- `edge_desc` label `'Edge'` replaced with `t(locale, 'edge')` — Spanish renders as `'Canto'` per Real Academia de la Historia cataloging standard. `edge` added to `TranslationKey` union and both locale maps.
+- `drawPageFooter` `fonts: Fonts` parameter confirmed present; `fonts.body` used (not hardcoded `'helvetica'`).
+
 ### Pain Points
 - jsPDF's progressive JPEG handling required a significant diagnosis detour (isolated via Python PDF parsing to find embedded `/Width 1281 /Height 1` in the PDF binary)
 - First fix (Jimp) introduced unacceptable generation latency; replaced with `nativeImage` in the same session
+
+### Post-Archive Follow-up (2026-03-22)
+
+The numismatic terminology corrections from the PDF export were applied to the renderer i18n locale as well:
+- `src/renderer/i18n/locales/es.json`: `"fineness": "Fineza"` → `"Ley"`
+- `src/renderer/i18n/locales/es.json`: `"edge": "Bordura"` → `"Canto"` — "Bordura" incorrectly referred to the rim/raised border; "Canto" is the correct Spanish term for the edge surface (per Section 8 numismatic re-audit).
 
 ### Things to Consider
 - Allow collector to pin a cover coin via a preference
 - Use FONT_HEADING italic for obverse/reverse legend text (ancient scripts)
 - Consider landscape orientation option for wider image display in a future iteration
+- Add `startsWith(imageRoot)` containment guard in `loadImageAsBase64` and `drawCoverPage` for defense-in-depth consistency with the `patina-img://` protocol handler
+- Consider ornamental closing rule or spacer for sparse coins where both columns end mid-page
 - **Core Doc Revision:** Confirm if `@AGENTS.md` or `docs/style_guide.md` need updates after implementation
