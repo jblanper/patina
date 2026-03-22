@@ -23,7 +23,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Export API
   exportToZip: (options: { includeImages?: boolean; includeCsv?: boolean }) => ipcRenderer.invoke('export:toZip', options),
-  exportToPdf: () => ipcRenderer.invoke('export:toPdf'),
+  exportToPdf: (locale: 'en' | 'es') => ipcRenderer.invoke('export:toPdf', { locale }),
 
   // Vocabulary API
   getVocab: (field: VocabField, locale?: 'en' | 'es'): Promise<string[]> =>

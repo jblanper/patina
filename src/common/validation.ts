@@ -156,6 +156,14 @@ export const VocabResetSchema = z.object({
 }).strict();
 
 /**
+ * PDF Export Options Schema
+ */
+export const PdfExportOptionsSchema = z.object({
+  locale: z.enum(['en', 'es']).default('es'),
+}).strict();
+export type PdfExportOptions = z.infer<typeof PdfExportOptionsSchema>;
+
+/**
  * CSV field escaping to prevent formula injection
  * Prefixes formula characters with apostrophe
  */

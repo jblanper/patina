@@ -5,6 +5,7 @@ import {
   FilterStateSchema,
   NewCoinImageSchema,
   ExportOptionsSchema,
+  PdfExportOptionsSchema,
   exportCsvField,
   VocabGetSchema,
   VocabAddSchema,
@@ -593,5 +594,30 @@ describe('VocabResetSchema', () => {
     const result = VocabResetSchema.safeParse({ field: 'metal', extra: 'bad' });
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error.issues.some(i => i.code === 'unrecognized_keys')).toBe(true);
+  });
+
+  describe('PdfExportOptionsSchema', () => {
+    it('TC-PDF-01: accepts locale "en"', () => {
+      expect(PdfExportOptionsSchema.safeParse({ locale: 'en' }).success).toBe(true);
+    });
+
+    it('TC-PDF-02: accepts locale "es"', () => {
+      expect(PdfExportOptionsSchema.safeParse({ locale: 'es' }).success).toBe(true);
+    });
+
+    it('TC-PDF-03: defaults locale to "es" when omitted', () => {
+      const result = PdfExportOptionsSchema.safeParse({});
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.data.locale).toBe('es');
+    });
+
+    it('TC-PDF-04: rejects invalid locale value', () => {
+      expect(PdfExportOptionsSchema.safeParse({ locale: 'fr' }).success).toBe(false);
+    });
+
+    it('TC-PDF-05: rejects extra properties (.strict)', () => {
+      const result = PdfExportOptionsSchema.safeParse({ locale: 'es', extra: true });
+      expect(result.success).toBe(false);
+    });
   });
 });

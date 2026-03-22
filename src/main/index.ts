@@ -5,7 +5,7 @@ import { dbService } from './db';
 import { createLensServer } from './server';
 import { getLocalIp } from './ip';
 import { NewCoin, NewCoinImage } from '../common/types';
-import { ExportOptionsSchema, VocabGetSchema, VocabAddSchema, VocabSearchSchema, VocabIncrementSchema, VocabResetSchema, PreferenceGetSchema, PreferenceSetSchema } from '../common/validation';
+import { ExportOptionsSchema, PdfExportOptionsSchema, VocabGetSchema, VocabAddSchema, VocabSearchSchema, VocabIncrementSchema, VocabResetSchema, PreferenceGetSchema, PreferenceSetSchema } from '../common/validation';
 import { exportToZip } from './export/zip';
 import { exportToPdf } from './export/pdf';
 
@@ -184,18 +184,19 @@ app.whenReady().then(() => {
     return exportToZip(result.filePath, validated.includeImages, validated.includeCsv);
   });
 
-  ipcMain.handle('export:toPdf', async () => {
+  ipcMain.handle('export:toPdf', async (_, data: unknown) => {
+    const { locale } = validateIpc(PdfExportOptionsSchema, data);
     const result = await dialog.showSaveDialog({
       title: 'Export PDF Catalog',
       defaultPath: `patina-catalog-${Date.now()}.pdf`,
       filters: [{ name: 'PDF Document', extensions: ['pdf'] }]
     });
-    
+
     if (result.canceled || !result.filePath) {
       return { success: false, error: 'Export cancelled' };
     }
-    
-    return exportToPdf(result.filePath);
+
+    return exportToPdf(result.filePath, locale);
   });
 
   // Vocabulary IPC Handlers

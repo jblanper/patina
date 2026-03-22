@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCoins } from '../hooks/useCoins';
 import { useExport } from '../hooks/useExport';
+import { useLanguage } from '../hooks/useLanguage';
 import { GalleryGrid } from './GalleryGrid';
 import { PatinaSidebar } from './PatinaSidebar';
 import { SearchBar } from './SearchBar';
@@ -23,6 +24,7 @@ export const Cabinet: React.FC = () => {
     availableGrades
   } = useCoins();
 
+  const { language } = useLanguage();
   const { status, resultPath, error: exportError, exportToZip, exportToPdf, reset } = useExport();
 
   if (error) {
@@ -52,7 +54,7 @@ export const Cabinet: React.FC = () => {
                 <button className="btn-action" onClick={() => exportToZip()}>
                   {t('cabinet.exportArchive')}
                 </button>
-                <button className="btn-action" onClick={() => exportToPdf()}>
+                <button className="btn-action" onClick={() => exportToPdf(language)}>
                   {t('cabinet.generateCatalog')}
                 </button>
                 <Link to="/glossary" className="btn-action glossary-toolbar-link">

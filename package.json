@@ -58,6 +58,11 @@
     "vitest": "^4.1.0",
     "wait-on": "^9.0.4"
   },
+  "build": {
+    "extraResources": [
+      { "from": "assets/fonts/", "to": "fonts/", "filter": ["**/*.ttf"] }
+    ]
+  },
   "dependencies": {
     "archiver": "^7.0.1",
     "better-sqlite3": "^12.6.2",

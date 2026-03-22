@@ -34,11 +34,11 @@ export function useExport() {
     }
   }, []);
 
-  const exportToPdf = useCallback(async () => {
+  const exportToPdf = useCallback(async (locale: 'en' | 'es' = 'es') => {
     setState({ status: 'exporting', type: 'pdf', error: null, resultPath: null });
-    
+
     try {
-      const result = await window.electronAPI.exportToPdf();
+      const result = await window.electronAPI.exportToPdf(locale);
       
       if (result.success) {
         setState({ status: 'success', type: 'pdf', error: null, resultPath: result.path || null });

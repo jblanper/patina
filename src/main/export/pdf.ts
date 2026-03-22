@@ -4,15 +4,117 @@ import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
 import { dbService } from '../db';
+import { Coin, CoinImage } from '../../common/types';
 
 const isDev = !app.isPackaged;
 const imageRoot = isDev
   ? path.join(process.cwd(), 'data', 'images')
   : path.join(app.getPath('userData'), 'images');
 
-const BLACK = '#000000';
-const GRAY = '#666666';
-const LIGHT_GRAY = '#CCCCCC';
+const fontRoot = isDev
+  ? path.join(process.cwd(), 'assets', 'fonts')
+  : path.join(process.resourcesPath, 'fonts');
+
+// Brand palette — Manuscript Hybrid v3.3
+const PARCHMENT    = '#FCF9F2';
+const IRON_GALL    = '#2D2926';
+const BURNT_SIENNA = '#914E32';
+const RULE_COLOR   = '#D4C9B0';
+
+// Layout constants
+const MARGIN      = 20;
+const CONTENT_W   = 170;  // 210 - 2×20
+const IMG_COL_W   = 68;   // left column: images
+const META_COL_W  = 98;   // right column: metadata (4mm gap between cols)
+// SLOT_HEIGHT is a conservative half-page heuristic (~126mm). Actual rendering
+// may be shorter, pushing the second coin upward slightly — this is acceptable.
+// Do not increase this constant without re-testing long-text coins.
+const SLOT_HEIGHT = 126;
+const IMG_SIZE    = 35;   // obverse/reverse image box (mm)
+
+type Locale = 'en' | 'es';
+
+type TranslationKey =
+  | 'specifications' | 'obverse' | 'reverse'
+  | 'metal' | 'grade' | 'mint' | 'weight'
+  | 'diameter' | 'dieAxis' | 'fineness'
+  | 'catalogRef' | 'provenance'
+  | 'story' | 'acquisition'
+  | 'tableOfContents' | 'collectionStatistics'
+  | 'page' | 'generated' | 'totalCoins'
+  | 'inscriptions' | 'denomination'
+  | 'byMetal' | 'byEra' | 'byGrade'
+  | 'totalValue' | 'imageUnavailable'
+  | 'era' | 'rarity';
+
+const TRANSLATIONS: Record<Locale, Record<TranslationKey, string>> = {
+  en: {
+    specifications: 'Specifications', obverse: 'Obverse', reverse: 'Reverse',
+    metal: 'Metal', grade: 'Grade', mint: 'Mint', weight: 'Weight',
+    diameter: 'Diameter', dieAxis: 'Die Axis', fineness: 'Fineness',
+    catalogRef: 'Catalog Reference', provenance: 'Provenance',
+    story: 'Story', acquisition: 'Acquisition',
+    tableOfContents: 'Table of Contents',
+    collectionStatistics: 'Collection Statistics',
+    page: 'Page', generated: 'Generated', totalCoins: 'Total Coins',
+    inscriptions: 'Inscriptions', denomination: 'Denomination',
+    byMetal: 'By Metal', byEra: 'By Era', byGrade: 'By Grade',
+    totalValue: 'Total Value', imageUnavailable: '[Image unavailable]',
+    era: 'Era', rarity: 'Rarity',
+  },
+  es: {
+    specifications: 'Especificaciones', obverse: 'Anverso', reverse: 'Reverso',
+    metal: 'Metal', grade: 'Grado', mint: 'Ceca', weight: 'Peso',
+    diameter: 'Diámetro', dieAxis: 'Eje de Cuño', fineness: 'Fineza',
+    catalogRef: 'Referencia de Catálogo', provenance: 'Procedencia',
+    story: 'Nota del Curador', acquisition: 'Adquisición',
+    tableOfContents: 'Índice de Contenidos',
+    collectionStatistics: 'Estadísticas de la Colección',
+    page: 'Página', generated: 'Generado', totalCoins: 'Total de Monedas',
+    inscriptions: 'Inscripciones', denomination: 'Denominación',
+    byMetal: 'Por Metal', byEra: 'Por Época', byGrade: 'Por Grado',
+    totalValue: 'Valor Total', imageUnavailable: '[Imagen no disponible]',
+    era: 'Época', rarity: 'Rareza',
+  },
+};
+
+function t(locale: Locale, key: TranslationKey): string {
+  return TRANSLATIONS[locale][key];
+}
+
+interface Fonts {
+  heading: string;
+  body: string;
+}
+
+interface FontDef {
+  file: string;
+  name: string;
+  style: string;
+}
+
+const FONT_DEFS: FontDef[] = [
+  { file: 'CormorantGaramond-Regular.ttf', name: 'CormorantGaramond', style: 'normal' },
+  { file: 'CormorantGaramond-Bold.ttf',    name: 'CormorantGaramond', style: 'bold'   },
+  { file: 'CormorantGaramond-Italic.ttf',  name: 'CormorantGaramond', style: 'italic' },
+  { file: 'Montserrat-Regular.ttf',        name: 'Montserrat',        style: 'normal' },
+  { file: 'Montserrat-Bold.ttf',           name: 'Montserrat',        style: 'bold'   },
+];
+
+// All fonts must load together or all fall back — never mix custom and system fonts
+function loadFonts(doc: jsPDF): boolean {
+  try {
+    for (const def of FONT_DEFS) {
+      const filePath = path.join(fontRoot, def.file);
+      const data = fs.readFileSync(filePath).toString('base64');
+      doc.addFileToVFS(def.file, data);
+      doc.addFont(def.file, def.name, def.style);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 interface ExportResult {
   success: boolean;
@@ -33,271 +135,494 @@ function loadImageAsBase64(imagePath: string): string | null {
   }
 }
 
-export async function exportToPdf(targetPath: string): Promise<ExportResult> {
+function applyPageBackground(doc: jsPDF): void {
+  doc.setFillColor(PARCHMENT);
+  doc.rect(0, 0, 210, 297, 'F');
+}
+
+function drawHorizontalRule(doc: jsPDF, y: number, color: string = RULE_COLOR): void {
+  doc.setDrawColor(color);
+  doc.setLineWidth(0.3);
+  doc.line(MARGIN, y, MARGIN + CONTENT_W, y);
+}
+
+function drawSectionHeader(doc: jsPDF, label: string, x: number, y: number, fonts: Fonts): number {
+  doc.setFont(fonts.heading, 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(BURNT_SIENNA);
+  doc.text(label, x, y);
+  return y + 7;
+}
+
+function drawPageFooter(doc: jsPDF, pageNum: number, total: number, locale: Locale): void {
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(IRON_GALL);
+  doc.text(`${t(locale, 'page')} ${pageNum} / ${total}`, 105, 287, { align: 'center' });
+}
+
+function estimateCoinSlotHeight(coin: Coin, hasImages: boolean): number {
+  let height = 18; // title + subtitle + rule
+  if (hasImages) height += 82; // 2×35mm + 2×6mm label + gap
+  height += 40; // spec table: ~10 rows
+  if (coin.story) height += Math.ceil(coin.story.length / 55) * 5;
+  if (coin.provenance) height += Math.ceil(coin.provenance.length / 55) * 5;
+  return height;
+}
+
+function drawCoinSlot(
+  doc: jsPDF,
+  coin: Coin,
+  images: CoinImage[],
+  slotY: number,
+  locale: Locale,
+  fonts: Fonts,
+): number {
+  // 1. Title
+  doc.setFont(fonts.heading, 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(IRON_GALL);
+  doc.text(coin.title, MARGIN, slotY);
+  slotY += 6;
+
+  // 2. Subtitle: issuer · year · era · mint (falsy values filtered)
+  const subtitleParts = [coin.issuer, coin.year_display, coin.era, coin.mint].filter(Boolean);
+  doc.setFont(fonts.body, 'italic');
+  doc.setFontSize(9);
+  doc.setTextColor(BURNT_SIENNA);
+  if (subtitleParts.length > 0) {
+    doc.text(subtitleParts.join(' · '), MARGIN, slotY);
+  }
+  slotY += 5;
+
+  // 3. Rule
+  drawHorizontalRule(doc, slotY);
+  slotY += 5;
+
+  const obverseImg = images.find(img => img.label === 'Obverse' || img.is_primary);
+  const reverseImg = images.find(img => img.label === 'Reverse');
+  const hasImages = !!(obverseImg || reverseImg);
+
+  // 4. Left column: stacked images
+  if (hasImages) {
+    const imgX = MARGIN;
+
+    if (obverseImg) {
+      const imgData = loadImageAsBase64(obverseImg.path);
+      if (imgData) {
+        try {
+          doc.addImage(imgData, 'JPEG', imgX, slotY, IMG_SIZE, IMG_SIZE);
+        } catch {
+          doc.setFont(fonts.body, 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(IRON_GALL);
+          doc.text(t(locale, 'imageUnavailable'), imgX + IMG_SIZE / 2, slotY + IMG_SIZE / 2, { align: 'center' });
+        }
+        doc.setDrawColor(RULE_COLOR);
+        doc.setLineWidth(0.3);
+        doc.rect(imgX, slotY, IMG_SIZE, IMG_SIZE);
+        doc.setFont(fonts.body, 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(IRON_GALL);
+        doc.text(t(locale, 'obverse'), imgX + IMG_SIZE / 2, slotY + IMG_SIZE + 4, { align: 'center' });
+      }
+    }
+
+    if (reverseImg) {
+      const revY = slotY + IMG_SIZE + 10;
+      const imgData = loadImageAsBase64(reverseImg.path);
+      if (imgData) {
+        try {
+          doc.addImage(imgData, 'JPEG', imgX, revY, IMG_SIZE, IMG_SIZE);
+        } catch {
+          doc.setFont(fonts.body, 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(IRON_GALL);
+          doc.text(t(locale, 'imageUnavailable'), imgX + IMG_SIZE / 2, revY + IMG_SIZE / 2, { align: 'center' });
+        }
+        doc.setDrawColor(RULE_COLOR);
+        doc.setLineWidth(0.3);
+        doc.rect(imgX, revY, IMG_SIZE, IMG_SIZE);
+        doc.setFont(fonts.body, 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(IRON_GALL);
+        doc.text(t(locale, 'reverse'), imgX + IMG_SIZE / 2, revY + IMG_SIZE + 4, { align: 'center' });
+      }
+    }
+  }
+
+  // 5. Right column: all metadata via autoTable
+  const metaX = MARGIN + IMG_COL_W + 4;
+
+  const metaRows: string[][] = [
+    [t(locale, 'denomination'), coin.denomination || '—'],
+    [t(locale, 'metal'),        coin.metal || '—'],
+    [t(locale, 'weight'),       coin.weight != null ? `${Number(coin.weight).toFixed(2)}g` : '—'],
+    [t(locale, 'diameter'),     coin.diameter != null ? `${Number(coin.diameter).toFixed(1)}mm` : '—'],
+    [t(locale, 'fineness'),     coin.fineness || '—'],
+    [t(locale, 'dieAxis'),      coin.die_axis || '—'],
+    [t(locale, 'grade'),        coin.grade || '—'],
+    [t(locale, 'mint'),         coin.mint || '—'],
+    [t(locale, 'catalogRef'),   coin.catalog_ref || '—'],
+    [t(locale, 'rarity'),       coin.rarity || '—'],
+  ];
+
+  if (coin.obverse_legend) metaRows.push([t(locale, 'obverse'), coin.obverse_legend]);
+  if (coin.obverse_desc)   metaRows.push([`${t(locale, 'obverse')} Desc.`, coin.obverse_desc]);
+  if (coin.reverse_legend) metaRows.push([t(locale, 'reverse'), coin.reverse_legend]);
+  if (coin.reverse_desc)   metaRows.push([`${t(locale, 'reverse')} Desc.`, coin.reverse_desc]);
+  if (coin.edge_desc)      metaRows.push(['Edge', coin.edge_desc]);
+  if (coin.provenance)     metaRows.push([t(locale, 'provenance'), coin.provenance]);
+  if (coin.story)          metaRows.push([t(locale, 'story'), coin.story]);
+
+  const acquisitionParts: string[] = [];
+  if (coin.purchase_price != null) acquisitionParts.push(`$${coin.purchase_price}`);
+  if (coin.purchase_date)          acquisitionParts.push(coin.purchase_date);
+  if (coin.purchase_source)        acquisitionParts.push(coin.purchase_source);
+  if (acquisitionParts.length > 0) {
+    metaRows.push([t(locale, 'acquisition'), acquisitionParts.join(' · ')]);
+  }
+
+  autoTable(doc, {
+    startY: slotY,
+    body: metaRows,
+    theme: 'plain',
+    styles: {
+      font: fonts.body,
+      fontSize: 9,
+      textColor: IRON_GALL,
+      cellPadding: 2,
+    },
+    columnStyles: {
+      0: { cellWidth: 30, fontStyle: 'bold', halign: 'left', textColor: BURNT_SIENNA },
+      1: { cellWidth: META_COL_W - 30, halign: 'left' },
+    },
+    margin: { left: metaX, right: MARGIN },
+  });
+
+  return (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY;
+}
+
+function drawBarChart(
+  doc: jsPDF,
+  data: Record<string, number>,
+  x: number,
+  y: number,
+  maxBarWidth: number,
+  fonts: Fonts,
+): number {
+  const entries = Object.entries(data)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
+  const maxCount = entries[0]?.[1] ?? 1;
+
+  for (const [label, count] of entries) {
+    doc.setFont(fonts.body, 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(IRON_GALL);
+    doc.text(label.slice(0, 18), x, y + 3);
+    const barW = (count / maxCount) * maxBarWidth;
+    doc.setFillColor(BURNT_SIENNA);
+    doc.rect(x + 40, y - 1, barW, 4, 'F');
+    doc.setFontSize(8);
+    doc.text(String(count), x + 40 + barW + 2, y + 3);
+    y += 8;
+  }
+  return y;
+}
+
+function drawStatsPage(doc: jsPDF, coins: Coin[], locale: Locale, fonts: Fonts): void {
+  let y = MARGIN;
+  y = drawSectionHeader(doc, t(locale, 'collectionStatistics'), MARGIN, y, fonts);
+  y += 5;
+
+  const byMetal: Record<string, number> = {};
+  const byEra: Record<string, number>   = {};
+  const byGrade: Record<string, number> = {};
+  for (const coin of coins) {
+    if (coin.metal) byMetal[coin.metal] = (byMetal[coin.metal] || 0) + 1;
+    if (coin.era)   byEra[coin.era]     = (byEra[coin.era] || 0) + 1;
+    if (coin.grade) byGrade[coin.grade] = (byGrade[coin.grade] || 0) + 1;
+  }
+
+  doc.setFont(fonts.heading, 'italic');
+  doc.setFontSize(11);
+  doc.setTextColor(BURNT_SIENNA);
+  doc.text(t(locale, 'byMetal'), MARGIN, y);
+  y += 6;
+  y = drawBarChart(doc, byMetal, MARGIN, y, 100, fonts);
+  y += 5;
+
+  doc.setFont(fonts.heading, 'italic');
+  doc.setFontSize(11);
+  doc.setTextColor(BURNT_SIENNA);
+  doc.text(t(locale, 'byEra'), MARGIN, y);
+  y += 6;
+  y = drawBarChart(doc, byEra, MARGIN, y, 100, fonts);
+  y += 5;
+
+  doc.setFont(fonts.heading, 'italic');
+  doc.setFontSize(11);
+  doc.setTextColor(BURNT_SIENNA);
+  doc.text(t(locale, 'byGrade'), MARGIN, y);
+  y += 6;
+  y = drawBarChart(doc, byGrade, MARGIN, y, 100, fonts);
+
+  if (coins.some(c => c.purchase_price != null)) {
+    const totalValue = coins.reduce((sum, c) => sum + (c.purchase_price ?? 0), 0);
+    y += 8;
+    doc.setFont(fonts.body, 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(IRON_GALL);
+    doc.text(`${t(locale, 'totalValue')}: $${totalValue.toFixed(2)}`, MARGIN, y);
+  }
+}
+
+function drawCoverPage(
+  doc: jsPDF,
+  coins: Coin[],
+  allImages: Map<number, CoinImage[]>,
+  locale: Locale,
+  fonts: Fonts,
+): void {
+  // Featured coin: largest image file by size
+  let featuredImgData: string | null = null;
+  let maxSize = 0;
+  for (const coin of coins) {
+    const imgs = allImages.get(coin.id) ?? [];
+    const primary = imgs.find(img => img.is_primary) ?? imgs[0];
+    if (!primary) continue;
+    const fullPath = path.join(imageRoot, primary.path);
+    try {
+      const { size } = fs.statSync(fullPath);
+      if (size > maxSize) {
+        maxSize = size;
+        featuredImgData = loadImageAsBase64(primary.path);
+      }
+    } catch {
+      // skip inaccessible files
+    }
+  }
+
+  // Featured image hero — 100×100mm centered, 1pt Burnt Sienna frame
+  if (featuredImgData) {
+    try {
+      doc.addImage(featuredImgData, 'JPEG', 55, 50, 100, 100);
+    } catch {
+      // skip
+    }
+    doc.setDrawColor(BURNT_SIENNA);
+    doc.setLineWidth(1);
+    doc.rect(55, 50, 100, 100);
+  }
+
+  // Collection title
+  doc.setFont(fonts.heading, 'bold');
+  doc.setFontSize(36);
+  doc.setTextColor(IRON_GALL);
+  doc.text('Patina', 105, 165, { align: 'center' });
+
+  // Subtitle line
+  const date = new Date().toLocaleDateString();
+  doc.setFont(fonts.body, 'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(IRON_GALL);
+  doc.text(
+    `${t(locale, 'generated')}: ${date}  ·  ${coins.length} ${t(locale, 'totalCoins')}`,
+    105, 176, { align: 'center' },
+  );
+
+  // Stats panel
+  doc.setFillColor(RULE_COLOR);
+  doc.rect(MARGIN, 200, CONTENT_W, 30, 'F');
+
+  if (coins.length > 0) {
+    const years = coins.map(c => c.year_numeric).filter((y): y is number => y != null);
+    const yearRange = years.length > 0
+      ? `${Math.min(...years)} – ${Math.max(...years)}`
+      : '—';
+    const metalCounts: Record<string, number> = {};
+    for (const coin of coins) {
+      if (coin.metal) metalCounts[coin.metal] = (metalCounts[coin.metal] || 0) + 1;
+    }
+    const topMetal = Object.entries(metalCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
+
+    doc.setFont(fonts.body, 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(IRON_GALL);
+    doc.text(yearRange, MARGIN + 10, 218);
+    doc.text(topMetal, MARGIN + 10, 226);
+  }
+}
+
+interface TocEntry {
+  coin: Coin;
+  pageNum: number;
+  obverseImg: CoinImage | undefined;
+}
+
+function groupAndSortByEra(coins: Coin[]): Coin[] {
+  return [...coins].sort((a, b) => {
+    const eraA = a.era ?? '';
+    const eraB = b.era ?? '';
+    if (eraA !== eraB) return eraA.localeCompare(eraB);
+    return a.title.localeCompare(b.title);
+  });
+}
+
+function renderTocEntries(
+  doc: jsPDF,
+  entries: TocEntry[],
+  locale: Locale,
+  fonts: Fonts,
+): void {
+  let y = MARGIN + 14;
+  let lastEra = '';
+
+  for (const entry of entries) {
+    if (entry.coin.era && entry.coin.era !== lastEra) {
+      lastEra = entry.coin.era;
+      doc.setFont(fonts.heading, 'italic');
+      doc.setFontSize(11);
+      doc.setTextColor(BURNT_SIENNA);
+      doc.text(entry.coin.era, MARGIN, y);
+      y += 6;
+    }
+
+    // Thumbnail
+    if (entry.obverseImg) {
+      const imgData = loadImageAsBase64(entry.obverseImg.path);
+      if (imgData) {
+        try {
+          doc.addImage(imgData, 'JPEG', MARGIN, y - 3, 15, 15);
+        } catch {
+          // skip
+        }
+      }
+    }
+
+    // Title
+    doc.setFont(fonts.body, 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(IRON_GALL);
+    doc.text(entry.coin.title, MARGIN + 18, y + 5);
+
+    // Dot leader — terminates 3–4mm before page number
+    const titleWidth = doc.getTextWidth(entry.coin.title);
+    const titleEndX  = MARGIN + 18 + titleWidth;
+    const pageNumX   = 190;
+    const leaderEndX = pageNumX - 4;
+    if (titleEndX < leaderEndX) {
+      doc.setLineDashPattern([0.5, 2], 0);
+      doc.setDrawColor(IRON_GALL);
+      doc.setLineWidth(0.3);
+      doc.line(titleEndX + 2, y + 4, leaderEndX, y + 4);
+      doc.setLineDashPattern([], 0);
+    }
+
+    // Page number right-aligned
+    doc.text(String(entry.pageNum), pageNumX, y + 5, { align: 'right' });
+
+    y += 20;
+  }
+}
+
+export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Promise<ExportResult> {
   try {
-    const coins = dbService.getCoins();
+    // 1. Set up document and fonts
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const pageWidth = 210;
-    const margin = 20;
-    const contentWidth = pageWidth - margin * 2;
+    const fontsLoaded = loadFonts(doc);
+    const fonts: Fonts = {
+      heading: fontsLoaded ? 'CormorantGaramond' : 'times',
+      body:    fontsLoaded ? 'Montserrat'        : 'helvetica',
+    };
 
-    const totalCoins = coins.length;
-    let currentPage = 1;
-
-    doc.setFont('times', 'bold');
-    doc.setFontSize(28);
-    doc.setTextColor(BLACK);
-    doc.text('Patina Collection Catalog', margin, 40);
-
-    doc.setFont('times', 'normal');
-    doc.setFontSize(11);
-    doc.setTextColor(GRAY);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, margin, 52);
-    doc.text(`Total Coins: ${totalCoins}`, margin, 60);
-
-    if (totalCoins > 0) {
-      doc.setFont('times', 'bold');
-      doc.setFontSize(12);
-      doc.setTextColor(BLACK);
-      doc.text('Contents', margin, 80);
-
-      doc.setFont('times', 'normal');
-      doc.setFontSize(10);
-      doc.setTextColor(GRAY);
-      let tocY = 90;
-      coins.forEach((coin, index) => {
-        if (tocY > 270) {
-          doc.addPage();
-          currentPage++;
-          tocY = 25;
-        }
-        doc.text(`${index + 1}. ${coin.title}`, margin + 5, tocY);
-        tocY += 7;
-      });
+    // 2. Load all data
+    const coins = dbService.getCoins();
+    const allImages = new Map<number, CoinImage[]>();
+    for (const coin of coins) {
+      allImages.set(coin.id, dbService.getImagesByCoinId(coin.id));
     }
 
-    for (let i = 0; i < coins.length; i++) {
-      const coin = coins[i];
-      const images = dbService.getImagesByCoinId(coin.id);
-      const obverseImg = images.find(img => img.label === 'Obverse' || (!img.label && img.is_primary));
-      const reverseImg = images.find(img => img.label === 'Reverse');
+    // 3. Cover page (page 1)
+    applyPageBackground(doc);
+    drawCoverPage(doc, coins, allImages, locale, fonts);
 
+    // 4. Compute pagePlan: pair coins unless overflow or last coin
+    const pagePlan: { coins: Coin[] }[] = [];
+    let i = 0;
+    while (i < coins.length) {
+      const coinA = coins[i];
+      const estA  = estimateCoinSlotHeight(coinA, (allImages.get(coinA.id)?.length ?? 0) > 0);
+      if (estA > SLOT_HEIGHT || i + 1 >= coins.length) {
+        pagePlan.push({ coins: [coinA] });
+        i++;
+      } else {
+        pagePlan.push({ coins: [coinA, coins[i + 1]] });
+        i += 2;
+      }
+    }
+
+    // 5. TOC placeholder pages (two-pass: insert, then back-fill after coin pages are rendered)
+    const tocPageCount = Math.ceil(Math.max(coins.length, 1) / 14);
+    const tocPageNums: number[] = [];
+    for (let tp = 0; tp < tocPageCount; tp++) {
       doc.addPage();
-      currentPage++;
-
-      let yPos = 25;
-
-      doc.setFont('times', 'bold');
-      doc.setFontSize(18);
-      doc.setTextColor(BLACK);
-      doc.text(coin.title, margin, yPos);
-      yPos += 8;
-
-      doc.setFont('times', 'normal');
-      doc.setFontSize(10);
-      doc.setTextColor(GRAY);
-      const subtitle = [coin.issuer, coin.year_display, coin.era, coin.mint].filter(Boolean).join(' · ');
-      doc.text(subtitle, margin, yPos);
-      yPos += 10;
-
-      doc.setDrawColor(LIGHT_GRAY);
-      doc.setLineWidth(0.2);
-      doc.line(margin, yPos, pageWidth - margin, yPos);
-      yPos += 10;
-
-      const singleImgWidth = contentWidth * 0.45;
-      const imgBoxHeight = 55;
-
-      if (obverseImg || reverseImg) {
-        if (obverseImg) {
-          const imgData = loadImageAsBase64(obverseImg.path);
-          if (imgData) {
-            try {
-              doc.addImage(imgData, 'JPEG', margin, yPos, singleImgWidth, imgBoxHeight);
-              doc.setDrawColor(LIGHT_GRAY);
-              doc.setLineWidth(0.3);
-              doc.rect(margin, yPos, singleImgWidth, imgBoxHeight);
-              doc.setFont('times', 'italic');
-              doc.setFontSize(8);
-              doc.setTextColor(GRAY);
-              doc.text('Obverse', margin + singleImgWidth / 2, yPos + imgBoxHeight + 4, { align: 'center' });
-            } catch {
-              doc.setFont('times', 'normal');
-              doc.setFontSize(8);
-              doc.text('[Image unavailable]', margin + singleImgWidth / 2, yPos + imgBoxHeight / 2, { align: 'center' });
-            }
-          }
-        }
-
-        if (reverseImg) {
-          const imgData = loadImageAsBase64(reverseImg.path);
-          const offsetX = margin + singleImgWidth + 10;
-          if (imgData) {
-            try {
-              doc.addImage(imgData, 'JPEG', offsetX, yPos, singleImgWidth, imgBoxHeight);
-              doc.setDrawColor(LIGHT_GRAY);
-              doc.setLineWidth(0.3);
-              doc.rect(offsetX, yPos, singleImgWidth, imgBoxHeight);
-              doc.setFont('times', 'italic');
-              doc.setFontSize(8);
-              doc.setTextColor(GRAY);
-              doc.text('Reverse', offsetX + singleImgWidth / 2, yPos + imgBoxHeight + 4, { align: 'center' });
-            } catch {
-              doc.setFont('times', 'normal');
-              doc.setFontSize(8);
-              doc.text('[Image unavailable]', offsetX + singleImgWidth / 2, yPos + imgBoxHeight / 2, { align: 'center' });
-            }
-          }
-        }
-
-        yPos += imgBoxHeight + 12;
-      }
-
-      doc.setDrawColor(LIGHT_GRAY);
-      doc.setLineWidth(0.2);
-      doc.line(margin, yPos, pageWidth - margin, yPos);
-      yPos += 8;
-
-      doc.setFont('times', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(BLACK);
-      doc.text('Specifications', margin, yPos);
-      yPos += 8;
-
-      const specsTable = [
-        ['Denomination', coin.denomination || '—', 'Metal', coin.metal || '—'],
-        ['Weight', coin.weight ? `${Number(coin.weight).toFixed(2)}g` : '—', 'Diameter', coin.diameter ? `${Number(coin.diameter).toFixed(1)}mm` : '—'],
-        ['Fineness', coin.fineness || '—', 'Mint', coin.mint || '—'],
-        ['Die Axis', coin.die_axis ? `${coin.die_axis}h` : '—', 'Grade', coin.grade || '—'],
-      ];
-
-      autoTable(doc, {
-        startY: yPos,
-        body: specsTable,
-        theme: 'plain',
-        styles: {
-          font: 'times',
-          fontSize: 9,
-          textColor: BLACK,
-          cellPadding: 3,
-        },
-        columnStyles: {
-          0: { cellWidth: 35, fontStyle: 'bold', halign: 'left' },
-          1: { cellWidth: 45, halign: 'left' },
-          2: { cellWidth: 35, fontStyle: 'bold', halign: 'left' },
-          3: { cellWidth: 55, halign: 'left' },
-        },
-        margin: { left: margin, right: margin },
-      });
-
-      const specsTableEnd = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY;
-      yPos = specsTableEnd + 10;
-
-      if (coin.rarity) {
-        doc.setFont('times', 'italic');
-        doc.setFontSize(9);
-        doc.setTextColor(GRAY);
-        doc.text(`Rarity: ${coin.rarity}`, margin, yPos);
-        yPos += 8;
-      }
-
-      const inscriptions = [];
-      if (coin.obverse_legend) inscriptions.push(['Obverse', coin.obverse_legend]);
-      if (coin.obverse_desc) inscriptions.push(['Obverse Desc.', coin.obverse_desc]);
-      if (coin.reverse_legend) inscriptions.push(['Reverse', coin.reverse_legend]);
-      if (coin.reverse_desc) inscriptions.push(['Reverse Desc.', coin.reverse_desc]);
-      if (coin.edge_desc) inscriptions.push(['Edge', coin.edge_desc]);
-
-      if (inscriptions.length > 0) {
-        doc.setDrawColor(LIGHT_GRAY);
-        doc.setLineWidth(0.2);
-        doc.line(margin, yPos, pageWidth - margin, yPos);
-        yPos += 8;
-
-        doc.setFont('times', 'bold');
-        doc.setFontSize(10);
-        doc.setTextColor(BLACK);
-        doc.text('Inscriptions', margin, yPos);
-        yPos += 8;
-
-        autoTable(doc, {
-          startY: yPos,
-          body: inscriptions,
-          theme: 'plain',
-          styles: {
-            font: 'times',
-            fontSize: 8,
-            textColor: BLACK,
-            cellPadding: 3,
-          },
-          columnStyles: {
-            0: { cellWidth: 35, fontStyle: 'bold', halign: 'left' },
-            1: { cellWidth: contentWidth - 35, halign: 'left' },
-          },
-          margin: { left: margin, right: margin },
-        });
-
-        yPos = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
-      }
-
-      const additional = [];
-      if (coin.catalog_ref) additional.push(['Catalog Ref.', coin.catalog_ref]);
-      if (coin.provenance) additional.push(['Provenance', coin.provenance]);
-      if (coin.story) additional.push(['Story', coin.story]);
-
-      if (additional.length > 0) {
-        doc.setDrawColor(LIGHT_GRAY);
-        doc.setLineWidth(0.2);
-        doc.line(margin, yPos, pageWidth - margin, yPos);
-        yPos += 8;
-
-        autoTable(doc, {
-          startY: yPos,
-          body: additional,
-          theme: 'plain',
-          styles: {
-            font: 'times',
-            fontSize: 8,
-            textColor: BLACK,
-            cellPadding: 3,
-          },
-          columnStyles: {
-            0: { cellWidth: 35, fontStyle: 'bold', halign: 'left' },
-            1: { cellWidth: contentWidth - 35, halign: 'left' },
-          },
-          margin: { left: margin, right: margin },
-        });
-
-        yPos = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
-      }
-
-      const acquisitionInfo = [];
-      if (coin.purchase_price !== undefined) acquisitionInfo.push(['Price', `$${coin.purchase_price}`]);
-      if (coin.purchase_date) acquisitionInfo.push(['Date', coin.purchase_date]);
-      if (coin.purchase_source) acquisitionInfo.push(['Source', coin.purchase_source]);
-
-      if (acquisitionInfo.length > 0) {
-        doc.setDrawColor(LIGHT_GRAY);
-        doc.setLineWidth(0.2);
-        doc.line(margin, yPos, pageWidth - margin, yPos);
-        yPos += 8;
-
-        doc.setFont('times', 'italic');
-        doc.setFontSize(9);
-        doc.setTextColor(GRAY);
-        const acqLabel = acquisitionInfo.map(([, val]) => val).join('  ·  ');
-        doc.text(acqLabel, margin, yPos);
-      }
-
-      doc.setFont('times', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(GRAY);
-      doc.text(`Page ${currentPage}`, 105, 290, { align: 'center' });
+      applyPageBackground(doc);
+      tocPageNums.push(doc.getNumberOfPages());
     }
 
-    const finalBuffer = doc.output('arraybuffer');
-    fs.writeFileSync(targetPath, Buffer.from(finalBuffer));
+    // 6. Stats placeholder page
+    doc.addPage();
+    applyPageBackground(doc);
+    const statsPageNum = doc.getNumberOfPages();
 
+    // 7. Render coin pages
+    const coinPageMap = new Map<number, number>();
+    for (const plan of pagePlan) {
+      doc.addPage();
+      applyPageBackground(doc);
+      const docPage = doc.getNumberOfPages();
+      plan.coins.forEach(c => coinPageMap.set(c.id, docPage));
+
+      let yPos = MARGIN;
+      plan.coins.forEach((coin, idx) => {
+        if (idx === 1) {
+          drawHorizontalRule(doc, yPos + 2);
+          yPos += 8;
+        }
+        drawCoinSlot(doc, coin, allImages.get(coin.id) ?? [], yPos, locale, fonts);
+        yPos += SLOT_HEIGHT + 5;
+      });
+
+      drawPageFooter(doc, docPage, doc.getNumberOfPages(), locale);
+    }
+
+    // 8. Back-fill TOC (grouped by era, alphabetical)
+    const sortedCoins = groupAndSortByEra(coins);
+    const tocEntries: TocEntry[] = sortedCoins.map(c => ({
+      coin: c,
+      pageNum: coinPageMap.get(c.id) ?? 0,
+      obverseImg: allImages.get(c.id)?.find(img => img.label === 'Obverse' || img.is_primary),
+    }));
+
+    for (let tp = 0; tp < tocPageNums.length; tp++) {
+      doc.setPage(tocPageNums[tp]);
+      applyPageBackground(doc);
+      drawSectionHeader(doc, t(locale, 'tableOfContents'), MARGIN, MARGIN, fonts);
+      const entries = tocEntries.slice(tp * 14, (tp + 1) * 14);
+      renderTocEntries(doc, entries, locale, fonts);
+    }
+
+    // 9. Back-fill stats page
+    doc.setPage(statsPageNum);
+    applyPageBackground(doc);
+    drawStatsPage(doc, coins, locale, fonts);
+    drawPageFooter(doc, statsPageNum, doc.getNumberOfPages(), locale);
+
+    // 10. Write to disk
+    const buf = doc.output('arraybuffer');
+    fs.writeFileSync(targetPath, Buffer.from(buf));
     return { success: true, path: targetPath };
   } catch (error) {
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };

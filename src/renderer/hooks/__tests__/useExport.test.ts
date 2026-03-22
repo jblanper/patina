@@ -132,14 +132,24 @@ describe('useExport Hook', () => {
       expect(result.current.error).toBe('PDF generation failed');
     });
 
-    it('should call exportToPdf with no arguments', async () => {
+    it('should call exportToPdf with the default locale ("es") when no argument given', async () => {
       mockExportToPdf.mockResolvedValueOnce({ success: true, path: '/tmp/catalog.pdf' });
 
       const { result } = renderHook(() => useExport());
 
       await result.current.exportToPdf();
 
-      expect(mockExportToPdf).toHaveBeenCalledWith();
+      expect(mockExportToPdf).toHaveBeenCalledWith('es');
+    });
+
+    it('should call exportToPdf with an explicit locale when provided', async () => {
+      mockExportToPdf.mockResolvedValueOnce({ success: true, path: '/tmp/catalog.pdf' });
+
+      const { result } = renderHook(() => useExport());
+
+      await result.current.exportToPdf('en');
+
+      expect(mockExportToPdf).toHaveBeenCalledWith('en');
     });
   });
 
