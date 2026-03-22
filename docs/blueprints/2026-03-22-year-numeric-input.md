@@ -39,6 +39,7 @@ No schema changes. No new IPC handlers. No migration.
 | `src/renderer/i18n/locales/en.json` | Change value of `ledger.year` → `"Date"`; add `ledger.yearCe` and `ledger.placeholders.yearCe` |
 | `src/renderer/i18n/locales/es.json` | Change value of `ledger.year` → `"Fecha"`; add `ledger.yearCe` and `ledger.placeholders.yearCe` |
 | `src/renderer/data/glossaryFields.ts` | Correct the `era` field description to reflect its actual role |
+| `scripts/seed_data.ts` | Fix `era` type, correct Edward I era, add Roman Imperial example coin |
 
 No changes to `src/common/`, `src/main/`, `src/renderer/hooks/`, or any test fixtures beyond the component test for `LedgerForm`.
 
@@ -174,6 +175,77 @@ vocabulary: {
   },
 },
 ```
+
+---
+
+### Step 4 — `scripts/seed_data.ts`: Update example coins
+
+Three issues identified in the seed script:
+
+1. **Stale TypeScript `era` type** — the `Coin` interface restricts `era` to `'Ancient' | 'Medieval' | 'Modern'`, predating the rich 11-value vocabulary. The production `Coin` type in `src/common/types.ts` uses `era: string`. Align the seed interface.
+
+2. **Incorrect era for Edward I Penny** — `era: 'Medieval'` should be `'High Medieval'`. The coin dates to 1279 AD, which falls within the documented High Medieval range (c. 1000–1300 AD). The generic `'Medieval'` fallback is for cases where the sub-period is unknown.
+
+3. **Roman Imperial era entirely absent** — it has the highest `usage_count` (80) of any era in the vocabulary, is the most foundational to serious coin collecting, and yet is unrepresented in the seed examples. Add one Roman Imperial coin.
+
+#### 4a. Fix `Coin` interface
+
+Replace the `era` literal union:
+```typescript
+// Before
+era: 'Ancient' | 'Medieval' | 'Modern';
+
+// After
+era: string;
+```
+
+#### 4b. Fix Edward I Penny era
+
+```typescript
+// Before
+era: 'Medieval',
+
+// After
+era: 'High Medieval',
+```
+
+#### 4c. Add Roman Imperial example coin
+
+Add as the second entry in `sampleCoins` (after the Athens Tetradrachm, before the Edward I Penny — ordered chronologically by `year_numeric`):
+
+```typescript
+{
+  title: 'Hadrian Denarius',
+  issuer: 'Hadrian',
+  denomination: 'Denarius',
+  year_display: '134 AD',
+  year_numeric: 134,
+  era: 'Roman Imperial',
+  mint: 'Rome',
+  metal: 'Silver',
+  fineness: '.800',
+  weight: 3.21,
+  diameter: 18.0,
+  die_axis: '6h',
+  obverse_legend: 'HADRIANVS AVG COS III PP',
+  obverse_desc: 'Laureate head of Hadrian right.',
+  reverse_legend: 'CLEMENTIA AVG',
+  reverse_desc: 'Clementia standing left, holding patera and vertical sceptre.',
+  edge_desc: 'Plain',
+  catalog_ref: 'RIC II 265',
+  rarity: 'Common',
+  grade: 'EF-45',
+  provenance: 'Ex. Roma Numismatics, E-Sale 82, 2020',
+  story: 'Struck during the well-documented middle years of Hadrian\'s reign (117–138 AD). The reverse type, Clementia (Clemency), was programmatic — Hadrian sought to distance himself from the executions at the start of his rule and project an image of mild government.',
+  purchase_price: 220.00,
+  purchase_date: '2020-07-15',
+  purchase_source: 'Roma Numismatics'
+},
+```
+
+**Why this coin:** RIC II 265 is one of the most catalogued Hadrian types, the denomination is the backbone of Roman Imperial silver, and Hadrian is among the most collected emperors. Weight (3.21 g) and diameter (18.0 mm) are within the documented range for mid-Hadrianic denarii.
+
+> **Note:** The seed script uses `db.run` to skip coins that already exist by title — existing databases are unaffected. New installations will receive all four coins.
 
 ---
 

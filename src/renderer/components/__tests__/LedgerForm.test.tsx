@@ -109,7 +109,8 @@ describe('LedgerForm', () => {
     });
 
     it('renders empty when formData.year_numeric is null', () => {
-      renderForm(<LedgerForm formData={{ ...baseFormData, year_numeric: null }} errors={{}} updateField={updateField} />);
+      // Cast needed: Coin type uses number | undefined but DB can return null at runtime
+      renderForm(<LedgerForm formData={{ ...baseFormData, year_numeric: null as unknown as number }} errors={{}} updateField={updateField} />);
       expect(screen.getByPlaceholderText('e.g. −44 or 134')).toHaveValue(null);
     });
 

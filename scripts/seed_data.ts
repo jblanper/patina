@@ -9,7 +9,7 @@ interface Coin {
   denomination: string;
   year_display: string;
   year_numeric: number;
-  era: 'Ancient' | 'Medieval' | 'Modern';
+  era: string;
   mint: string;
   metal: string;
   fineness: string;
@@ -39,6 +39,33 @@ const sampleCoins: Coin[] = [
     year_display: '440 BC',
     year_numeric: -440,
     era: 'Ancient',
+  },
+  {
+    title: 'Hadrian Denarius',
+    issuer: 'Hadrian',
+    denomination: 'Denarius',
+    year_display: '134 AD',
+    year_numeric: 134,
+    era: 'Roman Imperial',
+    mint: 'Rome',
+    metal: 'Silver',
+    fineness: '.800',
+    weight: 3.21,
+    diameter: 18.0,
+    die_axis: '6h',
+    obverse_legend: 'HADRIANVS AVG COS III PP',
+    obverse_desc: 'Laureate head of Hadrian right.',
+    reverse_legend: 'CLEMENTIA AVG',
+    reverse_desc: 'Clementia standing left, holding patera and vertical sceptre.',
+    edge_desc: 'Plain',
+    catalog_ref: 'RIC II 265',
+    rarity: 'Common',
+    grade: 'EF-45',
+    provenance: 'Ex. Roma Numismatics, E-Sale 82, 2020',
+    story: 'Struck during the well-documented middle years of Hadrian\'s reign (117–138 AD). The reverse type, Clementia (Clemency), was programmatic — Hadrian sought to distance himself from the executions at the start of his rule and project an image of mild government.',
+    purchase_price: 220.00,
+    purchase_date: '2020-07-15',
+    purchase_source: 'Roma Numismatics'
     mint: 'Athens',
     metal: 'Silver',
     fineness: '.999',
@@ -65,7 +92,7 @@ const sampleCoins: Coin[] = [
     denomination: 'Penny',
     year_display: '1279',
     year_numeric: 1279,
-    era: 'Medieval',
+    era: 'High Medieval',
     mint: 'London',
     metal: 'Silver',
     fineness: '.925',
