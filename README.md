@@ -79,7 +79,8 @@ npm run db:seed
 
 ```text
 patina/
-├── docs/               # Documentation, blueprints, style guide
+├── docs/               # Documentation, blueprints, style guide, research reports
+├── skills/             # Claude Code skill definitions (curating, scouting, QA, security…)
 ├── src/
 │   ├── main/           # Electron main process (DB, IPC, Lens server)
 │   ├── renderer/       # React frontend (Cabinet, Ledger, Scriptorium, Glossary)
