@@ -27,6 +27,15 @@ const mockDocInstance = {
   lastAutoTable: { finalY: 100 },
 };
 
+vi.mock('electron', () => ({
+  app: { isPackaged: false, getPath: vi.fn().mockReturnValue('/tmp') },
+  nativeImage: {
+    createFromBuffer: vi.fn().mockReturnValue({
+      toJPEG: vi.fn().mockReturnValue(Buffer.from('fake-jpeg')),
+    }),
+  },
+}));
+
 vi.mock('jspdf', () => ({
   jsPDF: vi.fn().mockImplementation(() => mockDocInstance),
 }));

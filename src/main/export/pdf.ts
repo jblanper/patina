@@ -2,8 +2,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import fs from 'fs';
 import path from 'path';
-import { app } from 'electron';
-import { Jimp } from 'jimp';
+import { app, nativeImage } from 'electron';
 import { dbService } from '../db';
 import { Coin, CoinImage } from '../../common/types';
 
@@ -124,7 +123,7 @@ interface ExportResult {
   error?: string;
 }
 
-async function loadImageAsBase64(imagePath: string): Promise<string | null> {
+function loadImageAsBase64(imagePath: string): string | null {
   const fullPath = path.join(imageRoot, imagePath);
   try {
     if (!fs.existsSync(fullPath)) return null;
@@ -135,9 +134,10 @@ async function loadImageAsBase64(imagePath: string): Promise<string | null> {
       return `data:image/png;base64,${buffer.toString('base64')}`;
     }
 
-    const img = await Jimp.read(buffer);
-    const baseline = await img.getBuffer('image/jpeg');
-    return `data:image/jpeg;base64,${baseline.toString('base64')}`;
+    // nativeImage decodes via Chromium's native stack, producing baseline JPEG.
+    // Fixes jsPDF misreading progressive JPEG (SOF2) dimensions as 1px tall.
+    const jpegBuffer = nativeImage.createFromBuffer(buffer).toJPEG(92);
+    return `data:image/jpeg;base64,${jpegBuffer.toString('base64')}`;
   } catch {
     return null;
   }
@@ -184,14 +184,14 @@ function estimateCoinSlotHeight(coin: Coin, hasImages: boolean): number {
   return height;
 }
 
-async function drawCoinSlot(
+function drawCoinSlot(
   doc: jsPDF,
   coin: Coin,
   images: CoinImage[],
   slotY: number,
   locale: Locale,
   fonts: Fonts,
-): Promise<number> {
+): number {
   // 1. Title
   doc.setFont(fonts.heading, 'bold');
   doc.setFontSize(14);
@@ -222,7 +222,7 @@ async function drawCoinSlot(
     const imgX = MARGIN;
 
     if (obverseImg) {
-      const imgData = await loadImageAsBase64(obverseImg.path);
+      const imgData = loadImageAsBase64(obverseImg.path);
       const fmt = imgData ? getImageFormat(imgData) : null;
       doc.setDrawColor(RULE_COLOR);
       doc.setLineWidth(0.3);
@@ -242,7 +242,7 @@ async function drawCoinSlot(
 
     if (reverseImg) {
       const revY = slotY + IMG_SIZE + 10;
-      const imgData = await loadImageAsBase64(reverseImg.path);
+      const imgData = loadImageAsBase64(reverseImg.path);
       const fmt = imgData ? getImageFormat(imgData) : null;
       doc.setDrawColor(RULE_COLOR);
       doc.setLineWidth(0.3);
@@ -381,13 +381,13 @@ function drawStatsPage(doc: jsPDF, coins: Coin[], locale: Locale, fonts: Fonts):
   }
 }
 
-async function drawCoverPage(
+function drawCoverPage(
   doc: jsPDF,
   coins: Coin[],
   allImages: Map<number, CoinImage[]>,
   locale: Locale,
   fonts: Fonts,
-): Promise<void> {
+): void {
   // Featured coin: largest image file by size
   let featuredImgData: string | null = null;
   let maxSize = 0;
@@ -400,7 +400,7 @@ async function drawCoverPage(
       const { size } = fs.statSync(fullPath);
       if (size > maxSize) {
         maxSize = size;
-        featuredImgData = await loadImageAsBase64(primary.path);
+        featuredImgData = loadImageAsBase64(primary.path);
       }
     } catch {
       // skip inaccessible files
@@ -483,12 +483,12 @@ function groupAndSortByEra(coins: Coin[]): Coin[] {
   });
 }
 
-async function renderTocEntries(
+function renderTocEntries(
   doc: jsPDF,
   entries: TocEntry[],
   locale: Locale,
   fonts: Fonts,
-): Promise<void> {
+): void {
   let y = MARGIN + 14;
   let lastEra = '';
 
@@ -504,7 +504,7 @@ async function renderTocEntries(
 
     // Thumbnail
     if (entry.obverseImg) {
-      const imgData = await loadImageAsBase64(entry.obverseImg.path);
+      const imgData = loadImageAsBase64(entry.obverseImg.path);
       const fmt = imgData ? getImageFormat(imgData) : null;
       if (imgData && fmt) {
         try {
@@ -561,7 +561,7 @@ export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Pr
 
     // 3. Cover page (page 1)
     applyPageBackground(doc);
-    await drawCoverPage(doc, coins, allImages, locale, fonts);
+    drawCoverPage(doc, coins, allImages, locale, fonts);
 
     // 4. Compute pagePlan: one coin per page (dense metadata makes pairing impractical)
     const pagePlan: { coins: Coin[] }[] = coins.map(coin => ({ coins: [coin] }));
@@ -589,7 +589,7 @@ export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Pr
       plan.coins.forEach(c => coinPageMap.set(c.id, docPage));
 
       const yPos = MARGIN;
-      await drawCoinSlot(doc, plan.coins[0], allImages.get(plan.coins[0].id) ?? [], yPos, locale, fonts);
+      drawCoinSlot(doc, plan.coins[0], allImages.get(plan.coins[0].id) ?? [], yPos, locale, fonts);
 
       drawPageFooter(doc, docPage, doc.getNumberOfPages(), locale);
     }
@@ -607,7 +607,7 @@ export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Pr
       applyPageBackground(doc);
       drawSectionHeader(doc, t(locale, 'tableOfContents'), MARGIN, MARGIN, fonts);
       const entries = tocEntries.slice(tp * 14, (tp + 1) * 14);
-      await renderTocEntries(doc, entries, locale, fonts);
+      renderTocEntries(doc, entries, locale, fonts);
     }
 
     // 9. Back-fill stats page

@@ -514,13 +514,15 @@ None — all design decisions resolved during brainstorming session on 2026-03-2
 
 **Root Cause:** `jsPDF` misreads progressive JPEG (SOF2) markers, reporting dimensions of e.g. `1281×1` instead of `3024×3024`. The images were correctly embedded but the PDF's image viewport was collapsed.
 
-**Fix:** `loadImageAsBase64()` now routes all JPEGs through `jimp` (pure JS, no native deps) to decode and re-encode as baseline JPEG before embedding:
-```
-Progressive JPEG (SOF2) → Jimp.decode → Jimp.encode (baseline) → jsPDF ✓
-```
-PNGs are passed through unchanged. Function is now `async`; `drawCoinSlot`, `drawCoverPage`, and `renderTocEntries` are also `async`.
+**Fix (v1 — superseded):** Jimp (pure JS) decode + re-encode. Worked but made PDF generation noticeably slow with even 3 images due to full pixel-buffer decode/encode in JS.
 
-**Tradeoff:** Baseline JPEG is ~1.7× larger than progressive (~4.65MB vs ~2.75MB for a 3024×3024 coin photo). Acceptable for a one-time PDF export. The `jimp` package is added as a project dependency.
+**Fix (v2 — current):** `loadImageAsBase64()` uses Electron's `nativeImage.createFromBuffer(buffer).toJPEG(92)` to normalize all JPEGs. Chromium's native image stack handles progressive JPEG correctly and runs at native speed — no async, no new dependency, `jimp` removed.
+```
+Progressive JPEG (SOF2) → nativeImage.createFromBuffer → .toJPEG(92) → jsPDF ✓
+```
+PNGs are passed through unchanged. `loadImageAsBase64`, `drawCoinSlot`, `drawCoverPage`, and `renderTocEntries` are all synchronous.
+
+**Tradeoff:** Output is re-encoded at quality 92 (baseline). File size increase vs progressive source is acceptable for a one-time catalog export.
 
 #### 2. Montserrat italic font error
 
@@ -553,7 +555,7 @@ const date = `${day}/${month}/${year}`;
 
 ### Pain Points
 - jsPDF's progressive JPEG handling required a significant diagnosis detour (isolated via Python PDF parsing to find embedded `/Width 1281 /Height 1` in the PDF binary)
-- `jimp` v1.x has a non-standard export structure (`jimp.Jimp` not `jimp.default.Jimp`)
+- First fix (Jimp) introduced unacceptable generation latency; replaced with `nativeImage` in the same session
 
 ### Things to Consider
 - Allow collector to pin a cover coin via a preference
