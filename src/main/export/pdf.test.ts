@@ -122,20 +122,20 @@ describe('PDF Export', () => {
   });
 
   // ── 4. 2 coins → correct addPage + setPage call counts ───────────────────
-  it('should call addPage correctly for 2 coins (1 toc + 1 stats + 1 content)', async () => {
+  it('should call addPage correctly for 2 coins (1 toc + 1 stats + 2 content)', async () => {
     mockGetCoins.mockReturnValue([baseCoin({ id: 1 }), baseCoin({ id: 2, title: 'Roman Denarius' })]);
     mockGetImagesByCoinId.mockReturnValue([]);
 
     await exportToPdf('/tmp/catalog.pdf', 'es');
 
-    // 1 TOC + 1 stats + 1 content page (2 coins fit together)
-    expect(mockDocInstance.addPage).toHaveBeenCalledTimes(3);
+    // 1 TOC + 1 stats + 2 content pages (1 coin per page)
+    expect(mockDocInstance.addPage).toHaveBeenCalledTimes(4);
     // setPage called for TOC back-fill + stats back-fill
     expect(mockDocInstance.setPage).toHaveBeenCalledTimes(2);
   });
 
-  // ── 5. 3 coins → 2 content pages (coins 1+2 paired, coin 3 solo) ─────────
-  it('should produce 2 content pages for 3 coins', async () => {
+  // ── 5. 3 coins → 3 content pages ─────────────────────────────────────────
+  it('should produce 3 content pages for 3 coins', async () => {
     mockGetCoins.mockReturnValue([
       baseCoin({ id: 1 }),
       baseCoin({ id: 2, title: 'Roman Denarius' }),
@@ -145,13 +145,13 @@ describe('PDF Export', () => {
 
     await exportToPdf('/tmp/catalog.pdf', 'es');
 
-    // 1 TOC + 1 stats + 2 content pages = 4 addPage calls
-    expect(mockDocInstance.addPage).toHaveBeenCalledTimes(4);
+    // 1 TOC + 1 stats + 3 content pages = 5 addPage calls
+    expect(mockDocInstance.addPage).toHaveBeenCalledTimes(5);
   });
 
-  // ── 6. Overflow coin (tall) → placed solo ─────────────────────────────────
-  it('should place a coin solo when its estimated height exceeds SLOT_HEIGHT', async () => {
-    const longStory = 'x'.repeat(2000); // forces estimateCoinSlotHeight > 126
+  // ── 6. Each coin gets its own page ────────────────────────────────────────
+  it('should give each coin its own page regardless of content length', async () => {
+    const longStory = 'x'.repeat(2000);
     mockGetCoins.mockReturnValue([
       baseCoin({ id: 1, story: longStory }),
       baseCoin({ id: 2, title: 'Roman Denarius' }),
@@ -160,7 +160,7 @@ describe('PDF Export', () => {
 
     await exportToPdf('/tmp/catalog.pdf', 'es');
 
-    // Both coins end up solo: 1 TOC + 1 stats + 2 content = 4
+    // 1 TOC + 1 stats + 2 content pages = 4 addPage calls
     expect(mockDocInstance.addPage).toHaveBeenCalledTimes(4);
   });
 

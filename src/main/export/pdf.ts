@@ -3,6 +3,7 @@ import autoTable from 'jspdf-autotable';
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
+import { Jimp } from 'jimp';
 import { dbService } from '../db';
 import { Coin, CoinImage } from '../../common/types';
 
@@ -99,6 +100,7 @@ const FONT_DEFS: FontDef[] = [
   { file: 'CormorantGaramond-Italic.ttf',  name: 'CormorantGaramond', style: 'italic' },
   { file: 'Montserrat-Regular.ttf',        name: 'Montserrat',        style: 'normal' },
   { file: 'Montserrat-Bold.ttf',           name: 'Montserrat',        style: 'bold'   },
+  { file: 'Montserrat-Italic.ttf',         name: 'Montserrat',        style: 'italic' },
 ];
 
 // All fonts must load together or all fall back — never mix custom and system fonts
@@ -122,17 +124,29 @@ interface ExportResult {
   error?: string;
 }
 
-function loadImageAsBase64(imagePath: string): string | null {
+async function loadImageAsBase64(imagePath: string): Promise<string | null> {
+  const fullPath = path.join(imageRoot, imagePath);
   try {
-    const fullPath = path.join(imageRoot, imagePath);
     if (!fs.existsSync(fullPath)) return null;
     const buffer = fs.readFileSync(fullPath);
     const ext = path.extname(fullPath).toLowerCase();
-    const mimeType = ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg';
-    return `data:${mimeType};base64,${buffer.toString('base64')}`;
+
+    if (ext === '.png') {
+      return `data:image/png;base64,${buffer.toString('base64')}`;
+    }
+
+    const img = await Jimp.read(buffer);
+    const baseline = await img.getBuffer('image/jpeg');
+    return `data:image/jpeg;base64,${baseline.toString('base64')}`;
   } catch {
     return null;
   }
+}
+
+function getImageFormat(dataUri: string): 'JPEG' | 'PNG' | null {
+  if (dataUri.startsWith('data:image/png')) return 'PNG';
+  if (dataUri.startsWith('data:image/jpeg')) return 'JPEG';
+  return null;
 }
 
 function applyPageBackground(doc: jsPDF): void {
@@ -170,14 +184,14 @@ function estimateCoinSlotHeight(coin: Coin, hasImages: boolean): number {
   return height;
 }
 
-function drawCoinSlot(
+async function drawCoinSlot(
   doc: jsPDF,
   coin: Coin,
   images: CoinImage[],
   slotY: number,
   locale: Locale,
   fonts: Fonts,
-): number {
+): Promise<number> {
   // 1. Title
   doc.setFont(fonts.heading, 'bold');
   doc.setFontSize(14);
@@ -208,46 +222,42 @@ function drawCoinSlot(
     const imgX = MARGIN;
 
     if (obverseImg) {
-      const imgData = loadImageAsBase64(obverseImg.path);
-      if (imgData) {
+      const imgData = await loadImageAsBase64(obverseImg.path);
+      const fmt = imgData ? getImageFormat(imgData) : null;
+      doc.setDrawColor(RULE_COLOR);
+      doc.setLineWidth(0.3);
+      doc.rect(imgX, slotY, IMG_SIZE, IMG_SIZE);
+      if (imgData && fmt) {
         try {
-          doc.addImage(imgData, 'JPEG', imgX, slotY, IMG_SIZE, IMG_SIZE);
+          doc.addImage(imgData, fmt, imgX, slotY, IMG_SIZE, IMG_SIZE);
         } catch {
-          doc.setFont(fonts.body, 'normal');
-          doc.setFontSize(9);
-          doc.setTextColor(IRON_GALL);
-          doc.text(t(locale, 'imageUnavailable'), imgX + IMG_SIZE / 2, slotY + IMG_SIZE / 2, { align: 'center' });
+          // border drawn; image skipped silently
         }
-        doc.setDrawColor(RULE_COLOR);
-        doc.setLineWidth(0.3);
-        doc.rect(imgX, slotY, IMG_SIZE, IMG_SIZE);
-        doc.setFont(fonts.body, 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(IRON_GALL);
-        doc.text(t(locale, 'obverse'), imgX + IMG_SIZE / 2, slotY + IMG_SIZE + 4, { align: 'center' });
       }
+      doc.setFont(fonts.body, 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(IRON_GALL);
+      doc.text(t(locale, 'obverse'), imgX + IMG_SIZE / 2, slotY + IMG_SIZE + 4, { align: 'center' });
     }
 
     if (reverseImg) {
       const revY = slotY + IMG_SIZE + 10;
-      const imgData = loadImageAsBase64(reverseImg.path);
-      if (imgData) {
+      const imgData = await loadImageAsBase64(reverseImg.path);
+      const fmt = imgData ? getImageFormat(imgData) : null;
+      doc.setDrawColor(RULE_COLOR);
+      doc.setLineWidth(0.3);
+      doc.rect(imgX, revY, IMG_SIZE, IMG_SIZE);
+      if (imgData && fmt) {
         try {
-          doc.addImage(imgData, 'JPEG', imgX, revY, IMG_SIZE, IMG_SIZE);
+          doc.addImage(imgData, fmt, imgX, revY, IMG_SIZE, IMG_SIZE);
         } catch {
-          doc.setFont(fonts.body, 'normal');
-          doc.setFontSize(9);
-          doc.setTextColor(IRON_GALL);
-          doc.text(t(locale, 'imageUnavailable'), imgX + IMG_SIZE / 2, revY + IMG_SIZE / 2, { align: 'center' });
+          // border drawn; image skipped silently
         }
-        doc.setDrawColor(RULE_COLOR);
-        doc.setLineWidth(0.3);
-        doc.rect(imgX, revY, IMG_SIZE, IMG_SIZE);
-        doc.setFont(fonts.body, 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(IRON_GALL);
-        doc.text(t(locale, 'reverse'), imgX + IMG_SIZE / 2, revY + IMG_SIZE + 4, { align: 'center' });
       }
+      doc.setFont(fonts.body, 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(IRON_GALL);
+      doc.text(t(locale, 'reverse'), imgX + IMG_SIZE / 2, revY + IMG_SIZE + 4, { align: 'center' });
     }
   }
 
@@ -303,30 +313,23 @@ function drawCoinSlot(
   return (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY;
 }
 
-function drawBarChart(
+function drawStatsList(
   doc: jsPDF,
   data: Record<string, number>,
   x: number,
   y: number,
-  maxBarWidth: number,
   fonts: Fonts,
 ): number {
   const entries = Object.entries(data)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8);
-  const maxCount = entries[0]?.[1] ?? 1;
 
   for (const [label, count] of entries) {
     doc.setFont(fonts.body, 'normal');
-    doc.setFontSize(9);
+    doc.setFontSize(10);
     doc.setTextColor(IRON_GALL);
-    doc.text(label.slice(0, 18), x, y + 3);
-    const barW = (count / maxCount) * maxBarWidth;
-    doc.setFillColor(BURNT_SIENNA);
-    doc.rect(x + 40, y - 1, barW, 4, 'F');
-    doc.setFontSize(8);
-    doc.text(String(count), x + 40 + barW + 2, y + 3);
-    y += 8;
+    doc.text(`${label}: ${count}`, x, y);
+    y += 7;
   }
   return y;
 }
@@ -350,7 +353,7 @@ function drawStatsPage(doc: jsPDF, coins: Coin[], locale: Locale, fonts: Fonts):
   doc.setTextColor(BURNT_SIENNA);
   doc.text(t(locale, 'byMetal'), MARGIN, y);
   y += 6;
-  y = drawBarChart(doc, byMetal, MARGIN, y, 100, fonts);
+  y = drawStatsList(doc, byMetal, MARGIN, y, fonts);
   y += 5;
 
   doc.setFont(fonts.heading, 'italic');
@@ -358,7 +361,7 @@ function drawStatsPage(doc: jsPDF, coins: Coin[], locale: Locale, fonts: Fonts):
   doc.setTextColor(BURNT_SIENNA);
   doc.text(t(locale, 'byEra'), MARGIN, y);
   y += 6;
-  y = drawBarChart(doc, byEra, MARGIN, y, 100, fonts);
+  y = drawStatsList(doc, byEra, MARGIN, y, fonts);
   y += 5;
 
   doc.setFont(fonts.heading, 'italic');
@@ -366,7 +369,7 @@ function drawStatsPage(doc: jsPDF, coins: Coin[], locale: Locale, fonts: Fonts):
   doc.setTextColor(BURNT_SIENNA);
   doc.text(t(locale, 'byGrade'), MARGIN, y);
   y += 6;
-  y = drawBarChart(doc, byGrade, MARGIN, y, 100, fonts);
+  y = drawStatsList(doc, byGrade, MARGIN, y, fonts);
 
   if (coins.some(c => c.purchase_price != null)) {
     const totalValue = coins.reduce((sum, c) => sum + (c.purchase_price ?? 0), 0);
@@ -378,13 +381,13 @@ function drawStatsPage(doc: jsPDF, coins: Coin[], locale: Locale, fonts: Fonts):
   }
 }
 
-function drawCoverPage(
+async function drawCoverPage(
   doc: jsPDF,
   coins: Coin[],
   allImages: Map<number, CoinImage[]>,
   locale: Locale,
   fonts: Fonts,
-): void {
+): Promise<void> {
   // Featured coin: largest image file by size
   let featuredImgData: string | null = null;
   let maxSize = 0;
@@ -397,7 +400,7 @@ function drawCoverPage(
       const { size } = fs.statSync(fullPath);
       if (size > maxSize) {
         maxSize = size;
-        featuredImgData = loadImageAsBase64(primary.path);
+        featuredImgData = await loadImageAsBase64(primary.path);
       }
     } catch {
       // skip inaccessible files
@@ -406,10 +409,13 @@ function drawCoverPage(
 
   // Featured image hero — 100×100mm centered, 1pt Burnt Sienna frame
   if (featuredImgData) {
-    try {
-      doc.addImage(featuredImgData, 'JPEG', 55, 50, 100, 100);
-    } catch {
-      // skip
+    const fmt = getImageFormat(featuredImgData);
+    if (fmt) {
+      try {
+        doc.addImage(featuredImgData, fmt, 55, 50, 100, 100);
+      } catch {
+        // skip
+      }
     }
     doc.setDrawColor(BURNT_SIENNA);
     doc.setLineWidth(1);
@@ -420,22 +426,28 @@ function drawCoverPage(
   doc.setFont(fonts.heading, 'bold');
   doc.setFontSize(36);
   doc.setTextColor(IRON_GALL);
-  doc.text('Patina', 105, 165, { align: 'center' });
+  doc.text('Patina', 105, 168, { align: 'center' });
 
   // Subtitle line
-  const date = new Date().toLocaleDateString();
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const year = now.getFullYear();
+  const date = `${day}/${month}/${year}`;
   doc.setFont(fonts.body, 'normal');
   doc.setFontSize(11);
   doc.setTextColor(IRON_GALL);
   doc.text(
     `${t(locale, 'generated')}: ${date}  ·  ${coins.length} ${t(locale, 'totalCoins')}`,
-    105, 176, { align: 'center' },
+    105, 179, { align: 'center' },
   );
 
-  // Stats panel
-  doc.setFillColor(RULE_COLOR);
-  doc.rect(MARGIN, 200, CONTENT_W, 30, 'F');
+  // Thin hairline rule above stats
+  doc.setDrawColor(RULE_COLOR);
+  doc.setLineWidth(0.3);
+  doc.line(MARGIN, 197, MARGIN + CONTENT_W, 197);
 
+  // Inline manuscript footer
   if (coins.length > 0) {
     const years = coins.map(c => c.year_numeric).filter((y): y is number => y != null);
     const yearRange = years.length > 0
@@ -445,13 +457,14 @@ function drawCoverPage(
     for (const coin of coins) {
       if (coin.metal) metalCounts[coin.metal] = (metalCounts[coin.metal] || 0) + 1;
     }
-    const topMetal = Object.entries(metalCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
+    const topMetalEntry = Object.entries(metalCounts).sort((a, b) => b[1] - a[1])[0];
+    const topMetal = topMetalEntry ? `${topMetalEntry[0]} (${topMetalEntry[1]})` : null;
 
+    const statsLine = [yearRange, topMetal].filter(Boolean).join('  ·  ');
     doc.setFont(fonts.body, 'normal');
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setTextColor(IRON_GALL);
-    doc.text(yearRange, MARGIN + 10, 218);
-    doc.text(topMetal, MARGIN + 10, 226);
+    doc.text(statsLine, 105, 205, { align: 'center' });
   }
 }
 
@@ -470,12 +483,12 @@ function groupAndSortByEra(coins: Coin[]): Coin[] {
   });
 }
 
-function renderTocEntries(
+async function renderTocEntries(
   doc: jsPDF,
   entries: TocEntry[],
   locale: Locale,
   fonts: Fonts,
-): void {
+): Promise<void> {
   let y = MARGIN + 14;
   let lastEra = '';
 
@@ -491,10 +504,11 @@ function renderTocEntries(
 
     // Thumbnail
     if (entry.obverseImg) {
-      const imgData = loadImageAsBase64(entry.obverseImg.path);
-      if (imgData) {
+      const imgData = await loadImageAsBase64(entry.obverseImg.path);
+      const fmt = imgData ? getImageFormat(imgData) : null;
+      if (imgData && fmt) {
         try {
-          doc.addImage(imgData, 'JPEG', MARGIN, y - 3, 15, 15);
+          doc.addImage(imgData, fmt, MARGIN, y - 3, 15, 15);
         } catch {
           // skip
         }
@@ -541,27 +555,16 @@ export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Pr
     const coins = dbService.getCoins();
     const allImages = new Map<number, CoinImage[]>();
     for (const coin of coins) {
-      allImages.set(coin.id, dbService.getImagesByCoinId(coin.id));
+      const imgs = dbService.getImagesByCoinId(coin.id);
+      allImages.set(coin.id, imgs);
     }
 
     // 3. Cover page (page 1)
     applyPageBackground(doc);
-    drawCoverPage(doc, coins, allImages, locale, fonts);
+    await drawCoverPage(doc, coins, allImages, locale, fonts);
 
-    // 4. Compute pagePlan: pair coins unless overflow or last coin
-    const pagePlan: { coins: Coin[] }[] = [];
-    let i = 0;
-    while (i < coins.length) {
-      const coinA = coins[i];
-      const estA  = estimateCoinSlotHeight(coinA, (allImages.get(coinA.id)?.length ?? 0) > 0);
-      if (estA > SLOT_HEIGHT || i + 1 >= coins.length) {
-        pagePlan.push({ coins: [coinA] });
-        i++;
-      } else {
-        pagePlan.push({ coins: [coinA, coins[i + 1]] });
-        i += 2;
-      }
-    }
+    // 4. Compute pagePlan: one coin per page (dense metadata makes pairing impractical)
+    const pagePlan: { coins: Coin[] }[] = coins.map(coin => ({ coins: [coin] }));
 
     // 5. TOC placeholder pages (two-pass: insert, then back-fill after coin pages are rendered)
     const tocPageCount = Math.ceil(Math.max(coins.length, 1) / 14);
@@ -585,15 +588,8 @@ export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Pr
       const docPage = doc.getNumberOfPages();
       plan.coins.forEach(c => coinPageMap.set(c.id, docPage));
 
-      let yPos = MARGIN;
-      plan.coins.forEach((coin, idx) => {
-        if (idx === 1) {
-          drawHorizontalRule(doc, yPos + 2);
-          yPos += 8;
-        }
-        drawCoinSlot(doc, coin, allImages.get(coin.id) ?? [], yPos, locale, fonts);
-        yPos += SLOT_HEIGHT + 5;
-      });
+      const yPos = MARGIN;
+      await drawCoinSlot(doc, plan.coins[0], allImages.get(plan.coins[0].id) ?? [], yPos, locale, fonts);
 
       drawPageFooter(doc, docPage, doc.getNumberOfPages(), locale);
     }
@@ -611,7 +607,7 @@ export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Pr
       applyPageBackground(doc);
       drawSectionHeader(doc, t(locale, 'tableOfContents'), MARGIN, MARGIN, fonts);
       const entries = tocEntries.slice(tp * 14, (tp + 1) * 14);
-      renderTocEntries(doc, entries, locale, fonts);
+      await renderTocEntries(doc, entries, locale, fonts);
     }
 
     // 9. Back-fill stats page

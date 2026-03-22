@@ -495,10 +495,8 @@ None — all design decisions resolved during brainstorming session on 2026-03-2
 
 ## 10. Post-Implementation Retrospective
 
-*(To be filled after implementation is complete)*
-
-**Date:** —
-**Outcome:** —
+**Date:** 2026-03-22
+**Outcome:** Implementation complete — all four issues resolved in post-launch verification.
 
 ### Summary of Work
 - [x] IPC chain updated (validation, preload, handler, hook, Cabinet)
@@ -508,8 +506,54 @@ None — all design decisions resolved during brainstorming session on 2026-03-2
 - [x] `npx tsc --noEmit` passes with zero errors
 - [x] All tests green — 190/190 passing
 
+### Post-Launch Fixes (2026-03-22 — Verification)
+
+#### 1. Progressive JPEG images invisible in PDF
+
+**Symptom:** Images were embedded in the PDF but rendered as 1-pixel-tall strips, making them invisible.
+
+**Root Cause:** `jsPDF` misreads progressive JPEG (SOF2) markers, reporting dimensions of e.g. `1281×1` instead of `3024×3024`. The images were correctly embedded but the PDF's image viewport was collapsed.
+
+**Fix:** `loadImageAsBase64()` now routes all JPEGs through `jimp` (pure JS, no native deps) to decode and re-encode as baseline JPEG before embedding:
+```
+Progressive JPEG (SOF2) → Jimp.decode → Jimp.encode (baseline) → jsPDF ✓
+```
+PNGs are passed through unchanged. Function is now `async`; `drawCoinSlot`, `drawCoverPage`, and `renderTocEntries` are also `async`.
+
+**Tradeoff:** Baseline JPEG is ~1.7× larger than progressive (~4.65MB vs ~2.75MB for a 3024×3024 coin photo). Acceptable for a one-time PDF export. The `jimp` package is added as a project dependency.
+
+#### 2. Montserrat italic font error
+
+**Symptom:** `Unable to look up font label for font 'Montserrat', 'italic'`.
+
+**Root Cause:** `FONT_DEFS` only included `Montserrat-Regular` and `Montserrat-Bold`; the subtitle line called `doc.setFont(fonts.body, 'italic')` requesting a non-existent italic variant.
+
+**Fix:** Added `Montserrat-Italic.ttf` to `FONT_DEFS` (6th entry) and to `assets/fonts/`. The file was obtained by downloading the WOFF2 from Google Fonts and converting to TTF using Python's fonttools + brotli.
+
+#### 3. Date format DD/MM/YYYY
+
+**Symptom:** Cover page showed locale-dependent date output (e.g., `22/3/2026`).
+
+**Fix:** Replaced `new Date().toLocaleDateString()` with explicit zero-padded formatting:
+```typescript
+const day = String(now.getDate()).padStart(2, '0');
+const month = String(now.getMonth() + 1).padStart(2, '0');
+const date = `${day}/${month}/${year}`;
+```
+
+#### 4. Cover page stats redesign
+
+**Decision:** Adopted Option C — inline manuscript footer.
+
+- Removed the filled `RULE_COLOR` rectangle (too "dashboard widget")
+- Title moved from Y=165 → Y=168 for breathing room below the hero image
+- Thin 0.3pt hairline rule at Y=197
+- Stats as a single centered line at Y=205: `202 BC – AD 202  ·  Silver (12)`
+- Subtitle line adjusted to Y=179 accordingly
+
 ### Pain Points
-—
+- jsPDF's progressive JPEG handling required a significant diagnosis detour (isolated via Python PDF parsing to find embedded `/Width 1281 /Height 1` in the PDF binary)
+- `jimp` v1.x has a non-standard export structure (`jimp.Jimp` not `jimp.default.Jimp`)
 
 ### Things to Consider
 - Allow collector to pin a cover coin via a preference
