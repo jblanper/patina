@@ -33,7 +33,8 @@
     "objectCount_one": "{{count}} object in the ledger.",
     "objectCount_other": "{{count}} objects in the ledger.",
     "search": "Title, issuer, or catalog reference...",
-    "customizeDisplay": "Customize Display"
+    "customizeDisplay": "Customize Display",
+    "tools": "Tools"
   },
   "gallery": {
     "loading": "Opening the archives...",

@@ -128,6 +128,10 @@ Redesigned full-collection PDF catalog with Manuscript Hybrid branding, two coin
 - [PDF Export Redesign — The Prestige Catalog](./blueprints/archive/2026-03-22-pdf-export-redesign.md)
 - [Year Numeric Input & Era Glossary Correction](./blueprints/archive/2026-03-22-year-numeric-input.md)
 
+**Cabinet Ledge & CoinCard Redesign**
+Toolbar collapsed from five flat items to a three-item Command Strip (Personalizar · Herramientas ▾ dropdown · + Nueva Entrada). CoinCard grade moved from the inline metrics row to a dedicated labeled row, eliminating multi-word grade overflow and aligning presentation with numismatic catalogue convention.
+- [Cabinet Ledge & CoinCard Redesign](./blueprints/archive/2026-03-23-cabinet-ledge-coincard-redesign.md)
+
 ### Active
 
 | Blueprint | Status |

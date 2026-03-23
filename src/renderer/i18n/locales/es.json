@@ -33,7 +33,8 @@
     "objectCount_one": "{{count}} objeto en el registro.",
     "objectCount_other": "{{count}} objetos en el registro.",
     "search": "Título, emisor o referencia de catálogo...",
-    "customizeDisplay": "Personalizar Vista"
+    "customizeDisplay": "Personalizar Vista",
+    "tools": "Herramientas"
   },
   "gallery": {
     "loading": "Abriendo los archivos...",

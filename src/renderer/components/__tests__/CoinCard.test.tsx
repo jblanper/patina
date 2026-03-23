@@ -44,20 +44,20 @@ describe('CoinCard', () => {
 
   // ── Grade badge visibility ───────────────────────────────────────────────
 
-  it('TC-CC-01: renders .metric-grade when card.grade=true and coin.grade is present', () => {
+  it('TC-CC-01: renders .coin-grade-row when card.grade=true and coin.grade is present', () => {
     const { container } = renderCard({ 'card.grade': true });
-    expect(container.querySelector('.metric-grade')).toBeInTheDocument();
-    expect(container.querySelector('.metric-grade')).toHaveTextContent('VF');
+    expect(container.querySelector('.coin-grade-row')).toBeInTheDocument();
+    expect(container.querySelector('.coin-grade-value')).toHaveTextContent('VF');
   });
 
-  it('TC-CC-02: does not render .metric-grade when card.grade=false', () => {
+  it('TC-CC-02: does not render .coin-grade-row when card.grade=false', () => {
     const { container } = renderCard({ 'card.grade': false });
-    expect(container.querySelector('.metric-grade')).not.toBeInTheDocument();
+    expect(container.querySelector('.coin-grade-row')).not.toBeInTheDocument();
   });
 
-  it('TC-CC-03: does not render .metric-grade when coin.grade is null/undefined', () => {
+  it('TC-CC-03: does not render .coin-grade-row when coin.grade is null/undefined', () => {
     const { container } = renderCard({ 'card.grade': true }, { grade: undefined });
-    expect(container.querySelector('.metric-grade')).not.toBeInTheDocument();
+    expect(container.querySelector('.coin-grade-row')).not.toBeInTheDocument();
   });
 
   // ── Always-visible fields ────────────────────────────────────────────────

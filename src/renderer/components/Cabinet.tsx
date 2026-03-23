@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FieldVisibilityDrawer } from './FieldVisibilityDrawer';
@@ -28,6 +28,19 @@ export const Cabinet: React.FC = () => {
   const { language } = useLanguage();
   const { status, resultPath, error: exportError, exportToZip, exportToPdf, reset } = useExport();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const toolsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!toolsOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (toolsRef.current && !toolsRef.current.contains(e.target as Node)) {
+        setToolsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [toolsOpen]);
 
   if (error) {
     throw error;
@@ -60,15 +73,44 @@ export const Cabinet: React.FC = () => {
                 >
                   {t('cabinet.customizeDisplay')}
                 </button>
-                <button className="btn-action" onClick={() => exportToZip()}>
-                  {t('cabinet.exportArchive')}
-                </button>
-                <button className="btn-action" onClick={() => exportToPdf(language)}>
-                  {t('cabinet.generateCatalog')}
-                </button>
-                <Link to="/glossary" className="btn-action glossary-toolbar-link">
-                  {t('glossary.toolbarLink')}
-                </Link>
+
+                <div className="tools-menu" ref={toolsRef}>
+                  <button
+                    className="btn-tools"
+                    onClick={() => setToolsOpen(prev => !prev)}
+                    aria-expanded={toolsOpen}
+                    aria-haspopup="menu"
+                  >
+                    {t('cabinet.tools')} ▾
+                  </button>
+                  {toolsOpen && (
+                    <div className="tools-dropdown" role="menu">
+                      <button
+                        className="tools-dropdown-item"
+                        role="menuitem"
+                        onClick={() => { exportToZip(); setToolsOpen(false); }}
+                      >
+                        {t('cabinet.exportArchive')}
+                      </button>
+                      <button
+                        className="tools-dropdown-item"
+                        role="menuitem"
+                        onClick={() => { exportToPdf(language); setToolsOpen(false); }}
+                      >
+                        {t('cabinet.generateCatalog')}
+                      </button>
+                      <Link
+                        to="/glossary"
+                        className="tools-dropdown-item"
+                        role="menuitem"
+                        onClick={() => setToolsOpen(false)}
+                      >
+                        {t('glossary.toolbarLink')}
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
                 <button className="btn-action btn-primary" onClick={() => navigate('/scriptorium/add')}>
                   {t('cabinet.newEntry')}
                 </button>

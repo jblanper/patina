@@ -200,6 +200,68 @@ main {
   margin-left: auto;
 }
 
+/* Tools dropdown */
+.tools-menu {
+  position: relative;
+}
+
+.btn-tools {
+  background: none;
+  border: 1px solid var(--border-hairline);
+  padding: 0.4rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-ink);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.btn-tools:hover,
+.btn-tools[aria-expanded="true"] {
+  border-color: var(--accent-manuscript);
+  color: var(--accent-manuscript);
+}
+
+.tools-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: var(--bg-manuscript);
+  border: 1px solid var(--border-hairline);
+  z-index: 200;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tools-dropdown-item {
+  background: none;
+  border: none;
+  padding: 0.55rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-ink);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  display: block;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tools-dropdown-item:hover {
+  background: var(--stone-pedestal);
+  color: var(--accent-manuscript);
+}
+
+.tools-dropdown-item + .tools-dropdown-item {
+  border-top: 1px solid var(--border-hairline);
+}
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -626,6 +688,30 @@ main {
 .metric-divider {
   color: var(--text-muted);
   font-weight: 400;
+}
+
+.coin-grade-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+.coin-grade-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+}
+
+.coin-grade-value {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-ink);
+  font-weight: 600;
 }
 
 .coin-ref {
@@ -2019,9 +2105,6 @@ main {
 .glossary-external-link:hover { color: var(--accent-manuscript); }
 
 /* Toolbar link */
-.glossary-toolbar-link {
-  text-decoration: none;
-}
 
 /* ── Glossary Drawer ───────────────────────────────────────────────────────── */
 
@@ -2402,11 +2485,3 @@ main {
   border-color: var(--accent-manuscript);
 }
 
-/* CoinCard — grade badge */
-.metric-grade {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--accent-manuscript);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}

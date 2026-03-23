@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patina — Design Proposals: The Ledge & CoinCard Grade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-manuscript: #FCF9F2;
+      --text-ink: #2D2926;
+      --text-muted: #6A6764;
+      --border-hairline: #E0DCCD;
+      --accent-manuscript: #914E32;
+      --stone-pedestal: #F0EDE6;
+      --font-serif: 'Cormorant Garamond', serif;
+      --font-sans: 'Montserrat', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: var(--font-sans);
+      background: #E8E4DB;
+      color: var(--text-ink);
+      padding: 3rem 2rem;
+    }
+
+    /* ── Page shell ── */
+    .doc-title {
+      font-family: var(--font-serif);
+      font-size: 2.2rem;
+      font-style: italic;
+      letter-spacing: -0.5px;
+      color: var(--text-ink);
+      margin-bottom: 0.35rem;
+    }
+    .doc-meta {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-manuscript);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 3rem;
+    }
+    .section-divider {
+      border: none;
+      border-top: 2px solid var(--text-ink);
+      margin: 3.5rem 0 2.5rem;
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+    .section-problem {
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      max-width: 72ch;
+      line-height: 1.65;
+      margin-bottom: 3rem;
+    }
+
+    /* ── Path grid ── */
+    .paths-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+      gap: 2rem;
+    }
+
+    .path-card {
+      background: var(--bg-manuscript);
+      padding: 2rem;
+      border: 1px solid var(--border-hairline);
+    }
+
+    .path-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .path-number {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+    }
+
+    .path-name {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-ink);
+    }
+
+    .path-desc {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.75rem;
+      border-bottom: 1px solid var(--border-hairline);
+      padding-bottom: 1.25rem;
+    }
+
+    .path-verdict {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-manuscript);
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-hairline);
+    }
+
+    /* ── MOCKUP CANVAS ── */
+    .mockup {
+      background: var(--bg-manuscript);
+      border: 1px solid var(--border-hairline);
+      padding: 1.5rem;
+    }
+
+    /* ─────────────────────────────────────────────
+       SECTION 1 — THE LEDGE TOOLBAR
+    ───────────────────────────────────────────── */
+
+    /* Current state (reference) */
+    .current-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .current-btn-action {
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--text-muted);
+      padding: 0.75rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      color: var(--text-ink);
+    }
+    .current-btn-primary {
+      background: var(--text-ink);
+      color: var(--bg-manuscript);
+      border: none;
+      padding: 0.6rem 1.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-left: auto;
+    }
+    .current-btn-customize {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--border-hairline);
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.1rem 0;
+    }
+
+    /* PATH 1 — The Command Strip */
+    .p1-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .p1-btn-ghost {
+      background: none;
+      border: 1px solid var(--border-hairline);
+      padding: 0.5rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    .p1-btn-ghost:hover { color: var(--accent-manuscript); border-color: var(--accent-manuscript); }
+    .p1-btn-tools {
+      background: none;
+      border: 1px solid var(--border-hairline);
+      padding: 0.5rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-ink);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+    }
+    .p1-btn-primary {
+      background: var(--text-ink);
+      color: var(--bg-manuscript);
+      border: none;
+      padding: 0.55rem 1.3rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+    .p1-dropdown-preview {
+      margin-top: 0.5rem;
+      background: var(--bg-manuscript);
+      border: 1px solid var(--border-hairline);
+      padding: 0.5rem 0;
+      display: inline-flex;
+      flex-direction: column;
+      min-width: 180px;
+    }
+    .p1-dropdown-item {
+      padding: 0.45rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-ink);
+      cursor: pointer;
+    }
+    .p1-dropdown-item:hover { background: var(--stone-pedestal); color: var(--accent-manuscript); }
+    .p1-dropdown-divider { height: 1px; background: var(--border-hairline); margin: 0.25rem 0; }
+
+    /* PATH 2 — The Stratified Header */
+    .p2-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .p2-row-primary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .p2-count {
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .p2-btn-primary {
+      background: var(--text-ink);
+      color: var(--bg-manuscript);
+      border: none;
+      padding: 0.6rem 1.3rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .p2-row-secondary {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .p2-chip {
+      background: var(--stone-pedestal);
+      border: none;
+      padding: 0.3rem 0.7rem;
+      font-family: var(--font-mono);
+      font-size: 0.63rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      white-space: nowrap;
+    }
+    .p2-chip:hover { color: var(--accent-manuscript); }
+    .p2-chip-icon { font-style: normal; font-size: 0.8rem; }
+
+    /* PATH 3 — The Icon Ledge */
+    .p3-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .p3-separator {
+      width: 1px;
+      height: 1.5rem;
+      background: var(--border-hairline);
+      margin: 0 0.75rem;
+    }
+    .p3-btn-icon {
+      background: none;
+      border: none;
+      padding: 0.6rem 0.7rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+    .p3-btn-icon:hover { color: var(--accent-manuscript); }
+    .p3-icon-glyph {
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .p3-icon-label {
+      font-size: 0.58rem;
+      letter-spacing: 1px;
+    }
+    .p3-btn-primary {
+      background: var(--text-ink);
+      color: var(--bg-manuscript);
+      border: none;
+      padding: 0.6rem 1.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    /* ─────────────────────────────────────────────
+       SECTION 2 — COIN CARD GRADE
+    ───────────────────────────────────────────── */
+
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* Shared card shell */
+    .demo-card {
+      background: var(--bg-manuscript);
+      padding: 0;
+      border: 1px solid var(--border-hairline);
+      cursor: pointer;
+    }
+    .demo-coin-img {
+      width: 100%;
+      aspect-ratio: 1;
+      background: var(--stone-pedestal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .demo-coin-silhouette {
+      width: 68%;
+      height: 68%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #E8E4D8 0%, #D1CDC0 100%);
+      box-shadow: 4px 4px 15px rgba(0,0,0,0.05);
+    }
+    .demo-coin-info {
+      padding: 1rem;
+    }
+    .demo-coin-title {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--text-ink);
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+    .demo-coin-ref {
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    /* Current — metrics inline (for reference) */
+    .metrics-inline {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-manuscript);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .m-divider { color: var(--text-muted); }
+
+    /* PATH A — Grade Badge */
+    .pa-metrics {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-manuscript);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .pa-footer {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+    .pa-grade-badge {
+      background: var(--accent-manuscript);
+      color: var(--bg-manuscript);
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0.2rem 0.5rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .pa-ref-text {
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    /* PATH B — Dedicated Grade Row */
+    .pb-metrics {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-manuscript);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+      white-space: nowrap;
+    }
+    .pb-grade-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.3rem;
+    }
+    .pb-grade-label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+    }
+    .pb-grade-value {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-ink);
+      font-weight: 600;
+    }
+    .pb-grade-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--border-hairline);
+      flex-shrink: 0;
+    }
+
+    /* PATH C — Wrap with Grade Right-Anchored */
+    .pc-metrics {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-manuscript);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .pc-grade {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-manuscript);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: var(--stone-pedestal);
+      padding: 0.15rem 0.45rem;
+    }
+
+    /* ── Utility ── */
+    .label-current {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .annotation {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-hairline);
+      font-style: italic;
+    }
+    .tag-recommended {
+      display: inline-block;
+      background: var(--accent-manuscript);
+      color: var(--bg-manuscript);
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 0.15rem 0.5rem;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+  <p class="doc-meta">Patina Design Office — Proposal · 2026-03-23</p>
+  <h1 class="doc-title">El Gabinete — Two Proposals</h1>
+  <p style="font-family: var(--font-sans); font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; max-width: 65ch; line-height: 1.65;">
+    Two distinct UI problems identified in the Cabinet view. Each receives three curated paths. One path will be selected per problem and implemented together.
+  </p>
+
+  <!-- ═══════════════════════════════════════════════════
+       PROBLEM 1 — THE LEDGE TOOLBAR
+  ════════════════════════════════════════════════════ -->
+
+  <hr class="section-divider">
+  <p class="section-label">Problem I</p>
+  <h2 class="section-title">The Ledge — Toolbar Redesign</h2>
+  <p class="section-problem">
+    The action bar above the coin grid currently presents five items at nearly identical visual weight: <em>Personalizar Vista</em>, <em>Exportar Archivo</em>, <em>Generar Catálogo</em>, <em>Referencia de Campos</em>, and <em>+ Nueva Entrada</em>. The flat underlined treatment and tight horizontal packing produce visual noise. The hierarchy between a secondary utility action and the primary CTA is indistinguishable. Three restructuring strategies are proposed below.
+  </p>
+
+  <!-- Reference: current state -->
+  <div style="margin-bottom: 2.5rem;">
+    <span class="label-current">Current State (Reference)</span>
+    <div class="mockup">
+      <div class="current-toolbar">
+        <button class="current-btn-customize">Personalizar Vista</button>
+        <button class="current-btn-action">Exportar Archivo</button>
+        <button class="current-btn-action">Generar Catálogo</button>
+        <button class="current-btn-action">Referencia de Campos</button>
+        <button class="current-btn-primary">+ Nueva Entrada</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="paths-grid">
+
+    <!-- PATH 1: The Command Strip -->
+    <div class="path-card">
+      <div class="path-header">
+        <span class="path-number">Path 1</span>
+        <span class="path-name">The Command Strip</span>
+      </div>
+      <p class="path-desc">
+        Secondary actions (export, catalogue, glossary) collapse into a single <strong>Herramientas ▾</strong> dropdown. The toolbar is reduced to three items: a ghost <em>Personalizar</em> trigger, the tool menu, and the primary CTA. The dropdown surfaces on click — still within two interactions (Single-Click Rule compliant). Maximum reduction in visual noise.
+      </p>
+      <div class="mockup">
+        <div class="p1-toolbar">
+          <button class="p1-btn-ghost">⊞ Personalizar</button>
+          <button class="p1-btn-tools">Herramientas ▾</button>
+          <button class="p1-btn-primary">+ Nueva Entrada</button>
+        </div>
+        <!-- Dropdown preview -->
+        <div style="margin-top: 0.75rem; display: flex; gap: 1rem;">
+          <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+            <span style="font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted);">Dropdown open ↓</span>
+            <div class="p1-dropdown-preview">
+              <div class="p1-dropdown-item">↓ Exportar Archivo</div>
+              <div class="p1-dropdown-divider"></div>
+              <div class="p1-dropdown-item">☷ Generar Catálogo</div>
+              <div class="p1-dropdown-divider"></div>
+              <div class="p1-dropdown-item">☰ Referencia de Campos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="path-verdict">
+        Complexity: Low · Change scope: Cabinet.tsx + new dropdown component + CSS · Verdict: Cleanest surface, requires dropdown state management
+      </p>
+    </div>
+
+    <!-- PATH 2: The Stratified Header -->
+    <div class="path-card">
+      <div class="path-header">
+        <span class="path-number">Path 2</span>
+        <span class="path-name">The Stratified Header <span class="tag-recommended">Recommended</span></span>
+      </div>
+      <p class="path-desc">
+        The toolbar splits into two tiers. The <strong>primary row</strong> holds only the object count and the CTA — clean, dominant, immediate. The <strong>secondary row</strong> presents utility actions as compact stone-pedestal chips with leading glyphs. Each tier has a clear purpose. No dropdown required. No hidden actions.
+      </p>
+      <div class="mockup">
+        <div class="p2-header">
+          <div class="p2-row-primary">
+            <span class="p2-count">19 objetos en el registro.</span>
+            <button class="p2-btn-primary">+ Nueva Entrada</button>
+          </div>
+          <div class="p2-row-secondary">
+            <button class="p2-chip"><span class="p2-chip-icon">⊞</span> Personalizar Vista</button>
+            <button class="p2-chip"><span class="p2-chip-icon">↓</span> Exportar Archivo</button>
+            <button class="p2-chip"><span class="p2-chip-icon">☷</span> Generar Catálogo</button>
+            <button class="p2-chip"><span class="p2-chip-icon">☰</span> Referencia de Campos</button>
+          </div>
+        </div>
+      </div>
+      <p class="path-verdict">
+        Complexity: Very Low · Change scope: CSS only + minor Cabinet.tsx restructure · Verdict: Best hierarchy, no hidden state, fully responsive
+      </p>
+    </div>
+
+    <!-- PATH 3: The Icon Ledge -->
+    <div class="path-card">
+      <div class="path-header">
+        <span class="path-number">Path 3</span>
+        <span class="path-name">The Icon Ledge</span>
+      </div>
+      <p class="path-desc">
+        All five actions remain in a single row but secondary tools become compact <strong>icon + micro-label</strong> vertical units. A hairline separator isolates the primary CTA on the right. The glyphs carry immediate meaning; the labels confirm it. Denser but more structured than current.
+      </p>
+      <div class="mockup">
+        <div class="p3-toolbar">
+          <button class="p3-btn-icon">
+            <span class="p3-icon-glyph">⊞</span>
+            <span class="p3-icon-label">Personalizar</span>
+          </button>
+          <button class="p3-btn-icon">
+            <span class="p3-icon-glyph">↓</span>
+            <span class="p3-icon-label">Exportar</span>
+          </button>
+          <button class="p3-btn-icon">
+            <span class="p3-icon-glyph">☷</span>
+            <span class="p3-icon-label">Catálogo</span>
+          </button>
+          <button class="p3-btn-icon">
+            <span class="p3-icon-glyph">☰</span>
+            <span class="p3-icon-label">Referencia</span>
+          </button>
+          <div class="p3-separator"></div>
+          <button class="p3-btn-primary">+ Nueva Entrada</button>
+        </div>
+      </div>
+      <p class="path-verdict">
+        Complexity: Very Low · Change scope: CSS only · Verdict: Single-row constraint maintained; glyphs need careful selection for legibility
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════
+       PROBLEM 2 — COIN CARD GRADE OVERFLOW
+  ════════════════════════════════════════════════════ -->
+
+  <hr class="section-divider">
+  <p class="section-label">Problem II</p>
+  <h2 class="section-title">CoinCard — Grade Display</h2>
+  <p class="section-problem">
+    The inline metrics row — <code>ELECTRUM // 8.10G // 20.5MM // CHOICE XF</code> — wraps mid-grade when the grade is multi-word, splitting a single token across lines. This breaks the rhythmic ledger aesthetic. Three solutions are proposed: one extracts the grade entirely, one gives it a dedicated row, and one resolves the overflow purely with CSS anchoring.
+  </p>
+
+  <!-- Reference: current state -->
+  <div style="margin-bottom: 2.5rem;">
+    <span class="label-current">Current State (Reference) — Grade wraps on narrow cards</span>
+    <div class="mockup">
+      <div class="cards-row" style="max-width: 560px;">
+        <div class="demo-card">
+          <div class="demo-coin-img"><div class="demo-coin-silhouette"></div></div>
+          <div class="demo-coin-info">
+            <h3 class="demo-coin-title">Croesus Electrum Stater</h3>
+            <div class="metrics-inline">
+              <span>Electrum</span>
+              <span class="m-divider">//</span>
+              <span>8.10g</span>
+              <span class="m-divider">//</span>
+              <span>20.5mm</span>
+              <span class="m-divider">//</span>
+              <span>VF-35</span>
+            </div>
+            <div class="demo-coin-ref">Ref. Sear GCV 3395; Rosen 664</div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-coin-img"><div class="demo-coin-silhouette"></div></div>
+          <div class="demo-coin-info">
+            <h3 class="demo-coin-title">Athens Tetradrachm</h3>
+            <div class="metrics-inline">
+              <span>Silver</span>
+              <span class="m-divider">//</span>
+              <span>17.20g</span>
+              <span class="m-divider">//</span>
+              <span>24.5mm</span>
+              <span class="m-divider">//</span>
+              <span>Choice XF</span>
+            </div>
+            <div class="demo-coin-ref">Ref. HGC 4, 1597</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="paths-grid">
+
+    <!-- PATH A: Grade Badge -->
+    <div class="path-card">
+      <div class="path-header">
+        <span class="path-number">Path A</span>
+        <span class="path-name">The Grade Badge</span>
+      </div>
+      <p class="path-desc">
+        Grade is extracted from the metrics row entirely. The metrics row becomes guaranteed single-line: <em>Metal // Weight // Diameter</em>. The grade surfaces as a solid accent badge, co-positioned with the catalog reference — asserting its importance as a collector-critical field without disrupting metric flow.
+      </p>
+      <div class="mockup">
+        <div class="cards-row" style="max-width: 500px;">
+          <div class="demo-card">
+            <div class="demo-coin-img"><div class="demo-coin-silhouette"></div></div>
+            <div class="demo-coin-info">
+              <h3 class="demo-coin-title">Croesus Electrum Stater</h3>
+              <div class="pa-metrics">
+                <span>Electrum</span>
+                <span class="m-divider">//</span>
+                <span>8.10g</span>
+                <span class="m-divider">//</span>
+                <span>20.5mm</span>
+              </div>
+              <div class="pa-footer">
+                <span class="pa-ref-text">Ref. Sear GCV 3395</span>
+                <span class="pa-grade-badge">VF-35</span>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-coin-img"><div class="demo-coin-silhouette"></div></div>
+            <div class="demo-coin-info">
+              <h3 class="demo-coin-title">Athens Tetradrachm</h3>
+              <div class="pa-metrics">
+                <span>Silver</span>
+                <span class="m-divider">//</span>
+                <span>17.20g</span>
+                <span class="m-divider">//</span>
+                <span>24.5mm</span>
+              </div>
+              <div class="pa-footer">
+                <span class="pa-ref-text">Ref. HGC 4, 1597</span>
+                <span class="pa-grade-badge">Choice XF</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="annotation">Grade badge sits in accent Burnt Sienna. Catalog ref and badge share one flex row — ref grows, badge stays pinned right.</p>
+      </div>
+      <p class="path-verdict">
+        Complexity: Low · Change scope: CoinCard.tsx restructure + CSS · Verdict: Grade gets its own visual identity; strongest hierarchy
+      </p>
+    </div>
+
+    <!-- PATH B: Dedicated Grade Row -->
+    <div class="path-card">
+      <div class="path-header">
+        <span class="path-number">Path B</span>
+        <span class="path-name">The Grade Row <span class="tag-recommended">Recommended</span></span>
+      </div>
+      <p class="path-desc">
+        A second metadata row is added below the metrics: <em>Grado · VF-35</em>. The metrics row remains a clean single line of physical data. The grade row is typographically subordinate but distinct — labeled, never orphaned. This mirrors professional numismatic catalogue layouts where grade is listed separately from physical specs.
+      </p>
+      <div class="mockup">
+        <div class="cards-row" style="max-width: 500px;">
+          <div class="demo-card">
+            <div class="demo-coin-img"><div class="demo-coin-silhouette"></div></div>
+            <div class="demo-coin-info">
+              <h3 class="demo-coin-title">Croesus Electrum Stater</h3>
+              <div class="pb-metrics">
+                <span>Electrum</span>
+                <span class="m-divider">//</span>
+                <span>8.10g</span>
+                <span class="m-divider">//</span>
+                <span>20.5mm</span>
+              </div>
+              <div class="pb-grade-row">
+                <div class="pb-grade-dot"></div>
+                <span class="pb-grade-label">Grado</span>
+                <span class="pb-grade-value">VF-35</span>
+              </div>
+              <div class="demo-coin-ref">Ref. Sear GCV 3395; Rosen 664</div>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-coin-img"><div class="demo-coin-silhouette"></div></div>
+            <div class="demo-coin-info">
+              <h3 class="demo-coin-title">Athens Tetradrachm</h3>
+              <div class="pb-metrics">
+                <span>Silver</span>
+                <span class="m-divider">//</span>
+                <span>17.20g</span>
+                <span class="m-divider">//</span>
+                <span>24.5mm</span>
+              </div>
+              <div class="pb-grade-row">
+                <div class="pb-grade-dot"></div>
+                <span class="pb-grade-label">Grado</span>
+                <span class="pb-grade-value">Choice XF</span>
+              </div>
+              <div class="demo-coin-ref">Ref. HGC 4, 1597</div>
+            </div>
+          </div>
+        </div>
+        <p class="annotation">Grade label in muted text-muted; grade value in Iron Gall at 600 weight — clear, never truncated, label disambiguates field meaning.</p>
+      </div>
+      <p class="path-verdict">
+        Complexity: Very Low · Change scope: CSS only (new .coin-grade-row) + trivial JSX change · Verdict: Cleanest to implement; aligns with numismatic convention
+      </p>
+    </div>
+
+    <!-- PATH C: Wrap + Grade Anchored Right -->
+    <div class="path-card">
+      <div class="path-header">
+        <span class="path-number">Path C</span>
+        <span class="path-name">The Anchored Grade</span>
+      </div>
+      <p class="path-desc">
+        Minimal intervention. The metrics row gains <code>flex-wrap: wrap</code> and the grade span receives <code>margin-left: auto</code>. When the full row fits, grade floats to the right of the same line. When the card is narrow, grade drops to its own line left-aligned — never splitting mid-token. The stone-pedestal background on the grade provides subtle visual anchoring.
+      </p>
+      <div class="mockup">
+        <div class="cards-row" style="max-width: 500px;">
+          <div class="demo-card">
+            <div class="demo-coin-img"><div class="demo-coin-silhouette"></div></div>
+            <div class="demo-coin-info">
+              <h3 class="demo-coin-title">Croesus Electrum Stater</h3>
+              <div class="pc-metrics">
+                <span>Electrum</span>
+                <span class="m-divider">//</span>
+                <span>8.10g</span>
+                <span class="m-divider">//</span>
+                <span>20.5mm</span>
+                <span class="pc-grade">VF-35</span>
+              </div>
+              <div class="demo-coin-ref">Ref. Sear GCV 3395; Rosen 664</div>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-coin-img"><div class="demo-coin-silhouette"></div></div>
+            <div class="demo-coin-info">
+              <h3 class="demo-coin-title">Athens Tetradrachm</h3>
+              <div class="pc-metrics">
+                <span>Silver</span>
+                <span class="m-divider">//</span>
+                <span>17.20g</span>
+                <span class="m-divider">//</span>
+                <span>24.5mm</span>
+                <span class="pc-grade">Choice XF</span>
+              </div>
+              <div class="demo-coin-ref">Ref. HGC 4, 1597</div>
+            </div>
+          </div>
+        </div>
+        <p class="annotation">Grade gets <code>margin-left: auto</code> and stone-pedestal background. At wide widths it right-aligns in the same row; at narrow widths it wraps clean to its own line.</p>
+      </div>
+      <p class="path-verdict">
+        Complexity: Minimal · Change scope: 3 CSS lines, 0 JSX changes · Verdict: Fastest to ship; grade remains part of the metric stream rather than promoted as its own field
+      </p>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       CURATOR'S RECOMMENDATION SUMMARY
+  ════════════════════════════════════════════════════ -->
+
+  <hr class="section-divider">
+  <p class="section-label">Curator's Recommendation</p>
+  <h2 class="section-title">Preferred Combination</h2>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+    <div style="background: var(--bg-manuscript); padding: 1.75rem; border-left: 3px solid var(--accent-manuscript);">
+      <p style="font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-manuscript); margin-bottom: 0.5rem;">Ledge Toolbar</p>
+      <p style="font-family: var(--font-serif); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem;">Path 2 — The Stratified Header</p>
+      <p style="font-family: var(--font-sans); font-size: 0.82rem; color: var(--text-muted); line-height: 1.65;">
+        Splitting into two tiers requires zero new state management. The primary row achieves immediate hierarchy clarity — the count informs, the CTA acts. The secondary chip row respects the archival aesthetic without underlines or noise. Fully responsive. Requires only minor JSX restructure and new CSS chip styles.
+      </p>
+    </div>
+    <div style="background: var(--bg-manuscript); padding: 1.75rem; border-left: 3px solid var(--accent-manuscript);">
+      <p style="font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-manuscript); margin-bottom: 0.5rem;">Coin Card Grade</p>
+      <p style="font-family: var(--font-serif); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.75rem;">Path B — The Grade Row</p>
+      <p style="font-family: var(--font-sans); font-size: 0.82rem; color: var(--text-muted); line-height: 1.65;">
+        A dedicated grade row aligns with professional numismatic catalogue conventions where physical specs (weight, diameter, metal) are grouped separately from condition (grade). The labeled approach removes ambiguity for new users. Implementation is CSS-only with a trivial JSX change — lowest risk, cleanest result.
+      </p>
+    </div>
+  </div>
+
+  <div style="margin-top: 3rem; padding: 1.25rem 1.5rem; background: var(--stone-pedestal); border: 1px solid var(--border-hairline);">
+    <p style="font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted);">
+      Status: Awaiting selection · These two decisions are independent — one can be approved without the other.
+      <br>Saved: docs/curating-ui/proposal_ledge_coincard_2026-03-23.html
+    </p>
+  </div>
+
+</body>
+</html>

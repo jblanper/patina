@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { CoinWithPrimaryImage } from '../../common/types';
 import { useFieldVisibility } from '../hooks/useFieldVisibility';
 
@@ -13,6 +14,7 @@ interface CoinCardProps {
  * Adheres to 2-decimal (weight) and 1-decimal (diameter) rules.
  */
 export const CoinCard: React.FC<CoinCardProps> = React.memo(({ coin, onClick }) => {
+  const { t } = useTranslation();
   const { isVisible } = useFieldVisibility();
 
   const formatWeight = (w?: number) => {
@@ -75,14 +77,15 @@ export const CoinCard: React.FC<CoinCardProps> = React.memo(({ coin, onClick }) 
           <span className="metric-weight">{formatWeight(coin.weight)}</span>
           <span className="metric-divider">//</span>
           <span className="metric-diameter">{formatDiameter(coin.diameter)}</span>
-          {isVisible('card.grade') && coin.grade && (
-            <>
-              <span className="metric-divider">//</span>
-              <span className="metric-grade">{coin.grade}</span>
-            </>
-          )}
         </div>
         
+        {isVisible('card.grade') && coin.grade && (
+          <div className="coin-grade-row">
+            <span className="coin-grade-label">{t('ledger.grade')}</span>
+            <span className="coin-grade-value">{coin.grade}</span>
+          </div>
+        )}
+
         {coin.catalog_ref && (
           <div className="coin-ref">
             REF. {coin.catalog_ref}
