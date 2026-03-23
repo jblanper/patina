@@ -139,3 +139,15 @@ The sidebar's first group. Controls the sort order of the Cabinet gallery.
 #### Filter Checkbox CSS Classes
 - **`.filter-checkbox`** — Custom 16×16px ring (1px hairline border, 50% radius). On checked state: accent fill with 8×8px `--accent-manuscript` dot inside. The native `<input type="checkbox">` is visually hidden but remains in the DOM for screen readers.
 - **`.filter-item-label`** — Wraps the checkbox and label text. On active (checked) state: left border in `--accent-manuscript`, bold weight, and soft background fill.
+
+#### Filter Overflow: The Soft Reveal
+Dynamic filter groups (Metals, Grade) truncate to 8 values when the list exceeds that threshold. The pattern is implemented in `PatinaSidebar` via `renderOverflowGroup`.
+
+- **`TRUNCATION_THRESHOLD = 8`** — Module-level constant (not a prop). Change in one place if ever revised.
+- **Active-selection pinning** — Selected values are sorted to the top of the list before truncation is applied; a selected value is never hidden.
+- **`.filter-overflow-wrap`** — `position: relative` wrapper that hosts the fade overlay.
+- **`.filter-overflow-wrap.truncated::after`** — `pointer-events: none` gradient fade from `transparent` to `var(--bg-manuscript)`, applied only when the list is truncated. Do **not** remove `pointer-events: none` — without it the overlay intercepts clicks on the last visible filter item.
+- **`.filter-show-more`** — Trigger button styled as an archival footnote cross-reference: `var(--font-mono)`, `0.65rem`, `var(--accent-manuscript)`, uppercase, letter-spacing. Uses `aria-expanded` to signal disclosure state (WCAG 4.1.2).
+- **Expand state is local, not persisted** — The sidebar opens in compact state on every session. Do not lift this state to `localStorage` or a hook.
+- **Fixed groups are never truncated** — Sort and Eras have small, fixed value sets. Do not apply `renderOverflowGroup` to them.
+- **No expand/collapse animation** — Do not add `transition` on `max-height`. Animated reflow shifts the sidebar while the user is interacting with it.

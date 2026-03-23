@@ -1,7 +1,7 @@
 # Implementation Blueprint: Sidebar Filter Overflow — The Soft Reveal
 
 **Date:** 2026-03-21
-**Status:** Verification
+**Status:** Completed
 **Reference:** UI proposal approved via `docs/curating-ui/proposal_filter_overflow_2026-03-21.html` (Path A selected). Design rationale documented in conversation of 2026-03-21; research report consulted Baymard Institute, Omeka S, CollectiveAccess, and Algolia InstantSearch benchmarks.
 
 ---
@@ -342,14 +342,30 @@ Replace the existing `<ul className="filter-list">` block inside the Metals `<di
 ---
 
 ## 10. Post-Implementation Retrospective
-**Date:** —
-**Outcome:** —
+**Date:** 2026-03-23
+**Outcome:** Completed — all re-audits passed, 21/21 tests green, `npx tsc --noEmit` clean.
+
+### Re-Audit Results (Verification Phase)
+
+| Skill | Status | Notes |
+|---|---|---|
+| `curating-blueprints` | Verified | Implementation matches blueprint exactly. `TRUNCATION_THRESHOLD`, active-selection pinning, expand state locality all confirmed in code. |
+| `securing-electron` | Verified | No cross-process boundary touched. `hiddenCount` is a computed integer — not user-supplied input. Metal/grade values rendered via React (XSS-safe). `pointer-events: none` present on gradient overlay. |
+| `assuring-quality` | Verified | All 10 specified overflow tests implemented. Both boundary cases (exactly 8 / exactly 9) present. `queryByRole('button', { name: /show/i })` returns null at count = 8 — confirmed. |
+| `curating-ui` | Verified | CSS tokens match approved proposal: `var(--bg-manuscript)` gradient endpoint, `var(--accent-manuscript)` link color, `var(--font-mono)`. `aria-expanded` present on disclosure button. No `transition` on expand/collapse. |
+| `curating-coins` | Verified | No data model impact. Active-selection pinning confirmed in `renderOverflowGroup`. Grade alphabetical-sort limitation acknowledged; out of scope. |
 
 ### Summary of Work
-- (To be completed after implementation)
+- Added `renderOverflowGroup` helper inside `PatinaSidebar` with active-selection pinning and expand/collapse state.
+- Added `TRUNCATION_THRESHOLD = 8` module-level constant.
+- Added `.filter-overflow-wrap`, `.filter-overflow-wrap.truncated::after`, `.filter-show-more`, `.filter-show-more:hover` to `index.css`.
+- Added `sidebar.showMore` / `sidebar.showLess` i18n keys to both `en.json` and `es.json`.
+- Added 10 new tests covering all branches; total suite now 21 tests, all passing.
+- Incidental fix: changed `.gallery-grid` from `auto-fit` to `auto-fill` with `min(100%, 280px)` to prevent card stretch on sparse results.
+- Updated `docs/style_guide.md §5` (Archival Filters) with the `.filter-overflow-wrap` pattern.
 
 ### Pain Points
-- (To be completed after implementation)
+- None. The renderer-only scope kept the implementation tight. The `renderOverflowGroup` helper was the right abstraction level — no leakage into the hook layer.
 
 ### Things to Consider
 - Path B (search-within-filter) should be revisited if/when a Denomination or Country filter is added — those groups may reach 30–50 values where search becomes essential.

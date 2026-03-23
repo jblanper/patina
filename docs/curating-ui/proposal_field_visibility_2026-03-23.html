@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curatorial Proposal: Field Visibility Settings — Phase 6c — Patina</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #6A6764;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: #EEEBE4;
+            color: var(--text-ink);
+            line-height: 1.6;
+            padding: clamp(2rem, 6vw, 4rem);
+        }
+
+        /* ── Proposal Shell ────────────────────────────────────── */
+        .proposal-header {
+            max-width: 1400px;
+            margin: 0 auto 4rem;
+            border-bottom: 2px solid var(--text-ink);
+            padding-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .proposal-header h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+        .proposal-meta {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-manuscript);
+            text-align: right;
+        }
+        .proposal-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 7rem;
+        }
+
+        /* ── Path Section ───────────────────────────────────────── */
+        .path-tag {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+        .path-title {
+            font-family: var(--font-serif);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+        .path-body {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            max-width: 680px;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+        .verdict-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem 2rem;
+            max-width: 640px;
+            margin-bottom: 2.5rem;
+        }
+        .verdict-item {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .v-pro { color: #4a7c4e; }
+        .v-con { color: var(--text-muted); }
+        .verdict-item span:first-child { flex-shrink: 0; }
+
+        /* ── Demo Wrapper ───────────────────────────────────────── */
+        .demo-wrapper {
+            background: var(--bg-manuscript);
+            border: 1px solid var(--border-hairline);
+            border-radius: 0;
+            overflow: hidden;
+        }
+        .demo-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            background: var(--stone-pedestal);
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        /* ── Shared Ledger Shell ─────────────────────────────────── */
+        .ledger-shell {
+            display: flex;
+            flex-direction: column;
+            min-height: 560px;
+            position: relative;
+        }
+
+        .app-header-demo {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid var(--border-hairline);
+            background: var(--bg-manuscript);
+            gap: 1rem;
+        }
+        .nav-back-demo {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        .header-actions-demo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-minimal-demo {
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--text-ink);
+            padding: 0.1rem 0;
+            cursor: pointer;
+            color: var(--text-ink);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-minimal-demo:hover { color: var(--accent-manuscript); border-color: var(--accent-manuscript); }
+        .btn-delete-demo {
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--text-muted);
+            padding: 0.1rem 0;
+            cursor: pointer;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-delete-demo:hover { color: var(--error-red); border-color: var(--error-red); }
+        .btn-customize-demo {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--border-hairline);
+            padding: 0.1rem 0;
+            cursor: pointer;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-customize-demo:hover, .btn-customize-demo.active { color: var(--accent-manuscript); border-color: var(--accent-manuscript); }
+
+        .ledger-body-demo {
+            display: grid;
+            grid-template-columns: 42% 58%;
+            flex: 1;
+        }
+        .left-folio-demo {
+            border-right: 1px solid var(--border-hairline);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .plate-demo {
+            background: var(--stone-pedestal);
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .coin-silhouette-demo {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: var(--border-hairline);
+        }
+        .plate-caption-demo {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+        .right-folio-demo {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        .folio-header-demo { margin-bottom: 1rem; }
+        .meta-line-demo {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        .folio-title-demo {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 0.3rem;
+        }
+        .subtitle-demo {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        .metrics-grid-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .metric-item-demo { display: flex; flex-direction: column; gap: 0.1rem; }
+        .metric-label-demo {
+            font-family: var(--font-sans);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+        .metric-value-demo {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-ink);
+        }
+        .section-label-demo {
+            font-family: var(--font-sans);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .desc-block-demo {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: var(--text-ink);
+            margin-bottom: 1rem;
+        }
+        .field-hidden-demo {
+            display: none;
+        }
+
+        /* ════════════════════════════════════════════════════════
+           PATH A — The Annotation Drawer
+        ═════════════════════════════════════════════════════════ */
+        .drawer-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(45, 41, 38, 0.15);
+            z-index: 10;
+        }
+        .drawer-overlay.open { display: block; }
+
+        .annotation-drawer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 340px;
+            background: var(--bg-manuscript);
+            border-right: 1px solid var(--border-hairline);
+            z-index: 11;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(-100%);
+            transition: transform 0.2s ease;
+        }
+        .annotation-drawer.open { transform: translateX(0); }
+
+        /* Cabinet variant — anchors right (left side occupied by PatinaSidebar) */
+        .annotation-drawer.right-anchor {
+            left: auto;
+            right: 0;
+            border-right: none;
+            border-left: 1px solid var(--border-hairline);
+            transform: translateX(100%);
+        }
+        .annotation-drawer.right-anchor.open { transform: translateX(0); }
+
+        /* Cabinet shell */
+        .cabinet-shell {
+            display: flex;
+            flex-direction: column;
+            min-height: 480px;
+            position: relative;
+        }
+        .cabinet-layout-demo {
+            display: flex;
+            flex: 1;
+        }
+        .cabinet-sidebar-demo {
+            width: 200px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border-hairline);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+        .sidebar-group-demo { display: flex; flex-direction: column; gap: 0.4rem; }
+        .sidebar-group-label-demo {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+        }
+        .sidebar-filter-item-demo {
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .sidebar-filter-item-demo.active { color: var(--accent-manuscript); }
+        .cabinet-grid-demo {
+            flex: 1;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 130px), 130px));
+            gap: 0.75rem;
+            align-content: start;
+        }
+        .cabinet-card-demo {
+            background: var(--stone-pedestal);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.6rem;
+        }
+        .card-image-demo {
+            background: var(--border-hairline);
+            aspect-ratio: 1;
+            border-radius: 50%;
+            width: 56px;
+            margin: 0 auto;
+        }
+        .card-title-demo {
+            font-family: var(--font-serif);
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: center;
+        }
+        .card-metrics-demo {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.6;
+        }
+        .card-grade-badge {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-manuscript);
+            text-align: center;
+        }
+        .card-grade-badge.hidden { display: none; }
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .drawer-title {
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            font-weight: 700;
+            font-style: italic;
+        }
+        .drawer-close {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .drawer-close:hover { color: var(--text-ink); }
+
+        .drawer-surface-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .surface-tab {
+            flex: 1;
+            padding: 0.6rem;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+        }
+        .surface-tab.active {
+            color: var(--accent-manuscript);
+            border-bottom-color: var(--accent-manuscript);
+        }
+
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+        .drawer-section { border-bottom: 1px solid var(--border-hairline); }
+        .drawer-section-head {
+            padding: 0.6rem 1.25rem 0.4rem;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            background: var(--stone-pedestal);
+        }
+        .drawer-field-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.55rem 1.25rem;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .drawer-field-row:last-child { border-bottom: none; }
+        .drawer-field-name {
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            color: var(--text-ink);
+        }
+        .drawer-field-sub {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            display: block;
+        }
+        .field-toggle {
+            width: 34px;
+            height: 18px;
+            background: var(--border-hairline);
+            border-radius: 9px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+        .field-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: white;
+            transition: left 0.15s;
+        }
+        .field-toggle.on {
+            background: var(--accent-manuscript);
+        }
+        .field-toggle.on::after {
+            left: 18px;
+        }
+        .field-toggle.locked {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        .drawer-footer {
+            padding: 0.75rem 1.25rem;
+            border-top: 1px solid var(--border-hairline);
+        }
+        .drawer-reset {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--border-hairline);
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.1rem 0;
+        }
+        .drawer-reset:hover { color: var(--accent-manuscript); border-color: var(--accent-manuscript); }
+        .live-badge {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4a7c4e;
+            float: right;
+        }
+
+        /* ════════════════════════════════════════════════════════
+           PATH B — The Archivist's Manifest
+        ═════════════════════════════════════════════════════════ */
+        .manifest-shell {
+            min-height: 560px;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-manuscript);
+        }
+        .manifest-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .manifest-title-block { display: flex; flex-direction: column; }
+        .manifest-breadcrumb {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.1rem;
+        }
+        .manifest-page-title {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            font-weight: 700;
+            font-style: italic;
+        }
+        .manifest-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .btn-reset-manifest {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--border-hairline);
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.1rem 0;
+        }
+        .btn-reset-manifest:hover { color: var(--accent-manuscript); border-color: var(--accent-manuscript); }
+        .btn-save-manifest {
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--text-ink);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.25rem;
+            cursor: pointer;
+        }
+        .btn-save-manifest:hover { background: var(--accent-manuscript); }
+
+        .manifest-body {
+            display: grid;
+            grid-template-columns: 60% 40%;
+            flex: 1;
+            border-top: none;
+        }
+        .manifest-panel {
+            padding: 1.5rem;
+            border-right: 1px solid var(--border-hairline);
+        }
+        .manifest-panel:last-child { border-right: none; }
+        .manifest-panel-title {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-manuscript);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .manifest-group { margin-bottom: 1.25rem; }
+        .manifest-group-label {
+            font-family: var(--font-sans);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .manifest-field-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .manifest-field-row:last-child { border-bottom: none; }
+        .manifest-field-name {
+            font-family: var(--font-sans);
+            font-size: 0.78rem;
+            color: var(--text-ink);
+        }
+        .manifest-field-sub {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            color: var(--text-muted);
+        }
+        .manifest-toggle-pair {
+            display: flex;
+            gap: 0;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .mtoggle-btn {
+            padding: 0.2rem 0.5rem;
+            border: 1px solid var(--border-hairline);
+            background: none;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .mtoggle-btn.on-active {
+            background: var(--accent-manuscript);
+            color: white;
+            border-color: var(--accent-manuscript);
+        }
+        .mtoggle-btn.off-active {
+            background: var(--stone-pedestal);
+            color: var(--text-ink);
+            border-color: var(--border-hairline);
+        }
+        .manifest-note {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 0.4rem;
+        }
+
+        /* ════════════════════════════════════════════════════════
+           PATH C — The Inline Edit Mode
+        ═════════════════════════════════════════════════════════ */
+        .inline-header-mode {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1.5rem;
+            background: #F5F0E8;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .inline-mode-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-manuscript);
+        }
+        .inline-mode-count {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        .btn-done-demo {
+            font-family: var(--font-sans);
+            font-size: 0.72rem;
+            background: var(--text-ink);
+            color: white;
+            border: none;
+            padding: 0.35rem 0.9rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-done-demo:hover { background: var(--accent-manuscript); }
+
+        .inline-metric-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+        .inline-eye-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0;
+            line-height: 1;
+        }
+        .inline-eye-btn:hover { color: var(--accent-manuscript); }
+        .inline-eye-btn.hidden-field { color: var(--border-hairline); }
+        .inline-field-wrapper { position: relative; padding: 0.4rem 0.5rem; }
+        .inline-field-wrapper:hover { background: #F5F1E8; }
+        .field-stub {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--border-hairline);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px dashed var(--border-hairline);
+            padding: 0.25rem 0.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .field-stub-restore {
+            font-family: var(--font-mono);
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .field-stub-restore:hover { color: var(--accent-manuscript); }
+
+        /* mode indicator ring */
+        .edit-mode-ring {
+            outline: 2px dashed var(--accent-manuscript);
+            outline-offset: 2px;
+        }
+
+        /* ── Decision Notes ─────────────────────────────────────── */
+        .decision-block {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2.5rem;
+            border: 1px solid var(--border-hairline);
+            background: var(--bg-manuscript);
+        }
+        .decision-title {
+            font-family: var(--font-serif);
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+        .decision-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+            gap: 1.5rem;
+        }
+        .decision-item { }
+        .decision-q {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-manuscript);
+            margin-bottom: 0.5rem;
+        }
+        .decision-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .decision-opt {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+        .decision-opt.winner {
+            color: var(--text-ink);
+            font-weight: 600;
+        }
+        .decision-opt .path-pill {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.1rem 0.35rem;
+            border: 1px solid var(--border-hairline);
+            flex-shrink: 0;
+            color: var(--text-muted);
+        }
+        .decision-opt.winner .path-pill {
+            background: var(--accent-manuscript);
+            color: white;
+            border-color: var(--accent-manuscript);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Proposal Header ───────────────────────────────────────── -->
+    <header class="proposal-header">
+        <h1>Field Visibility Settings<br><em style="font-size:0.6em;color:var(--text-muted);font-style:normal;font-family:var(--font-mono);letter-spacing:1px;text-transform:uppercase;">Phase 6c — Three-Path Curatorial Proposal</em></h1>
+        <div class="proposal-meta">
+            Patina · Manuscript Hybrid v3.3<br>
+            Chief Curator & UX Lead<br>
+            2026-03-23
+        </div>
+    </header>
+
+    <div class="proposal-container">
+
+        <!-- ════════════════════════════════════════════════════════
+             PATH A — The Annotation Drawer
+        ═════════════════════════════════════════════════════════ -->
+        <section>
+            <span class="path-tag">Path A</span>
+            <h2 class="path-title">The Annotation Drawer</h2>
+            <p class="path-body">
+                A 340px contextual drawer, accessible from both the Ledger and the Cabinet.
+                In the <strong>Ledger</strong>, triggered by a "Customize Display" text link placed between
+                Edit and Delete in the header — the drawer opens from the <strong>left</strong>, overlapping
+                the coin plate rather than the text record. In the <strong>Cabinet</strong>, triggered by
+                a "Customize Display" link in the gallery header — the drawer opens from the <strong>right</strong>
+                (left side is occupied by PatinaSidebar) and defaults to the Gallery Card tab.
+                Toggle switches update both surfaces live — no Apply button, no navigation away.
+            </p>
+            <div class="verdict-grid">
+                <div class="verdict-item v-pro"><span>✦</span><span>Left anchor in Ledger: right folio (text record) stays fully clear</span></div>
+                <div class="verdict-item v-pro"><span>✦</span><span>Live feedback: Ledger and Cards react instantly</span></div>
+                <div class="verdict-item v-pro"><span>✦</span><span>Reachable from both surfaces — correct tab pre-selected</span></div>
+                <div class="verdict-item v-pro"><span>✦</span><span>Toggle pattern matches existing sidebar design language</span></div>
+                <div class="verdict-item v-con"><span>·</span><span>Left drawer overlaps the coin plate in Ledger (acceptable trade-off)</span></div>
+                <div class="verdict-item v-con"><span>·</span><span>Right anchor in Cabinet overlaps the gallery cards while open</span></div>
+            </div>
+
+            <div class="demo-wrapper">
+                <div class="demo-label">Demo A1: Ledger — drawer opens from the LEFT, overlapping the coin plate. Right folio stays clear.</div>
+                <div class="ledger-shell" id="path-a-shell">
+
+                    <!-- App Header -->
+                    <div class="app-header-demo">
+                        <button class="nav-back-demo">← Close Entry</button>
+                        <div class="header-actions-demo">
+                            <button class="btn-customize-demo" id="btn-open-drawer" onclick="toggleDrawer()">Customize Display</button>
+                            <button class="btn-minimal-demo">Edit Record</button>
+                            <button class="btn-delete-demo">Delete Record</button>
+                        </div>
+                    </div>
+
+                    <!-- Ledger Body -->
+                    <div class="ledger-body-demo">
+                        <div class="left-folio-demo">
+                            <div class="plate-demo"><div class="coin-silhouette-demo"></div></div>
+                            <div class="plate-caption-demo">OBVERSE // 2:1 SCALE</div>
+                        </div>
+                        <div class="right-folio-demo" id="path-a-folio">
+                            <div class="folio-header-demo">
+                                <div class="meta-line-demo">Entry #004 // Ancient // Marc Antony</div>
+                                <div class="folio-title-demo">Legionary Denarius</div>
+                                <div class="subtitle-demo">Minted at Mobile Mint // 32–31 BC // Cr. 544/14</div>
+                            </div>
+                            <div class="metrics-grid-demo">
+                                <div class="metric-item-demo" id="pa-weight">
+                                    <span class="metric-label-demo">Weight</span>
+                                    <span class="metric-value-demo">3.82 g</span>
+                                </div>
+                                <div class="metric-item-demo" id="pa-diameter">
+                                    <span class="metric-label-demo">Diameter</span>
+                                    <span class="metric-value-demo">18.0 mm</span>
+                                </div>
+                                <div class="metric-item-demo field-hidden-demo" id="pa-dieaxis">
+                                    <span class="metric-label-demo">Die Axis</span>
+                                    <span class="metric-value-demo">6h</span>
+                                </div>
+                                <div class="metric-item-demo" id="pa-metal">
+                                    <span class="metric-label-demo">Material</span>
+                                    <span class="metric-value-demo">Silver (Ar)</span>
+                                </div>
+                                <div class="metric-item-demo field-hidden-demo" id="pa-fineness">
+                                    <span class="metric-label-demo">Fineness</span>
+                                    <span class="metric-value-demo">83%</span>
+                                </div>
+                                <div class="metric-item-demo" id="pa-grade">
+                                    <span class="metric-label-demo">Grade</span>
+                                    <span class="metric-value-demo">VF</span>
+                                </div>
+                            </div>
+                            <div id="pa-obverse">
+                                <span class="section-label-demo">Obverse</span>
+                                <div class="desc-block-demo">ANT AVG III VIR R P C · Galley right, mast with banners</div>
+                            </div>
+                            <div id="pa-reverse">
+                                <span class="section-label-demo">Reverse</span>
+                                <div class="desc-block-demo">LEG VI · Aquila between two standards</div>
+                            </div>
+                            <div id="pa-story">
+                                <span class="section-label-demo">Curator's Note</span>
+                                <div class="desc-block-demo" style="font-style:italic;">"Struck to pay the legions during the Actium campaign. Notoriously debased silver — this specimen retains a sharp strike."</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overlay -->
+                    <div class="drawer-overlay" id="pa-overlay" onclick="toggleDrawer()"></div>
+
+                    <!-- Annotation Drawer -->
+                    <div class="annotation-drawer" id="pa-drawer">
+                        <div class="drawer-header">
+                            <span class="drawer-title">Display Settings</span>
+                            <button class="drawer-close" onclick="toggleDrawer()">✕ Close</button>
+                        </div>
+                        <div class="drawer-surface-tabs">
+                            <button class="surface-tab active">Ledger</button>
+                            <button class="surface-tab">Gallery Card</button>
+                        </div>
+                        <div class="drawer-body">
+                            <div class="drawer-section">
+                                <div class="drawer-section-head">Physical Metrics</div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Weight</span></div>
+                                    <button class="field-toggle on locked" title="Required field"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Diameter</span></div>
+                                    <button class="field-toggle on locked" title="Required field"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div>
+                                        <span class="drawer-field-name">Die Axis</span>
+                                        <span class="drawer-field-sub">Expert field</span>
+                                    </div>
+                                    <button class="field-toggle" id="toggle-dieaxis" onclick="drawerToggle('pa-dieaxis','toggle-dieaxis')"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Metal</span></div>
+                                    <button class="field-toggle on locked"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div>
+                                        <span class="drawer-field-name">Fineness</span>
+                                        <span class="drawer-field-sub">Expert field</span>
+                                    </div>
+                                    <button class="field-toggle" id="toggle-fineness" onclick="drawerToggle('pa-fineness','toggle-fineness')"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Grade</span></div>
+                                    <button class="field-toggle on" id="toggle-grade" onclick="drawerToggle('pa-grade','toggle-grade')"></button>
+                                </div>
+                            </div>
+                            <div class="drawer-section">
+                                <div class="drawer-section-head">Numismatic Data</div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Obverse</span></div>
+                                    <button class="field-toggle on" id="toggle-obverse" onclick="drawerToggle('pa-obverse','toggle-obverse')"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Reverse</span></div>
+                                    <button class="field-toggle on" id="toggle-reverse" onclick="drawerToggle('pa-reverse','toggle-reverse')"></button>
+                                </div>
+                            </div>
+                            <div class="drawer-section">
+                                <div class="drawer-section-head">Narrative</div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Curator's Note</span></div>
+                                    <button class="field-toggle on" id="toggle-story" onclick="drawerToggle('pa-story','toggle-story')"></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="drawer-footer">
+                            <span class="live-badge">● Live</span>
+                            <button class="drawer-reset">Reset to Defaults</button>
+                        </div>
+                    </div>
+
+                </div><!-- /ledger-shell -->
+            </div><!-- /demo-wrapper -->
+
+            <!-- Cabinet demo -->
+            <div class="demo-wrapper" style="margin-top:1.5rem;">
+                <div class="demo-label">Demo A2: Cabinet — trigger in gallery header, drawer opens from the RIGHT, defaults to Gallery Card tab</div>
+                <div class="cabinet-shell" id="path-a-cabinet-shell">
+
+                    <!-- Cabinet Header -->
+                    <div class="app-header-demo">
+                        <span style="font-family:var(--font-serif);font-size:1rem;font-weight:700;font-style:italic;">The Cabinet</span>
+                        <div class="header-actions-demo">
+                            <button class="btn-customize-demo" id="btn-open-cabinet-drawer" onclick="toggleCabinetDrawer()">Customize Display</button>
+                        </div>
+                    </div>
+
+                    <div class="cabinet-layout-demo">
+                        <!-- Sidebar -->
+                        <div class="cabinet-sidebar-demo">
+                            <div class="sidebar-group-demo">
+                                <span class="sidebar-group-label-demo">Order By</span>
+                                <div class="sidebar-filter-item-demo active">Year</div>
+                                <div class="sidebar-filter-item-demo">Title</div>
+                                <div class="sidebar-filter-item-demo">Acquired</div>
+                            </div>
+                            <div class="sidebar-group-demo">
+                                <span class="sidebar-group-label-demo">Era</span>
+                                <div class="sidebar-filter-item-demo">Ancient</div>
+                                <div class="sidebar-filter-item-demo">Medieval</div>
+                                <div class="sidebar-filter-item-demo">Modern</div>
+                            </div>
+                            <div class="sidebar-group-demo">
+                                <span class="sidebar-group-label-demo">Metal</span>
+                                <div class="sidebar-filter-item-demo">Silver</div>
+                                <div class="sidebar-filter-item-demo">Gold</div>
+                                <div class="sidebar-filter-item-demo">Bronze</div>
+                            </div>
+                        </div>
+
+                        <!-- Gallery Grid -->
+                        <div class="cabinet-grid-demo" id="cabinet-grid">
+                            <div class="cabinet-card-demo">
+                                <div class="card-image-demo"></div>
+                                <div class="card-title-demo">Legionary Denarius</div>
+                                <div class="card-metrics-demo" id="cab-card-1-metrics">
+                                    SILVER // 3.82g<br>
+                                    <span id="cab-year-1">32–31 BC</span>
+                                </div>
+                                <div class="card-grade-badge" id="cab-grade-1">VF</div>
+                            </div>
+                            <div class="cabinet-card-demo">
+                                <div class="card-image-demo"></div>
+                                <div class="card-title-demo">Athenian Tetradrachm</div>
+                                <div class="card-metrics-demo">
+                                    SILVER // 17.15g<br>
+                                    <span id="cab-year-2">449–413 BC</span>
+                                </div>
+                                <div class="card-grade-badge" id="cab-grade-2">gVF</div>
+                            </div>
+                            <div class="cabinet-card-demo">
+                                <div class="card-image-demo"></div>
+                                <div class="card-title-demo">Solidus of Justinian I</div>
+                                <div class="card-metrics-demo">
+                                    GOLD // 4.44g<br>
+                                    <span id="cab-year-3">527–565 AD</span>
+                                </div>
+                                <div class="card-grade-badge" id="cab-grade-3">EF</div>
+                            </div>
+                            <div class="cabinet-card-demo">
+                                <div class="card-image-demo"></div>
+                                <div class="card-title-demo">Penny of Edward I</div>
+                                <div class="card-metrics-demo">
+                                    SILVER // 1.41g<br>
+                                    <span id="cab-year-4">1272–1307</span>
+                                </div>
+                                <div class="card-grade-badge" id="cab-grade-4">F</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cabinet Overlay -->
+                    <div class="drawer-overlay" id="pa-cabinet-overlay" onclick="toggleCabinetDrawer()"></div>
+
+                    <!-- Cabinet Drawer (right-anchored, Card tab active by default) -->
+                    <div class="annotation-drawer right-anchor" id="pa-cabinet-drawer">
+                        <div class="drawer-header">
+                            <span class="drawer-title">Display Settings</span>
+                            <button class="drawer-close" onclick="toggleCabinetDrawer()">✕ Close</button>
+                        </div>
+                        <div class="drawer-surface-tabs">
+                            <button class="surface-tab" id="cab-tab-ledger" onclick="switchCabTab('ledger')">Ledger</button>
+                            <button class="surface-tab active" id="cab-tab-card" onclick="switchCabTab('card')">Gallery Card</button>
+                        </div>
+
+                        <!-- Card Tab (default) -->
+                        <div class="drawer-body" id="cab-body-card">
+                            <div class="drawer-section">
+                                <div class="drawer-section-head">Gallery Card Fields</div>
+                                <div class="drawer-field-row">
+                                    <div>
+                                        <span class="drawer-field-name">Metal</span>
+                                        <span class="drawer-field-sub">Always visible</span>
+                                    </div>
+                                    <button class="field-toggle on locked"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div>
+                                        <span class="drawer-field-name">Year</span>
+                                        <span class="drawer-field-sub">Always visible</span>
+                                    </div>
+                                    <button class="field-toggle on locked"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Grade</span></div>
+                                    <button class="field-toggle on" id="cab-toggle-grade" onclick="cabToggleGrade()"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Weight</span></div>
+                                    <button class="field-toggle on" id="cab-toggle-weight" onclick="cabToggleWeight()"></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ledger Tab (hidden by default in Cabinet context) -->
+                        <div class="drawer-body" id="cab-body-ledger" style="display:none;">
+                            <div class="drawer-section">
+                                <div class="drawer-section-head">Physical Metrics</div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Weight</span></div>
+                                    <button class="field-toggle on locked"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Diameter</span></div>
+                                    <button class="field-toggle on locked"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div>
+                                        <span class="drawer-field-name">Die Axis</span>
+                                        <span class="drawer-field-sub">Expert field</span>
+                                    </div>
+                                    <button class="field-toggle"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Grade</span></div>
+                                    <button class="field-toggle on"></button>
+                                </div>
+                            </div>
+                            <div class="drawer-section">
+                                <div class="drawer-section-head">Numismatic Data</div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Obverse</span></div>
+                                    <button class="field-toggle on"></button>
+                                </div>
+                                <div class="drawer-field-row">
+                                    <div><span class="drawer-field-name">Reverse</span></div>
+                                    <button class="field-toggle on"></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="drawer-footer">
+                            <span class="live-badge">● Live</span>
+                            <button class="drawer-reset">Reset to Defaults</button>
+                        </div>
+                    </div>
+
+                </div><!-- /cabinet-shell -->
+            </div><!-- /cabinet demo-wrapper -->
+        </section>
+
+
+        <!-- ════════════════════════════════════════════════════════
+             PATH B — The Archivist's Manifest
+        ═════════════════════════════════════════════════════════ -->
+        <section>
+            <span class="path-tag">Path B</span>
+            <h2 class="path-title">The Archivist's Manifest</h2>
+            <p class="path-body">
+                A dedicated <code>/preferences/display</code> route, reachable by a "Display Preferences"
+                text link in the Ledger header. The page presents two panels side-by-side: the Ledger
+                (22 fields, grouped by section) on the left, and the Gallery Card (4 fields) on the right.
+                Each field uses a compact ON/OFF text-toggle pair — typographically minimal, no slider chrome.
+                Changes are batched and saved explicitly via "Save Preferences". A "Reset to Defaults" link
+                is available at the top. Navigation back returns to the Ledger.
+            </p>
+            <div class="verdict-grid">
+                <div class="verdict-item v-pro"><span>✦</span><span>Full canvas for 22 fields — no overlay congestion</span></div>
+                <div class="verdict-item v-pro"><span>✦</span><span>Card preferences share the same screen — no tab-switching</span></div>
+                <div class="verdict-item v-pro"><span>✦</span><span>Accessible from Cabinet header too (global settings)</span></div>
+                <div class="verdict-item v-pro"><span>✦</span><span>Batch save = single IPC call</span></div>
+                <div class="verdict-item v-con"><span>·</span><span>Navigates away from the Ledger (breaks Single-Click Rule for quick tweaks)</span></div>
+                <div class="verdict-item v-con"><span>·</span><span>No live preview — must return to Ledger to see effect</span></div>
+            </div>
+
+            <div class="demo-wrapper">
+                <div class="demo-label">Interactive Demo — The /preferences/display route. Click ON/OFF pairs to toggle fields.</div>
+                <div class="manifest-shell">
+                    <div class="manifest-header">
+                        <div class="manifest-title-block">
+                            <span class="manifest-breadcrumb">← Back to Legionary Denarius</span>
+                            <span class="manifest-page-title">Display Preferences</span>
+                        </div>
+                        <div class="manifest-actions">
+                            <button class="btn-reset-manifest">Reset to Defaults</button>
+                            <button class="btn-save-manifest">Save Preferences</button>
+                        </div>
+                    </div>
+                    <div class="manifest-body">
+                        <!-- Ledger Panel -->
+                        <div class="manifest-panel">
+                            <div class="manifest-panel-title">Ledger Record — 22 Fields</div>
+
+                            <div class="manifest-group">
+                                <span class="manifest-group-label">Identity</span>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Title</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Issuer</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Denomination</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Year</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Era</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Mint</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn">Off</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="manifest-group">
+                                <span class="manifest-group-label">Physical Metrics</span>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Weight</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn" style="opacity:0.4;cursor:default;">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Diameter</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn" style="opacity:0.4;cursor:default;">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div>
+                                        <span class="manifest-field-name">Die Axis</span>
+                                        <span class="manifest-field-sub">Expert field</span>
+                                    </div>
+                                    <div class="manifest-toggle-pair" id="mb-dieaxis-pair">
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-dieaxis-pair')">On</button>
+                                        <button class="mtoggle-btn off-active" onclick="manifestToggle('mb-dieaxis-pair')">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div>
+                                        <span class="manifest-field-name">Fineness</span>
+                                        <span class="manifest-field-sub">Expert field</span>
+                                    </div>
+                                    <div class="manifest-toggle-pair" id="mb-fineness-pair">
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-fineness-pair')">On</button>
+                                        <button class="mtoggle-btn off-active" onclick="manifestToggle('mb-fineness-pair')">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Grade</span></div>
+                                    <div class="manifest-toggle-pair" id="mb-grade-pair">
+                                        <button class="mtoggle-btn on-active" onclick="manifestToggle('mb-grade-pair')">On</button>
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-grade-pair')">Off</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="manifest-group">
+                                <span class="manifest-group-label">Numismatic Data</span>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Obverse Legend</span></div>
+                                    <div class="manifest-toggle-pair" id="mb-oleg-pair">
+                                        <button class="mtoggle-btn on-active" onclick="manifestToggle('mb-oleg-pair')">On</button>
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-oleg-pair')">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Obverse Description</span></div>
+                                    <div class="manifest-toggle-pair" id="mb-odesc-pair">
+                                        <button class="mtoggle-btn on-active" onclick="manifestToggle('mb-odesc-pair')">On</button>
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-odesc-pair')">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Reverse Legend</span></div>
+                                    <div class="manifest-toggle-pair" id="mb-rleg-pair">
+                                        <button class="mtoggle-btn on-active" onclick="manifestToggle('mb-rleg-pair')">On</button>
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-rleg-pair')">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Reverse Description</span></div>
+                                    <div class="manifest-toggle-pair" id="mb-rdesc-pair">
+                                        <button class="mtoggle-btn on-active" onclick="manifestToggle('mb-rdesc-pair')">On</button>
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-rdesc-pair')">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div>
+                                        <span class="manifest-field-name">Edge Description</span>
+                                        <span class="manifest-field-sub">Expert field</span>
+                                    </div>
+                                    <div class="manifest-toggle-pair" id="mb-edge-pair">
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-edge-pair')">On</button>
+                                        <button class="mtoggle-btn off-active" onclick="manifestToggle('mb-edge-pair')">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Catalog Reference</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Rarity</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn">Off</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="manifest-group">
+                                <span class="manifest-group-label">Narrative & Provenance</span>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Curator's Note</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div>
+                                        <span class="manifest-field-name">Provenance</span>
+                                        <span class="manifest-field-sub">Privacy-sensitive</span>
+                                    </div>
+                                    <div class="manifest-toggle-pair" id="mb-prov-pair">
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-prov-pair')">On</button>
+                                        <button class="mtoggle-btn off-active" onclick="manifestToggle('mb-prov-pair')">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div>
+                                        <span class="manifest-field-name">Acquisition Details</span>
+                                        <span class="manifest-field-sub">Privacy-sensitive</span>
+                                    </div>
+                                    <div class="manifest-toggle-pair" id="mb-acq-pair">
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-acq-pair')">On</button>
+                                        <button class="mtoggle-btn off-active" onclick="manifestToggle('mb-acq-pair')">Off</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Panel -->
+                        <div class="manifest-panel">
+                            <div class="manifest-panel-title">Gallery Card — 4 Fields</div>
+
+                            <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.5;">
+                                These badges appear on every coin card in the Cabinet. Keep this list short — the card is a quick-glance surface.
+                            </p>
+
+                            <div class="manifest-group">
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Metal</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Year</span></div>
+                                    <div class="manifest-toggle-pair">
+                                        <button class="mtoggle-btn on-active">On</button>
+                                        <button class="mtoggle-btn">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Grade</span></div>
+                                    <div class="manifest-toggle-pair" id="mb-card-grade-pair">
+                                        <button class="mtoggle-btn on-active" onclick="manifestToggle('mb-card-grade-pair')">On</button>
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-card-grade-pair')">Off</button>
+                                    </div>
+                                </div>
+                                <div class="manifest-field-row">
+                                    <div><span class="manifest-field-name">Weight</span></div>
+                                    <div class="manifest-toggle-pair" id="mb-card-weight-pair">
+                                        <button class="mtoggle-btn on-active" onclick="manifestToggle('mb-card-weight-pair')">On</button>
+                                        <button class="mtoggle-btn" onclick="manifestToggle('mb-card-weight-pair')">Off</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="manifest-note">Metal and Year cannot be turned off — they are primary identification fields for a historical coin collection.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ════════════════════════════════════════════════════════
+             PATH C — The Inline Edit Mode
+        ═════════════════════════════════════════════════════════ -->
+        <section>
+            <span class="path-tag">Path C</span>
+            <h2 class="path-title">The Inline Edit Mode</h2>
+            <p class="path-body">
+                A "Customize" button in the Ledger header activates a transient <em>edit mode</em>.
+                In this mode, every field row in the Ledger gains a small visibility toggle button
+                (rendered as a simple ○/● indicator to the right of each field). Toggling a field
+                hides or shows it live, leaving a thin dashed stub — with a "Restore" link — where
+                the hidden field was. A persistent mode-bar replaces the standard header, showing
+                a live count ("12 of 18 fields visible") and a "Done" button. No panel, no route, no Apply.
+                The Ledger itself becomes the settings UI.
+            </p>
+            <div class="verdict-grid">
+                <div class="verdict-item v-pro"><span>✦</span><span>Most contextual — you see the Ledger change as you configure it</span></div>
+                <div class="verdict-item v-pro"><span>✦</span><span>No overlay, no navigation — zero context switch</span></div>
+                <div class="verdict-item v-pro"><span>✦</span><span>No Apply button — simplest mental model</span></div>
+                <div class="verdict-item v-con"><span>·</span><span>Most complex to implement (edit mode adds state to CoinDetail)</span></div>
+                <div class="verdict-item v-con"><span>·</span><span>Card visibility has no natural home — needs a secondary interaction</span></div>
+                <div class="verdict-item v-con"><span>·</span><span>Dashed stubs add visual noise to the Ledger during edit mode</span></div>
+            </div>
+
+            <div class="demo-wrapper">
+                <div class="demo-label">Interactive Demo — Click "Customize" to enter edit mode. Use ● toggles next to each field.</div>
+                <div class="ledger-shell" id="path-c-shell">
+
+                    <!-- Standard Header (hidden in edit mode) -->
+                    <div class="app-header-demo" id="pc-std-header">
+                        <button class="nav-back-demo">← Close Entry</button>
+                        <div class="header-actions-demo">
+                            <button class="btn-customize-demo" onclick="enterEditMode()">Customize</button>
+                            <button class="btn-minimal-demo">Edit Record</button>
+                            <button class="btn-delete-demo">Delete Record</button>
+                        </div>
+                    </div>
+
+                    <!-- Edit Mode Header (shown in edit mode) -->
+                    <div class="inline-header-mode" id="pc-edit-header" style="display:none;">
+                        <span class="inline-mode-label">● Customizing Display</span>
+                        <span class="inline-mode-count" id="pc-field-count">5 of 6 fields visible</span>
+                        <button class="btn-done-demo" onclick="exitEditMode()">Done</button>
+                    </div>
+
+                    <!-- Ledger Body -->
+                    <div class="ledger-body-demo">
+                        <div class="left-folio-demo">
+                            <div class="plate-demo"><div class="coin-silhouette-demo"></div></div>
+                            <div class="plate-caption-demo">OBVERSE // 2:1 SCALE</div>
+                        </div>
+                        <div class="right-folio-demo" id="pc-folio">
+                            <div class="folio-header-demo" style="margin-bottom:1rem;">
+                                <div class="meta-line-demo">Entry #004 // Ancient // Marc Antony</div>
+                                <div class="folio-title-demo">Legionary Denarius</div>
+                                <div class="subtitle-demo">Minted at Mobile Mint // 32–31 BC // Cr. 544/14</div>
+                            </div>
+
+                            <div class="metrics-grid-demo" id="pc-metrics" style="position:relative;">
+                                <div class="inline-field-wrapper" id="pc-weight-wrap">
+                                    <div class="metric-item-demo">
+                                        <span class="metric-label-demo">Weight</span>
+                                        <span class="metric-value-demo">3.82 g</span>
+                                    </div>
+                                    <button class="inline-eye-btn" id="pc-eye-weight" onclick="inlineToggle('weight')" style="display:none;" title="Toggle Weight">●</button>
+                                </div>
+                                <div class="inline-field-wrapper" id="pc-diameter-wrap">
+                                    <div class="metric-item-demo">
+                                        <span class="metric-label-demo">Diameter</span>
+                                        <span class="metric-value-demo">18.0 mm</span>
+                                    </div>
+                                    <button class="inline-eye-btn" id="pc-eye-diameter" onclick="inlineToggle('diameter')" style="display:none;" title="Toggle Diameter">●</button>
+                                </div>
+                                <div class="inline-field-wrapper" id="pc-dieaxis-wrap">
+                                    <div class="metric-item-demo field-hidden-demo" id="pc-dieaxis-content">
+                                        <span class="metric-label-demo">Die Axis</span>
+                                        <span class="metric-value-demo">6h</span>
+                                    </div>
+                                    <div class="field-stub" id="pc-dieaxis-stub" style="display:none;">
+                                        <span>Die Axis</span>
+                                        <button class="field-stub-restore" onclick="inlineToggle('dieaxis')">+ Restore</button>
+                                    </div>
+                                    <button class="inline-eye-btn hidden-field" id="pc-eye-dieaxis" onclick="inlineToggle('dieaxis')" style="display:none;" title="Toggle Die Axis">○</button>
+                                </div>
+                                <div class="inline-field-wrapper" id="pc-metal-wrap">
+                                    <div class="metric-item-demo">
+                                        <span class="metric-label-demo">Material</span>
+                                        <span class="metric-value-demo">Silver (Ar)</span>
+                                    </div>
+                                    <button class="inline-eye-btn" id="pc-eye-metal" onclick="inlineToggle('metal')" style="display:none;">●</button>
+                                </div>
+                                <div class="inline-field-wrapper" id="pc-fineness-wrap">
+                                    <div class="metric-item-demo field-hidden-demo" id="pc-fineness-content">
+                                        <span class="metric-label-demo">Fineness</span>
+                                        <span class="metric-value-demo">83%</span>
+                                    </div>
+                                    <div class="field-stub" id="pc-fineness-stub" style="display:none;">
+                                        <span>Fineness</span>
+                                        <button class="field-stub-restore" onclick="inlineToggle('fineness')">+ Restore</button>
+                                    </div>
+                                    <button class="inline-eye-btn hidden-field" id="pc-eye-fineness" onclick="inlineToggle('fineness')" style="display:none;">○</button>
+                                </div>
+                                <div class="inline-field-wrapper" id="pc-grade-wrap">
+                                    <div class="metric-item-demo" id="pc-grade-content">
+                                        <span class="metric-label-demo">Grade</span>
+                                        <span class="metric-value-demo">VF</span>
+                                    </div>
+                                    <div class="field-stub" id="pc-grade-stub" style="display:none;">
+                                        <span>Grade</span>
+                                        <button class="field-stub-restore" onclick="inlineToggle('grade')">+ Restore</button>
+                                    </div>
+                                    <button class="inline-eye-btn" id="pc-eye-grade" onclick="inlineToggle('grade')" style="display:none;">●</button>
+                                </div>
+                            </div>
+
+                            <div class="inline-field-wrapper" id="pc-obverse-wrap" style="margin-bottom:0.5rem;">
+                                <div id="pc-obverse-content">
+                                    <span class="section-label-demo">Obverse</span>
+                                    <div class="desc-block-demo">ANT AVG III VIR R P C · Galley right, mast with banners</div>
+                                </div>
+                                <div class="field-stub" id="pc-obverse-stub" style="display:none;">
+                                    <span>Obverse</span>
+                                    <button class="field-stub-restore" onclick="inlineToggle('obverse')">+ Restore</button>
+                                </div>
+                                <button class="inline-eye-btn" id="pc-eye-obverse" onclick="inlineToggle('obverse')" style="display:none;">●</button>
+                            </div>
+
+                            <div class="inline-field-wrapper" id="pc-reverse-wrap" style="margin-bottom:0.5rem;">
+                                <div id="pc-reverse-content">
+                                    <span class="section-label-demo">Reverse</span>
+                                    <div class="desc-block-demo">LEG VI · Aquila between two standards</div>
+                                </div>
+                                <div class="field-stub" id="pc-reverse-stub" style="display:none;">
+                                    <span>Reverse</span>
+                                    <button class="field-stub-restore" onclick="inlineToggle('reverse')">+ Restore</button>
+                                </div>
+                                <button class="inline-eye-btn" id="pc-eye-reverse" onclick="inlineToggle('reverse')" style="display:none;">●</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /ledger-shell -->
+            </div><!-- /demo-wrapper -->
+        </section>
+
+
+        <!-- ════════════════════════════════════════════════════════
+             DECISION MATRIX
+        ═════════════════════════════════════════════════════════ -->
+        <section>
+            <div class="decision-block">
+                <h2 class="decision-title">Open Questions for the Curator</h2>
+                <div class="decision-grid">
+                    <div class="decision-item">
+                        <div class="decision-q">Q1 — Container: How are settings accessed?</div>
+                        <div class="decision-options">
+                            <div class="decision-opt"><span class="path-pill">A</span>Slide-in drawer, Ledger-local, text link in header</div>
+                            <div class="decision-opt"><span class="path-pill">B</span>Dedicated route /preferences/display, breadcrumb nav</div>
+                            <div class="decision-opt"><span class="path-pill">C</span>Edit mode on the Ledger itself, no panel</div>
+                        </div>
+                    </div>
+                    <div class="decision-item">
+                        <div class="decision-q">Q2 — Save Model: Live-update or explicit Save?</div>
+                        <div class="decision-options">
+                            <div class="decision-opt"><span class="path-pill">A</span>Live (IPC per toggle, instant Ledger feedback)</div>
+                            <div class="decision-opt"><span class="path-pill">B</span>Batch save (single IPC call, no draft state risk)</div>
+                            <div class="decision-opt"><span class="path-pill">C</span>Live (same as A)</div>
+                        </div>
+                    </div>
+                    <div class="decision-item">
+                        <div class="decision-q">Q3 — Trigger placement in Ledger header?</div>
+                        <div class="decision-options">
+                            <div class="decision-opt"><span class="path-pill">A/C</span>Text link "Customize Display" / "Customize" alongside Edit + Delete</div>
+                            <div class="decision-opt"><span class="path-pill">B</span>Text link "Display Preferences" in header (navigates away)</div>
+                        </div>
+                    </div>
+                    <div class="decision-item">
+                        <div class="decision-q">Q4 — Card visibility: Where does it live?</div>
+                        <div class="decision-options">
+                            <div class="decision-opt"><span class="path-pill">A</span>Second tab inside the drawer ("Gallery Card" tab)</div>
+                            <div class="decision-opt"><span class="path-pill">B</span>Second column on the /preferences page (best home)</div>
+                            <div class="decision-opt"><span class="path-pill">C</span>No natural home — requires separate interaction</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div><!-- /proposal-container -->
+
+
+    <script>
+        /* ── Path A: Ledger Drawer (left-anchored) ───────────── */
+        function toggleDrawer() {
+            const drawer = document.getElementById('pa-drawer');
+            const overlay = document.getElementById('pa-overlay');
+            const btn = document.getElementById('btn-open-drawer');
+            const isOpen = drawer.classList.contains('open');
+            drawer.classList.toggle('open', !isOpen);
+            overlay.classList.toggle('open', !isOpen);
+            btn.classList.toggle('active', !isOpen);
+        }
+
+        function drawerToggle(fieldId, toggleId) {
+            const field = document.getElementById(fieldId);
+            const toggle = document.getElementById(toggleId);
+            const isOn = toggle.classList.contains('on');
+            toggle.classList.toggle('on', !isOn);
+            field.classList.toggle('field-hidden-demo', isOn);
+        }
+
+        /* ── Path A: Cabinet Drawer (right-anchored) ─────────── */
+        function toggleCabinetDrawer() {
+            const drawer = document.getElementById('pa-cabinet-drawer');
+            const overlay = document.getElementById('pa-cabinet-overlay');
+            const btn = document.getElementById('btn-open-cabinet-drawer');
+            const isOpen = drawer.classList.contains('open');
+            drawer.classList.toggle('open', !isOpen);
+            overlay.classList.toggle('open', !isOpen);
+            btn.classList.toggle('active', !isOpen);
+        }
+
+        function switchCabTab(tab) {
+            document.getElementById('cab-body-card').style.display = tab === 'card' ? 'block' : 'none';
+            document.getElementById('cab-body-ledger').style.display = tab === 'ledger' ? 'block' : 'none';
+            document.getElementById('cab-tab-card').classList.toggle('active', tab === 'card');
+            document.getElementById('cab-tab-ledger').classList.toggle('active', tab === 'ledger');
+        }
+
+        function cabToggleGrade() {
+            const toggle = document.getElementById('cab-toggle-grade');
+            const isOn = toggle.classList.contains('on');
+            toggle.classList.toggle('on', !isOn);
+            ['cab-grade-1','cab-grade-2','cab-grade-3','cab-grade-4'].forEach(id => {
+                document.getElementById(id).classList.toggle('hidden', isOn);
+            });
+        }
+
+        function cabToggleWeight() {
+            const toggle = document.getElementById('cab-toggle-weight');
+            const isOn = toggle.classList.contains('on');
+            toggle.classList.toggle('on', !isOn);
+            // Weight is part of the metrics text — toggle opacity as a proxy
+            document.getElementById('cabinet-grid').style.opacity = isOn ? '0.85' : '1';
+        }
+
+        /* ── Path B: Manifest ON/OFF pairs ─────────────────── */
+        function manifestToggle(pairId) {
+            const pair = document.getElementById(pairId);
+            const [onBtn, offBtn] = pair.querySelectorAll('.mtoggle-btn');
+            const currentlyOn = onBtn.classList.contains('on-active');
+            onBtn.classList.toggle('on-active', !currentlyOn);
+            onBtn.classList.toggle('off-active', false);
+            offBtn.classList.toggle('off-active', currentlyOn);
+            offBtn.classList.toggle('on-active', false);
+        }
+
+        /* ── Path C: Inline Edit Mode ───────────────────────── */
+        const PC_FIELDS = ['weight','diameter','dieaxis','metal','fineness','grade','obverse','reverse'];
+        const PC_HIDDEN_BY_DEFAULT = new Set(['dieaxis','fineness']);
+        const pcHidden = new Set(PC_HIDDEN_BY_DEFAULT);
+        let pcEditMode = false;
+
+        function countVisible() {
+            return PC_FIELDS.length - pcHidden.size;
+        }
+
+        function updateCount() {
+            document.getElementById('pc-field-count').textContent =
+                `${countVisible()} of ${PC_FIELDS.length} fields visible`;
+        }
+
+        function enterEditMode() {
+            pcEditMode = true;
+            document.getElementById('pc-std-header').style.display = 'none';
+            document.getElementById('pc-edit-header').style.display = 'flex';
+            document.getElementById('pc-metrics').classList.add('edit-mode-ring');
+            // Show all eye buttons
+            PC_FIELDS.forEach(f => {
+                const btn = document.getElementById(`pc-eye-${f}`);
+                if (btn) btn.style.display = 'block';
+            });
+            // Show stubs for hidden fields
+            PC_HIDDEN_BY_DEFAULT.forEach(f => {
+                const content = document.getElementById(`pc-${f}-content`);
+                const stub = document.getElementById(`pc-${f}-stub`);
+                if (content) content.classList.add('field-hidden-demo');
+                if (stub) stub.style.display = 'flex';
+            });
+            updateCount();
+        }
+
+        function exitEditMode() {
+            pcEditMode = false;
+            document.getElementById('pc-std-header').style.display = 'flex';
+            document.getElementById('pc-edit-header').style.display = 'none';
+            document.getElementById('pc-metrics').classList.remove('edit-mode-ring');
+            PC_FIELDS.forEach(f => {
+                const btn = document.getElementById(`pc-eye-${f}`);
+                if (btn) btn.style.display = 'none';
+            });
+            // Hide stubs that remain hidden
+            pcHidden.forEach(f => {
+                const stub = document.getElementById(`pc-${f}-stub`);
+                if (stub) stub.style.display = 'none';
+            });
+        }
+
+        function inlineToggle(field) {
+            const isHidden = pcHidden.has(field);
+            const content = document.getElementById(`pc-${field}-content`);
+            const stub = document.getElementById(`pc-${field}-stub`);
+            const eyeBtn = document.getElementById(`pc-eye-${field}`);
+            if (isHidden) {
+                pcHidden.delete(field);
+                if (content) content.classList.remove('field-hidden-demo');
+                if (stub) stub.style.display = 'none';
+                if (eyeBtn) { eyeBtn.textContent = '●'; eyeBtn.classList.remove('hidden-field'); }
+            } else {
+                pcHidden.add(field);
+                if (content) content.classList.add('field-hidden-demo');
+                if (stub) stub.style.display = 'flex';
+                if (eyeBtn) { eyeBtn.textContent = '○'; eyeBtn.classList.add('hidden-field'); }
+            }
+            updateCount();
+        }
+    </script>
+
+</body>
+</html>
