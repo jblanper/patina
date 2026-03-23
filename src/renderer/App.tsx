@@ -7,6 +7,7 @@ import { Glossary } from './components/Glossary';
 import { GlossaryDrawer } from './components/GlossaryDrawer';
 import { GlossaryContext } from './contexts/GlossaryContext';
 import { useGlossaryDrawer } from './hooks/useGlossaryDrawer';
+import { FieldVisibilityProvider } from './contexts/FieldVisibilityContext';
 import './i18n';
 import i18n from './i18n';
 
@@ -24,9 +25,10 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <HashRouter>
-      <div className="app-container">
-        <GlossaryContext.Provider value={glossaryDrawer}>
+    <FieldVisibilityProvider>
+      <HashRouter>
+        <div className="app-container">
+          <GlossaryContext.Provider value={glossaryDrawer}>
           <Routes>
             <Route path="/" element={<Cabinet />} />
             <Route path="/coin/:id" element={<CoinDetail />} />
@@ -41,9 +43,10 @@ const App: React.FC = () => {
             onOpenField={glossaryDrawer.openField}
             onOpenIndex={glossaryDrawer.openIndex}
           />
-        </GlossaryContext.Provider>
-      </div>
-    </HashRouter>
+          </GlossaryContext.Provider>
+        </div>
+      </HashRouter>
+    </FieldVisibilityProvider>
   );
 };
 

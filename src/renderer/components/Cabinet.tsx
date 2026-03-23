@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { FieldVisibilityDrawer } from './FieldVisibilityDrawer';
 import { useCoins } from '../hooks/useCoins';
 import { useExport } from '../hooks/useExport';
 import { useLanguage } from '../hooks/useLanguage';
@@ -26,6 +27,7 @@ export const Cabinet: React.FC = () => {
 
   const { language } = useLanguage();
   const { status, resultPath, error: exportError, exportToZip, exportToPdf, reset } = useExport();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   if (error) {
     throw error;
@@ -51,6 +53,13 @@ export const Cabinet: React.FC = () => {
           <section className="cabinet-section">
             <header className="cabinet-header">
               <div className="cabinet-toolbar">
+                <button
+                  className="btn-customize"
+                  onClick={() => setDrawerOpen(true)}
+                  aria-label={t('cabinet.customizeDisplay')}
+                >
+                  {t('cabinet.customizeDisplay')}
+                </button>
                 <button className="btn-action" onClick={() => exportToZip()}>
                   {t('cabinet.exportArchive')}
                 </button>
@@ -86,6 +95,13 @@ export const Cabinet: React.FC = () => {
           </section>
         </main>
       </div>
+
+      <FieldVisibilityDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        defaultTab="card"
+        anchor="right"
+      />
 
       <ExportToast
         isVisible={status === 'success' || status === 'error'}

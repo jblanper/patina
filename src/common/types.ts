@@ -56,3 +56,6 @@ export interface Vocabulary {
 }
 
 export type VocabularyInput = Omit<Vocabulary, 'id' | 'created_at'>;
+
+import type { VisibilityKey } from './validation';
+export type FieldVisibilityMap = Record<VisibilityKey, boolean>;

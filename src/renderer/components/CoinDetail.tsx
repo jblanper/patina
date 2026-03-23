@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCoin } from '../hooks/useCoin';
+import { FieldVisibilityDrawer } from './FieldVisibilityDrawer';
+import { useFieldVisibility } from '../hooks/useFieldVisibility';
 
 export const CoinDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -11,6 +13,8 @@ export const CoinDetail: React.FC = () => {
   const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const { isVisible } = useFieldVisibility();
 
   const handleDelete = async () => {
     if (!id) return;
@@ -57,6 +61,13 @@ export const CoinDetail: React.FC = () => {
           {t('detail.closeEntry')}
         </button>
         <div className="header-actions">
+          <button
+            className="btn-customize"
+            onClick={() => setDrawerOpen(true)}
+            aria-label={t('detail.customizeDisplay')}
+          >
+            {t('detail.customizeDisplay')}
+          </button>
           <button onClick={() => navigate(`/scriptorium/edit/${coin.id}`)} className="btn-minimal">
             {t('detail.editRecord')}
           </button>
@@ -65,6 +76,13 @@ export const CoinDetail: React.FC = () => {
           </button>
         </div>
       </header>
+
+      <FieldVisibilityDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        defaultTab="ledger"
+        anchor="left"
+      />
 
       {showDeleteConfirm && (
         <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
@@ -120,82 +138,102 @@ export const CoinDetail: React.FC = () => {
         <div className="right-folio">
            <header className="folio-header">
              <span className="meta-line">
-               {t('detail.entryLabel')} #{String(coin.id).padStart(3, '0')} // {coin.era} // {coin.issuer || t('detail.unknownIssuer')}
+               {t('detail.entryLabel')} #{String(coin.id).padStart(3, '0')}
+               {isVisible('ledger.era') && ` // ${coin.era}`}
+               {isVisible('ledger.issuer') && ` // ${coin.issuer || t('detail.unknownIssuer')}`}
              </span>
              <h1 className="folio-title">{coin.title}</h1>
              <div className="subtitle">
-               {coin.mint ? `${t('detail.mintedAt')} ${coin.mint}` : t('detail.mintUnknown')}
-               {coin.year_display && ` // ${coin.year_display}`}
-               {coin.catalog_ref && ` // ${coin.catalog_ref}`}
+               {isVisible('ledger.mint') && (coin.mint ? `${t('detail.mintedAt')} ${coin.mint}` : t('detail.mintUnknown'))}
+               {isVisible('ledger.year') && coin.year_display && ` // ${coin.year_display}`}
+               {isVisible('ledger.catalog_ref') && coin.catalog_ref && ` // ${coin.catalog_ref}`}
              </div>
            </header>
 
           {/* 1. Physical Metrics */}
           <div className="metrics-grid">
+            {/* weight: locked — always rendered */}
             <div className="metric-item">
               <span className="metric-label">{t('ledger.weight')}</span>
               <span className="metric-value">
                 {coin.weight ? `${coin.weight.toFixed(2)} g` : '—'}
               </span>
             </div>
+            {/* diameter: locked — always rendered */}
             <div className="metric-item">
               <span className="metric-label">{t('ledger.diameter')}</span>
               <span className="metric-value">
                 {coin.diameter ? `${coin.diameter.toFixed(1)} mm` : '—'}
               </span>
             </div>
-            <div className="metric-item">
-              <span className="metric-label">{t('ledger.dieAxis')}</span>
-              <span className="metric-value">{coin.die_axis || '—'}</span>
-            </div>
-            <div className="metric-item">
-              <span className="metric-label">{t('ledger.material')}</span>
-              <span className="metric-value">{coin.metal || '—'}</span>
-            </div>
-            <div className="metric-item">
-              <span className="metric-label">{t('ledger.fineness')}</span>
-              <span className="metric-value">{coin.fineness || '—'}</span>
-            </div>
-            <div className="metric-item">
-              <span className="metric-label">{t('ledger.grade')}</span>
-              <span className="metric-value">{coin.grade || '—'}</span>
-            </div>
+            {isVisible('ledger.die_axis') && (
+              <div className="metric-item">
+                <span className="metric-label">{t('ledger.dieAxis')}</span>
+                <span className="metric-value">{coin.die_axis || '—'}</span>
+              </div>
+            )}
+            {isVisible('ledger.metal') && (
+              <div className="metric-item">
+                <span className="metric-label">{t('ledger.material')}</span>
+                <span className="metric-value">{coin.metal || '—'}</span>
+              </div>
+            )}
+            {isVisible('ledger.fineness') && (
+              <div className="metric-item">
+                <span className="metric-label">{t('ledger.fineness')}</span>
+                <span className="metric-value">{coin.fineness || '—'}</span>
+              </div>
+            )}
+            {isVisible('ledger.grade') && (
+              <div className="metric-item">
+                <span className="metric-label">{t('ledger.grade')}</span>
+                <span className="metric-value">{coin.grade || '—'}</span>
+              </div>
+            )}
           </div>
 
           {/* 2. Numismatic Data */}
           <div className="numismatic-section">
-            {(coin.obverse_legend || coin.obverse_desc) && (
+            {(isVisible('ledger.obverse_legend') || isVisible('ledger.obverse_desc')) && (coin.obverse_legend || coin.obverse_desc) ? (
               <>
                 <span className="section-label">{t('ledger.obverse')}</span>
                 <div className="desc-block">
-                  {coin.obverse_legend && <span className="desc-legend">{coin.obverse_legend}</span>}
-                  {coin.obverse_desc && <p className="desc-text">{coin.obverse_desc}</p>}
+                  {isVisible('ledger.obverse_legend') && coin.obverse_legend && (
+                    <span className="desc-legend">{coin.obverse_legend}</span>
+                  )}
+                  {isVisible('ledger.obverse_desc') && coin.obverse_desc && (
+                    <p className="desc-text">{coin.obverse_desc}</p>
+                  )}
                 </div>
               </>
-            )}
+            ) : null}
 
-            {(coin.reverse_legend || coin.reverse_desc) && (
+            {(isVisible('ledger.reverse_legend') || isVisible('ledger.reverse_desc')) && (coin.reverse_legend || coin.reverse_desc) ? (
               <>
                 <span className="section-label">{t('ledger.reverse')}</span>
                 <div className="desc-block">
-                  {coin.reverse_legend && <span className="desc-legend">{coin.reverse_legend}</span>}
-                  {coin.reverse_desc && <p className="desc-text">{coin.reverse_desc}</p>}
+                  {isVisible('ledger.reverse_legend') && coin.reverse_legend && (
+                    <span className="desc-legend">{coin.reverse_legend}</span>
+                  )}
+                  {isVisible('ledger.reverse_desc') && coin.reverse_desc && (
+                    <p className="desc-text">{coin.reverse_desc}</p>
+                  )}
                 </div>
               </>
-            )}
+            ) : null}
 
-            {coin.edge_desc && (
-               <>
+            {isVisible('ledger.edge_desc') && coin.edge_desc && (
+              <>
                 <span className="section-label">{t('ledger.edge')}</span>
                 <div className="desc-block">
                   <p className="desc-text">{coin.edge_desc}</p>
                 </div>
-               </>
+              </>
             )}
           </div>
 
           {/* 3. Curator's Note */}
-          {coin.story && (
+          {isVisible('ledger.story') && coin.story && (
             <div className="numismatic-section">
               <span className="section-label">{t('ledger.curatorsNote')}</span>
               <div className="desc-block">
@@ -207,7 +245,7 @@ export const CoinDetail: React.FC = () => {
           )}
 
           {/* Provenance — separate section */}
-          {coin.provenance && (
+          {isVisible('ledger.provenance') && coin.provenance && (
             <div className="numismatic-section">
               <span className="section-label">{t('ledger.provenance')}</span>
               <div className="provenance-note">{coin.provenance}</div>
@@ -215,19 +253,21 @@ export const CoinDetail: React.FC = () => {
           )}
 
           {/* 4. Acquisition Footer */}
-          <footer className="ledger-footer">
-            <div className="footer-item">
-              <strong>{t('detail.acquired')}:</strong>
-              {coin.purchase_date || t('detail.unknownDate')}
-              {coin.purchase_source && ` // ${coin.purchase_source}`}
-            </div>
-            {coin.purchase_price && (
-               <div className="footer-item cost-item">
-                 <strong>{t('detail.cost')}:</strong>
-                 ${coin.purchase_price.toFixed(2)}
-               </div>
-            )}
-          </footer>
+          {isVisible('ledger.acquisition') && (
+            <footer className="ledger-footer">
+              <div className="footer-item">
+                <strong>{t('detail.acquired')}:</strong>
+                {coin.purchase_date || t('detail.unknownDate')}
+                {coin.purchase_source && ` // ${coin.purchase_source}`}
+              </div>
+              {coin.purchase_price && (
+                <div className="footer-item cost-item">
+                  <strong>{t('detail.cost')}:</strong>
+                  ${coin.purchase_price.toFixed(2)}
+                </div>
+              )}
+            </footer>
+          )}
         </div>
       </div>
 

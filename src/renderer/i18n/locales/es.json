@@ -32,7 +32,8 @@
     "loading": "Sincronizando con el archivo local...",
     "objectCount_one": "{{count}} objeto en el registro.",
     "objectCount_other": "{{count}} objetos en el registro.",
-    "search": "Título, emisor o referencia de catálogo..."
+    "search": "Título, emisor o referencia de catálogo...",
+    "customizeDisplay": "Personalizar Vista"
   },
   "gallery": {
     "loading": "Abriendo los archivos...",
@@ -101,6 +102,7 @@
     "closeEntry": "← Cerrar Registro",
     "editRecord": "Editar Registro",
     "deleteRecord": "Eliminar Registro",
+    "customizeDisplay": "Personalizar Vista",
     "noImage": "Sin Imagen Disponible",
     "mintedAt": "Acuñado en",
     "mintUnknown": "Ceca Desconocida",
@@ -182,6 +184,58 @@
       "reverseDesc":   "Descripción del Reverso",
       "rarity":        "Rareza"
     }
+  },
+  "visibility": {
+    "drawer": {
+      "title": "Configuración de Pantalla",
+      "close": "Cerrar"
+    },
+    "tab": {
+      "ledger": "Ficha",
+      "card":   "Tarjeta de Galería"
+    },
+    "section": {
+      "identity":    "Identidad",
+      "physical":    "Métricas Físicas",
+      "numismatic":  "Datos Numismáticos",
+      "narrative":   "Narrativa",
+      "acquisition": "Adquisición",
+      "card":        "Campos de Tarjeta"
+    },
+    "field": {
+      "title":          "Título",
+      "issuer":         "Emisor",
+      "denomination":   "Denominación",
+      "year":           "Año",
+      "era":            "Era",
+      "mint":           "Ceca",
+      "metal":          "Metal",
+      "weight":         "Peso",
+      "diameter":       "Diámetro",
+      "dieAxis":        "Eje de Cuño",
+      "fineness":       "Ley",
+      "grade":          "Grado",
+      "obverseLegend":  "Leyenda del Anverso",
+      "obverseDesc":    "Descripción del Anverso",
+      "reverseLegend":  "Leyenda del Reverso",
+      "reverseDesc":    "Descripción del Reverso",
+      "edgeDesc":       "Descripción del Canto",
+      "catalogRef":     "Referencia de Catálogo",
+      "rarity":         "Rareza",
+      "provenance":     "Procedencia",
+      "story":          "Nota del Curador",
+      "acquisition":    "Detalles de Adquisición",
+      "cardMetal":      "Metal",
+      "cardYear":       "Año",
+      "cardGrade":      "Grado",
+      "cardWeight":     "Peso"
+    },
+    "expertField":      "Campo experto",
+    "alwaysVisible":    "Siempre visible",
+    "privacySensitive": "Dato privado",
+    "resetToDefaults":  "Restaurar valores predeterminados",
+    "liveIndicator":    "● En vivo",
+    "cardNote":         "Estos datos aparecen en cada tarjeta de la galería. Mantén la lista corta."
   },
   "common": {
     "comingSoon": "Próximamente"

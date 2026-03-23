@@ -73,6 +73,7 @@ All IPC/DB state in custom hooks: `useCoins`, `useCoin`, `useCoinForm`, `useExpo
 - **Derived arrays:** `useMemo` not `useState` — `useState` goes stale between renders.
 - **Vocabulary cache:** Always key as `"${field}:${locale}"` — bare `field` causes cross-locale stale hits.
 - **Glossary drawer:** Use `useGlossaryDrawer().open(fieldId)` — `GlossaryContext` is provided at root in `App.tsx`. Never manage drawer state locally.
+- **Field visibility:** Use `useFieldVisibility()` — `FieldVisibilityContext` is provided at root in `App.tsx`. Never call `window.electronAPI.prefsGetVisibility` directly from a component. This is the canonical pattern for any future global renderer preference.
 
 ## Testing Standards
 
@@ -80,7 +81,7 @@ All IPC/DB state in custom hooks: `useCoins`, `useCoin`, `useCoinForm`, `useExpo
 
 **Coverage:** 100% branch (`validation.ts`), 90% function (hooks), 80% statement (components).
 
-**Mocking:** `window.electronAPI` global mock in `setupTests.ts` — clear in `beforeEach`, set per-test. `react-i18next` global mock resolves keys to English. Call `clearVocabCache()` in `beforeEach` when testing vocab-backed components.
+**Mocking:** `window.electronAPI` global mock in `setupTests.ts` — clear in `beforeEach`, set per-test. `react-i18next` global mock resolves keys to English. Call `clearVocabCache()` in `beforeEach` when testing vocab-backed components. Use `renderWithVisibility(ui, overrides)` helper (defined in `CoinDetail.test.tsx`) as the model for testing components that consume `FieldVisibilityContext` — wrap with a provider and inject specific `false` values to test hidden-field branches.
 
 **Async:** Always `waitFor` / `findBy*` — never sync queries for async state.
 

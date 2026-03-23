@@ -32,7 +32,8 @@
     "loading": "Synchronizing with the local archive...",
     "objectCount_one": "{{count}} object in the ledger.",
     "objectCount_other": "{{count}} objects in the ledger.",
-    "search": "Title, issuer, or catalog reference..."
+    "search": "Title, issuer, or catalog reference...",
+    "customizeDisplay": "Customize Display"
   },
   "gallery": {
     "loading": "Opening the archives...",
@@ -101,6 +102,7 @@
     "closeEntry": "← Close Ledger Entry",
     "editRecord": "Edit Record",
     "deleteRecord": "Delete Record",
+    "customizeDisplay": "Customize Display",
     "noImage": "No Image Available",
     "mintedAt": "Minted at",
     "mintUnknown": "Mint Unknown",
@@ -182,6 +184,58 @@
       "reverseDesc":   "Reverse Description",
       "rarity":        "Rarity"
     }
+  },
+  "visibility": {
+    "drawer": {
+      "title": "Display Settings",
+      "close": "Close"
+    },
+    "tab": {
+      "ledger": "Ledger",
+      "card": "Gallery Card"
+    },
+    "section": {
+      "identity":    "Identity",
+      "physical":    "Physical Metrics",
+      "numismatic":  "Numismatic Data",
+      "narrative":   "Narrative",
+      "acquisition": "Acquisition",
+      "card":        "Gallery Card Fields"
+    },
+    "field": {
+      "title":          "Title",
+      "issuer":         "Issuer",
+      "denomination":   "Denomination",
+      "year":           "Year",
+      "era":            "Era",
+      "mint":           "Mint",
+      "metal":          "Metal",
+      "weight":         "Weight",
+      "diameter":       "Diameter",
+      "dieAxis":        "Die Axis",
+      "fineness":       "Fineness",
+      "grade":          "Grade",
+      "obverseLegend":  "Obverse Legend",
+      "obverseDesc":    "Obverse Description",
+      "reverseLegend":  "Reverse Legend",
+      "reverseDesc":    "Reverse Description",
+      "edgeDesc":       "Edge Description",
+      "catalogRef":     "Catalog Reference",
+      "rarity":         "Rarity",
+      "provenance":     "Provenance",
+      "story":          "Curator's Note",
+      "acquisition":    "Acquisition Details",
+      "cardMetal":      "Metal",
+      "cardYear":       "Year",
+      "cardGrade":      "Grade",
+      "cardWeight":     "Weight"
+    },
+    "expertField":      "Expert field",
+    "alwaysVisible":    "Always visible",
+    "privacySensitive": "Privacy-sensitive",
+    "resetToDefaults":  "Reset to Defaults",
+    "liveIndicator":    "● Live",
+    "cardNote":         "These badges appear on every card in the gallery. Keep this list short."
   },
   "common": {
     "comingSoon": "Coming soon"

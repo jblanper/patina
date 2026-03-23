@@ -5,7 +5,7 @@ import { dbService } from './db';
 import { createLensServer } from './server';
 import { getLocalIp } from './ip';
 import { NewCoin, NewCoinImage } from '../common/types';
-import { ExportOptionsSchema, PdfExportOptionsSchema, VocabGetSchema, VocabAddSchema, VocabSearchSchema, VocabIncrementSchema, VocabResetSchema, PreferenceGetSchema, PreferenceSetSchema } from '../common/validation';
+import { ExportOptionsSchema, PdfExportOptionsSchema, VocabGetSchema, VocabAddSchema, VocabSearchSchema, VocabIncrementSchema, VocabResetSchema, PreferenceGetSchema, PreferenceSetSchema, SetVisibilitySchema, LOCKED_VISIBILITY_KEYS } from '../common/validation';
 import { exportToZip } from './export/zip';
 import { exportToPdf } from './export/pdf';
 
@@ -81,6 +81,7 @@ function validateIpc<T>(schema: import('zod').ZodSchema<T>, data: unknown): T {
 
 app.whenReady().then(() => {
   dbService.seedVocabularies();
+  dbService.seedFieldVisibility();
 
   // Define image root path
   const isDev = !app.isPackaged;
@@ -234,6 +235,17 @@ app.whenReady().then(() => {
     const { field } = validateIpc(VocabResetSchema, data);
     dbService.resetVocabularies(field);
   });
+
+  // Field Visibility IPC Handlers
+  ipcMain.handle('prefs:getVisibility', () => dbService.getFieldVisibility());
+
+  ipcMain.handle('prefs:setVisibility', (_event, raw: unknown) => {
+    const { key, visible } = validateIpc(SetVisibilitySchema, raw);
+    if (LOCKED_VISIBILITY_KEYS.has(key)) return;
+    dbService.setFieldVisibility(key, visible);
+  });
+
+  ipcMain.handle('prefs:resetVisibility', () => dbService.resetFieldVisibility());
 
   ipcMain.handle('ping', () => 'pong');
   createWindow();

@@ -156,6 +156,66 @@ export const VocabResetSchema = z.object({
 }).strict();
 
 /**
+ * Field Visibility Schemas
+ */
+export const ALLOWED_VISIBILITY_KEYS = [
+  'ledger.title', 'ledger.issuer', 'ledger.denomination', 'ledger.year',
+  'ledger.era', 'ledger.mint', 'ledger.metal', 'ledger.weight',
+  'ledger.diameter', 'ledger.die_axis', 'ledger.fineness', 'ledger.grade',
+  'ledger.obverse_legend', 'ledger.obverse_desc', 'ledger.reverse_legend',
+  'ledger.reverse_desc', 'ledger.edge_desc', 'ledger.catalog_ref',
+  'ledger.rarity', 'ledger.provenance', 'ledger.story', 'ledger.acquisition',
+  'card.metal', 'card.year', 'card.grade', 'card.weight',
+] as const;
+
+export type VisibilityKey = typeof ALLOWED_VISIBILITY_KEYS[number];
+
+export const SetVisibilitySchema = z.object({
+  key:     z.enum(ALLOWED_VISIBILITY_KEYS),
+  visible: z.boolean(),
+}).strict();
+
+export const LOCKED_VISIBILITY_KEYS: ReadonlySet<VisibilityKey> = new Set([
+  'ledger.title', 'ledger.weight', 'ledger.diameter',
+  'card.metal', 'card.year',
+]);
+
+export const DEFAULT_FIELD_VISIBILITY: Record<VisibilityKey, boolean> = {
+  // ── Identity ────────────────────────────────────
+  'ledger.title':        true,
+  'ledger.issuer':       true,
+  'ledger.denomination': true,
+  'ledger.year':         true,
+  'ledger.era':          true,
+  'ledger.mint':         true,
+  // ── Physical Metrics ────────────────────────────
+  'ledger.metal':        true,
+  'ledger.weight':       true,
+  'ledger.diameter':     true,
+  'ledger.die_axis':     false,
+  'ledger.fineness':     false,
+  'ledger.grade':        true,
+  // ── Numismatic Data ─────────────────────────────
+  'ledger.obverse_legend': true,
+  'ledger.obverse_desc':   true,
+  'ledger.reverse_legend': true,
+  'ledger.reverse_desc':   true,
+  'ledger.edge_desc':      false,
+  'ledger.catalog_ref':    true,
+  'ledger.rarity':         true,
+  // ── Narrative ───────────────────────────────────
+  'ledger.story':        true,
+  'ledger.provenance':   false,
+  // ── Acquisition ─────────────────────────────────
+  'ledger.acquisition':  false,
+  // ── Gallery Card ────────────────────────────────
+  'card.metal':          true,
+  'card.year':           true,
+  'card.grade':          true,
+  'card.weight':         true,
+};
+
+/**
  * PDF Export Options Schema
  */
 export const PdfExportOptionsSchema = z.object({

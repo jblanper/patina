@@ -3,8 +3,8 @@ import path from 'path';
 import fs from 'fs';
 import { app } from 'electron';
 import { z } from 'zod';
-import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage, Vocabulary } from '../common/types';
-import { NewCoinSchema, NewCoinImageSchema, ALLOWED_VOCAB_FIELDS, VocabField } from '../common/validation';
+import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage, Vocabulary, FieldVisibilityMap } from '../common/types';
+import { NewCoinSchema, NewCoinImageSchema, ALLOWED_VOCAB_FIELDS, VocabField, ALLOWED_VISIBILITY_KEYS, DEFAULT_FIELD_VISIBILITY, VisibilityKey } from '../common/validation';
 
 import { SCHEMA, generateSQL } from '../common/schema';
 
@@ -371,8 +371,49 @@ export const dbService = {
     db.prepare('INSERT OR REPLACE INTO preferences (key, value) VALUES (?, ?)').run(key, value);
   },
 
+  seedFieldVisibility: (): void => {
+    const insert = db.prepare(
+      `INSERT OR IGNORE INTO field_visibility (key, visible) VALUES (?, ?)`
+    );
+    const insertAll = db.transaction(() => {
+      for (const [key, visible] of Object.entries(DEFAULT_FIELD_VISIBILITY)) {
+        insert.run(key, visible ? 1 : 0);
+      }
+    });
+    insertAll();
+  },
+
+  getFieldVisibility: (): FieldVisibilityMap => {
+    const rows = db
+      .prepare('SELECT key, visible FROM field_visibility')
+      .all() as { key: string; visible: number }[];
+
+    const result = { ...DEFAULT_FIELD_VISIBILITY };
+    for (const { key, visible } of rows) {
+      if ((ALLOWED_VISIBILITY_KEYS as readonly string[]).includes(key)) {
+        result[key as VisibilityKey] = visible === 1;
+      }
+    }
+    return result;
+  },
+
+  setFieldVisibility: (key: VisibilityKey, visible: boolean): void => {
+    db
+      .prepare(
+        `INSERT INTO field_visibility (key, visible) VALUES (?, ?)
+         ON CONFLICT(key) DO UPDATE SET visible = excluded.visible`
+      )
+      .run(key, visible ? 1 : 0);
+  },
+
+  resetFieldVisibility: (): FieldVisibilityMap => {
+    db.prepare('DELETE FROM field_visibility').run();
+    dbService.seedFieldVisibility();
+    return dbService.getFieldVisibility();
+  },
+
   seedVocabularies: (): void => {
-    const CURRENT_SEED_VERSION = '6b.2';
+    const CURRENT_SEED_VERSION = '6c.1';
     const row = db.prepare('SELECT value FROM preferences WHERE key = ?').get('vocab_seeded_version') as { value: string } | undefined;
     if (row?.value === CURRENT_SEED_VERSION) return;
 

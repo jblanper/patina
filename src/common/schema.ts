@@ -75,6 +75,14 @@ export const SCHEMA: TableDefinition[] = [
       { name: 'key', type: 'TEXT', constraints: 'PRIMARY KEY' },
       { name: 'value', type: 'TEXT', constraints: 'NOT NULL' }
     ]
+  },
+  {
+    name: 'field_visibility',
+    columns: [
+      { name: 'key', type: 'TEXT', constraints: 'PRIMARY KEY' },
+      { name: 'visible', type: 'INTEGER', constraints: 'NOT NULL DEFAULT 1' },
+      { name: 'sort_order', type: 'INTEGER', constraints: 'NOT NULL DEFAULT 0' },
+    ]
   }
 ];
 

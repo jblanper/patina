@@ -1,7 +1,7 @@
 # Implementation Blueprint: Phase 6c — Field Visibility Settings
 
 **Date:** 2026-03-19 (revised 2026-03-23)
-**Status:** Approved
+**Status:** Completed
 **Reference:** `docs/technical_plan.md`
 **UI Proposal:** `docs/curating-ui/proposal_field_visibility_2026-03-23.html` — Path A (The Annotation Drawer, revised) selected.
 
@@ -1401,11 +1401,23 @@ const renderWithVisibility = (
 ---
 
 ## 10. Post-Implementation Retrospective
-**Date:** Pending
-**Outcome:** TBD
+**Date:** 2026-03-23
+**Outcome:** Completed successfully. Manual testing confirmed by user.
 
-### Things to Consider
-- Path B (dedicated `/preferences` route) may be worthwhile as a secondary entry point once the feature matures — good for initial collection setup sessions.
-- Custom field ordering via drag-to-reorder is provisioned by the `sort_order` column. Implement when requested.
+### What Went Well
+- **Architecture held.** The Filter + contextBridge pattern extended cleanly to a new domain (preferences) with zero architectural surprises. `SetVisibilitySchema.strict()` + locked-key enforcement at two layers felt right.
+- **`DEFAULT_FIELD_VISIBILITY` in `src/common/validation.ts`** was the correct final resting place (originally planned in `db.ts`). Avoids a renderer→main import and is the natural home alongside its schema.
+- **Live-update UX** (optimistic state + fire-and-forget IPC) required no loading states — the drawer feels instant.
+- **Anchor strategy** (left in Ledger, right in Cabinet) solved the sidebar conflict cleanly without additional layout work.
+
+### What to Watch
+- `sort_order` column is provisioned in the DB but not yet exposed. If drag-to-reorder is ever implemented, the column is ready — no migration needed.
+- `card.diameter` is intentionally absent from the visibility system (hardcoded in `CoinCard`). Document in future UX reviews if collectors request hiding it.
+- The `src/main/__tests__/db.test.ts` file was not written — the current test infrastructure is jsdom-only. DB-layer tests for field visibility methods would require a separate Vitest workspace config with `environment: 'node'`. Low risk given TypeScript coverage and security audit sign-off.
+
+### Patterns Established
+- `FieldVisibilityContext` / `useFieldVisibility` is the canonical pattern for renderer-side preference reads. Follow this model for any future global preference.
+- `renderWithVisibility()` helper in `CoinDetail.test.tsx` is the model for testing components with selective field visibility.
+- `keyToI18n()` utility (strip prefix, camelCase suffix) is the translation key convention for dot-namespaced keys. Export and reuse for future preference drawers.
 - When Phase 6a's vocabulary system covers Grade, `availableGrades` will be sortable by Sheldon scale — at that point review whether `card.grade` visibility behaviour needs updating.
 - **Core Doc Revision:** After verification, add a "Field Visibility" section to the user guide and update `docs/style_guide.md §4` (Component Standards) with the `.fv-drawer` / `.fv-toggle` pattern.

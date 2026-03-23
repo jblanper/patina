@@ -47,4 +47,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   setPreference: (key: 'language', value: 'en' | 'es'): Promise<void> =>
     ipcRenderer.invoke('pref:set', { key, value }),
+
+  // Field Visibility API
+  prefsGetVisibility: () =>
+    ipcRenderer.invoke('prefs:getVisibility'),
+
+  prefsSetVisibility: (key: string, visible: boolean): Promise<void> =>
+    ipcRenderer.invoke('prefs:setVisibility', { key, visible }),
+
+  prefsResetVisibility: () =>
+    ipcRenderer.invoke('prefs:resetVisibility'),
 });

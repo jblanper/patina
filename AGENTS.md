@@ -79,6 +79,18 @@ This document defines the absolute standards for the Patina project. All develop
 - **Test Global Mock:** `react-i18next` is mocked in `src/renderer/setupTests.ts`; the mock resolves all keys to their English equivalents so existing test assertions remain stable. Do not override this mock per-test unless specifically testing translation behaviour.
 - **Composition Check:** `src/renderer/i18n/__tests__/translations.test.ts` verifies key completeness between `en.json` and `es.json`. When adding new keys to one locale, always add them to both.
 
+### Field Visibility System (Phase 6c)
+> See `docs/blueprints/archive/2026-03-19-phase-6c-field-visibility.md` for full design rationale.
+- **Scope:** Global (applies to all collections). Preferences stored in the `field_visibility` SQLite table. No `localStorage`, no per-session state.
+- **Keys:** All controllable keys are in `ALLOWED_VISIBILITY_KEYS` in `src/common/validation.ts`. Every key follows the `surface.field_name` convention (`ledger.*` or `card.*`). New controllable fields must be added here first.
+- **Locked fields:** `LOCKED_VISIBILITY_KEYS` (also in `validation.ts`) lists fields the user can never hide (`ledger.title`, `ledger.weight`, `ledger.diameter`, `card.metal`, `card.year`). The IPC handler silently ignores locked keys; the drawer disables their toggles.
+- **Context Pattern:** `FieldVisibilityProvider` (provided at root in `App.tsx`) loads preferences once on mount via a single `prefsGetVisibility` IPC call and caches them for the session. Components call `useFieldVisibility()` — never `window.electronAPI` directly. This is the canonical pattern for any future global renderer preference.
+- **Optimistic updates:** `setVisibility(key, value)` applies `setVisibilityState` before `await ipcRenderer.invoke(...)`. The UI reacts in the same frame as the toggle — no loading state required for local SQLite writes.
+- **IPC surface:** Three handlers — `prefs:getVisibility`, `prefs:setVisibility` (Filter-validated via `SetVisibilitySchema.strict()`), `prefs:resetVisibility`. All return or accept `FieldVisibilityMap` (`Record<VisibilityKey, boolean>`).
+- **`DEFAULT_FIELD_VISIBILITY`** lives in `src/common/validation.ts` (not `db.ts`) so the renderer can import it without creating a renderer→main dependency. Expert fields (`die_axis`, `fineness`, `edge_desc`) and privacy-sensitive fields (`provenance`, `acquisition`) default to `false`.
+- **`keyToI18n()` helper:** Converts a dot-namespaced visibility key to its i18n sub-key (`ledger.die_axis` → `dieAxis`, `card.grade` → `cardGrade`). Reuse this function if building future preference drawers with dot-namespaced keys.
+- **Testing:** Wrap components under test in `FieldVisibilityContext.Provider` with a mock value. The `renderWithVisibility(ui, overrides)` helper in `CoinDetail.test.tsx` is the established model — it merges `DEFAULT_FIELD_VISIBILITY` with selective `false` overrides to test hidden-field branches without real IPC.
+
 ### Glossary System (Phase 1a/1b)
 - **Content Source:** `src/renderer/data/glossaryFields.ts` is the single source of truth for all bilingual glossary content — a typed TS constant bundled at build time. No runtime fetch, no Markdown parsing. `description` and `vocabulary` tables stay as bilingual TS objects; only short UI strings (`nameKey`, `typeKey`, section `labelKey`) reference i18n keys.
 - **Full-Page Route:** `/glossary` → `Glossary.tsx` — a scrollable manuscript with a sticky section rail and `#anchor` deep-links.

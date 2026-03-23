@@ -1,4 +1,4 @@
-import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage } from '../common/types';
+import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage, FieldVisibilityMap } from '../common/types';
 import type { VocabField } from '../common/validation';
 
 export interface IElectronAPI {
@@ -34,6 +34,11 @@ export interface IElectronAPI {
   // Preference API
   getPreference: (key: 'language') => Promise<string | null>;
   setPreference: (key: 'language', value: 'en' | 'es') => Promise<void>;
+
+  // Field Visibility API
+  prefsGetVisibility: () => Promise<FieldVisibilityMap>;
+  prefsSetVisibility: (key: string, visible: boolean) => Promise<void>;
+  prefsResetVisibility: () => Promise<FieldVisibilityMap>;
 }
 
 declare global {

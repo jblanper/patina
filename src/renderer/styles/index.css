@@ -2159,3 +2159,254 @@ main {
 .metric-label:hover .glossary-hint,
 .subtitle-label:hover .glossary-hint,
 .section-label:hover .glossary-hint { opacity: 1; }
+
+/* ── Field Visibility Drawer ──────────────────────────────── */
+
+.fv-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 41, 38, 0.15);
+  z-index: 200;
+}
+
+/* Base drawer — left-anchored (Ledger default) */
+.fv-drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 340px;
+  background: var(--bg-manuscript);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+.fv-drawer.fv-drawer--left {
+  left: 0;
+  border-right: 1px solid var(--border-hairline);
+  transform: translateX(-100%);
+}
+.fv-drawer.fv-drawer--right {
+  right: 0;
+  border-left: 1px solid var(--border-hairline);
+  transform: translateX(100%);
+}
+.fv-drawer.open {
+  transform: translateX(0);
+}
+
+/* Drawer header */
+.fv-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-hairline);
+  flex-shrink: 0;
+}
+.fv-drawer-title {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  font-style: italic;
+}
+.fv-drawer-close {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.fv-drawer-close:hover { color: var(--text-ink); }
+
+/* Tabs */
+.fv-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-hairline);
+  flex-shrink: 0;
+}
+.fv-tab {
+  flex: 1;
+  padding: 0.65rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  color: var(--text-muted);
+  min-height: 44px;
+}
+.fv-tab.active {
+  color: var(--accent-manuscript);
+  border-bottom-color: var(--accent-manuscript);
+}
+.fv-tab:hover:not(.active) { color: var(--text-ink); }
+
+/* Scrollable body */
+.fv-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Section header */
+.fv-section {
+  border-bottom: 1px solid var(--border-hairline);
+}
+.fv-section-head {
+  padding: 0.55rem 1.25rem 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  background: var(--stone-pedestal);
+}
+
+/* Field row */
+.fv-field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 1.25rem;
+  border-bottom: 1px solid var(--border-hairline);
+  gap: 0.75rem;
+}
+.fv-field-row:last-child { border-bottom: none; }
+.fv-field-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.fv-field-name {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--text-ink);
+  overflow-wrap: anywhere;
+}
+.fv-field-sub {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--text-muted);
+}
+
+/* Toggle pill */
+.fv-toggle {
+  width: 34px;
+  height: 18px;
+  flex-shrink: 0;
+  background: var(--border-hairline);
+  border: none;
+  border-radius: 9px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s;
+  min-height: 44px;
+  padding: 13px 0;
+  background-clip: content-box;
+}
+.fv-toggle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  transition: left 0.15s;
+}
+.fv-toggle.on {
+  background-color: var(--accent-manuscript);
+  background-clip: content-box;
+}
+.fv-toggle.on::after { left: 18px; }
+.fv-toggle.locked {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Card note */
+.fv-card-note {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+/* Drawer footer */
+.fv-drawer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border-hairline);
+  flex-shrink: 0;
+}
+.fv-live-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #4a7c4e;
+}
+.fv-reset-btn {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-hairline);
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.1rem 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.fv-reset-btn:hover {
+  color: var(--accent-manuscript);
+  border-color: var(--accent-manuscript);
+}
+
+/* Trigger button — shared by Ledger and Cabinet headers */
+.btn-customize {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-hairline);
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.1rem 0;
+}
+.btn-customize:hover,
+.btn-customize[aria-expanded="true"] {
+  color: var(--accent-manuscript);
+  border-color: var(--accent-manuscript);
+}
+
+/* CoinCard — grade badge */
+.metric-grade {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent-manuscript);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

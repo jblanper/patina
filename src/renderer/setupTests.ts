@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import en from './i18n/locales/en.json';
+import { DEFAULT_FIELD_VISIBILITY } from '../common/validation';
 
 // Helper to resolve nested translation keys from the en.json object
 function resolveKey(key: string, opts?: Record<string, unknown>): string {
@@ -53,4 +54,7 @@ window.electronAPI = {
   resetVocab: vi.fn().mockResolvedValue(undefined),
   getPreference: vi.fn().mockResolvedValue('es'),
   setPreference: vi.fn().mockResolvedValue(undefined),
+  prefsGetVisibility: vi.fn().mockResolvedValue({ ...DEFAULT_FIELD_VISIBILITY }),
+  prefsSetVisibility: vi.fn().mockResolvedValue(undefined),
+  prefsResetVisibility: vi.fn().mockResolvedValue({ ...DEFAULT_FIELD_VISIBILITY }),
 };

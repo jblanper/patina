@@ -1,8 +1,48 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
 import { CoinDetail } from '../CoinDetail';
 import * as useCoinHook from '../../hooks/useCoin';
 import { Coin, CoinImage } from '../../../common/types';
+import { FieldVisibilityContext } from '../../contexts/FieldVisibilityContext';
+import type { FieldVisibilityMap } from '../../../common/types';
+import type { VisibilityKey } from '../../../common/validation';
+import { DEFAULT_FIELD_VISIBILITY } from '../../../common/validation';
+
+// Context with all fields visible — preserves existing test assertions unchanged
+const renderWithAllVisible = (ui: React.ReactElement) =>
+  render(
+    <FieldVisibilityContext.Provider
+      value={{
+        visibility: {} as FieldVisibilityMap,
+        isVisible: (_key: VisibilityKey) => true,
+        setVisibility: vi.fn(),
+        resetToDefaults: vi.fn(),
+      }}
+    >
+      {ui}
+    </FieldVisibilityContext.Provider>
+  );
+
+// Context with selective visibility — for conditional-rendering branch tests
+const renderWithVisibility = (
+  ui: React.ReactElement,
+  overrides: Partial<FieldVisibilityMap> = {}
+) => {
+  const visibility = { ...DEFAULT_FIELD_VISIBILITY, ...overrides } as FieldVisibilityMap;
+  return render(
+    <FieldVisibilityContext.Provider
+      value={{
+        visibility,
+        isVisible: (key: VisibilityKey) => visibility[key] ?? true,
+        setVisibility: vi.fn(),
+        resetToDefaults: vi.fn(),
+      }}
+    >
+      {ui}
+    </FieldVisibilityContext.Provider>
+  );
+};
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -57,7 +97,7 @@ describe('CoinDetail Component', () => {
       error: null,
     });
 
-    render(<CoinDetail />);
+    renderWithAllVisible(<CoinDetail />);
     expect(screen.getByText('Retrieving archival record...')).toBeInTheDocument();
   });
 
@@ -69,7 +109,7 @@ describe('CoinDetail Component', () => {
       error: new Error('Failed'),
     });
 
-    render(<CoinDetail />);
+    renderWithAllVisible(<CoinDetail />);
     expect(screen.getByText('Record not found.')).toBeInTheDocument();
   });
 
@@ -81,7 +121,7 @@ describe('CoinDetail Component', () => {
       error: null,
     });
 
-    render(<CoinDetail />);
+    renderWithAllVisible(<CoinDetail />);
 
     // Header
     expect(screen.getByText('Test Coin')).toBeInTheDocument();
@@ -127,7 +167,7 @@ describe('CoinDetail Component', () => {
       error: null,
     });
 
-    render(<CoinDetail />);
+    renderWithAllVisible(<CoinDetail />);
 
     const backBtn = screen.getByRole('button', { name: '← Close Ledger Entry' });
     fireEvent.click(backBtn);
@@ -142,7 +182,7 @@ describe('CoinDetail Component', () => {
       error: null,
     });
 
-    render(<CoinDetail />);
+    renderWithAllVisible(<CoinDetail />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Edit Record' }));
     expect(mockNavigate).toHaveBeenCalledWith('/scriptorium/edit/1');
@@ -157,7 +197,7 @@ describe('CoinDetail Component', () => {
     });
     vi.mocked(window.electronAPI.deleteCoin).mockResolvedValue(true);
 
-    render(<CoinDetail />);
+    renderWithAllVisible(<CoinDetail />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete Record' }));
     expect(screen.getByText('Confirm Deletion')).toBeInTheDocument();
@@ -179,12 +219,81 @@ describe('CoinDetail Component', () => {
       error: null,
     });
 
-    render(<CoinDetail />);
+    renderWithAllVisible(<CoinDetail />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete Record' }));
     expect(screen.getByText('Confirm Deletion')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(screen.queryByText('Confirm Deletion')).not.toBeInTheDocument();
+  });
+
+  // ── Conditional field rendering (isVisible guards) ───────────────────────
+
+  it('TC-CD-VIS-01: hides die_axis metric when ledger.die_axis=false', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin, images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.die_axis': false });
+    expect(screen.queryByText('12h')).not.toBeInTheDocument();
+  });
+
+  it('TC-CD-VIS-02: shows die_axis metric when ledger.die_axis=true', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin, images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.die_axis': true });
+    expect(screen.getByText('12h')).toBeInTheDocument();
+  });
+
+  it('TC-CD-VIS-03: hides acquisition footer when ledger.acquisition=false', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin, images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.acquisition': false });
+    expect(screen.queryByText(/Test Dealer/)).not.toBeInTheDocument();
+    expect(screen.queryByText('$100.00')).not.toBeInTheDocument();
+  });
+
+  it('TC-CD-VIS-04: shows acquisition footer when ledger.acquisition=true', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin, images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.acquisition': true });
+    expect(screen.getByText(/Test Dealer/)).toBeInTheDocument();
+  });
+
+  it("TC-CD-VIS-05: hides Curator's Note when ledger.story=false", () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin, images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.story': false });
+    expect(screen.queryByText('"This is a story."')).not.toBeInTheDocument();
+  });
+
+  it("TC-CD-VIS-06: shows Curator's Note when ledger.story=true", () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin, images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.story': true });
+    expect(screen.getByText('"This is a story."')).toBeInTheDocument();
+  });
+
+  it('TC-CD-VIS-07: hides provenance when ledger.provenance=false', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin, images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.provenance': false });
+    expect(screen.queryByText(/Found in a field/)).not.toBeInTheDocument();
+  });
+
+  it('TC-CD-VIS-08: hides grade metric when ledger.grade=false', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin, images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.grade': false });
+    // Grade value 'XF' should not be in the metrics grid
+    const metrics = document.querySelector('.metrics-grid');
+    expect(metrics?.textContent).not.toContain('XF');
   });
 });

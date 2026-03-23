@@ -13,6 +13,10 @@ import {
   VocabIncrementSchema,
   VocabResetSchema,
   ALLOWED_VOCAB_FIELDS,
+  ALLOWED_VISIBILITY_KEYS,
+  SetVisibilitySchema,
+  LOCKED_VISIBILITY_KEYS,
+  DEFAULT_FIELD_VISIBILITY,
 } from '../validation';
 
 describe('validation.ts', () => {
@@ -618,6 +622,99 @@ describe('VocabResetSchema', () => {
     it('TC-PDF-05: rejects extra properties (.strict)', () => {
       const result = PdfExportOptionsSchema.safeParse({ locale: 'es', extra: true });
       expect(result.success).toBe(false);
+    });
+  });
+
+  describe('SetVisibilitySchema', () => {
+    it('TC-SV-01: accepts a valid key with visible=true', () => {
+      const result = SetVisibilitySchema.safeParse({ key: 'ledger.title', visible: true });
+      expect(result.success).toBe(true);
+    });
+
+    it('TC-SV-02: accepts a valid key with visible=false', () => {
+      const result = SetVisibilitySchema.safeParse({ key: 'card.grade', visible: false });
+      expect(result.success).toBe(true);
+    });
+
+    it('TC-SV-03: rejects an unknown key', () => {
+      const result = SetVisibilitySchema.safeParse({ key: 'ledger.unknown_field', visible: true });
+      expect(result.success).toBe(false);
+    });
+
+    it('TC-SV-04: rejects extra properties (.strict)', () => {
+      const result = SetVisibilitySchema.safeParse({ key: 'ledger.grade', visible: true, extra: 'x' });
+      expect(result.success).toBe(false);
+    });
+
+    it('TC-SV-05: rejects non-boolean visible', () => {
+      const result = SetVisibilitySchema.safeParse({ key: 'ledger.grade', visible: 1 });
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('ALLOWED_VISIBILITY_KEYS', () => {
+    it('TC-AVK-01: contains exactly 26 keys', () => {
+      expect(ALLOWED_VISIBILITY_KEYS.length).toBe(26);
+    });
+
+    it('TC-AVK-02: all ledger keys start with "ledger."', () => {
+      const ledgerKeys = ALLOWED_VISIBILITY_KEYS.filter(k => k.startsWith('ledger.'));
+      expect(ledgerKeys.length).toBe(22);
+    });
+
+    it('TC-AVK-03: all card keys start with "card."', () => {
+      const cardKeys = ALLOWED_VISIBILITY_KEYS.filter(k => k.startsWith('card.'));
+      expect(cardKeys.length).toBe(4);
+    });
+
+    it('TC-AVK-04: every key in ALLOWED_VISIBILITY_KEYS parses successfully', () => {
+      for (const key of ALLOWED_VISIBILITY_KEYS) {
+        const result = SetVisibilitySchema.safeParse({ key, visible: true });
+        expect(result.success).toBe(true);
+      }
+    });
+  });
+
+  describe('LOCKED_VISIBILITY_KEYS', () => {
+    it('TC-LVK-01: contains exactly 5 locked keys', () => {
+      expect(LOCKED_VISIBILITY_KEYS.size).toBe(5);
+    });
+
+    it('TC-LVK-02: contains the expected locked keys', () => {
+      expect(LOCKED_VISIBILITY_KEYS.has('ledger.title')).toBe(true);
+      expect(LOCKED_VISIBILITY_KEYS.has('ledger.weight')).toBe(true);
+      expect(LOCKED_VISIBILITY_KEYS.has('ledger.diameter')).toBe(true);
+      expect(LOCKED_VISIBILITY_KEYS.has('card.metal')).toBe(true);
+      expect(LOCKED_VISIBILITY_KEYS.has('card.year')).toBe(true);
+    });
+
+    it('TC-LVK-03: all locked keys are also in ALLOWED_VISIBILITY_KEYS', () => {
+      for (const key of LOCKED_VISIBILITY_KEYS) {
+        expect((ALLOWED_VISIBILITY_KEYS as readonly string[]).includes(key)).toBe(true);
+      }
+    });
+  });
+
+  describe('DEFAULT_FIELD_VISIBILITY', () => {
+    it('TC-DFV-01: covers every key in ALLOWED_VISIBILITY_KEYS', () => {
+      for (const key of ALLOWED_VISIBILITY_KEYS) {
+        expect(key in DEFAULT_FIELD_VISIBILITY).toBe(true);
+      }
+    });
+
+    it('TC-DFV-02: expert / privacy-sensitive fields default to false', () => {
+      expect(DEFAULT_FIELD_VISIBILITY['ledger.die_axis']).toBe(false);
+      expect(DEFAULT_FIELD_VISIBILITY['ledger.fineness']).toBe(false);
+      expect(DEFAULT_FIELD_VISIBILITY['ledger.edge_desc']).toBe(false);
+      expect(DEFAULT_FIELD_VISIBILITY['ledger.provenance']).toBe(false);
+      expect(DEFAULT_FIELD_VISIBILITY['ledger.acquisition']).toBe(false);
+    });
+
+    it('TC-DFV-03: core identity fields default to true', () => {
+      expect(DEFAULT_FIELD_VISIBILITY['ledger.title']).toBe(true);
+      expect(DEFAULT_FIELD_VISIBILITY['ledger.issuer']).toBe(true);
+      expect(DEFAULT_FIELD_VISIBILITY['ledger.denomination']).toBe(true);
+      expect(DEFAULT_FIELD_VISIBILITY['ledger.year']).toBe(true);
     });
   });
 });
