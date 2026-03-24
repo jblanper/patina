@@ -1,7 +1,7 @@
 # Implementation Blueprint: Field Completeness — CoinDetail & Scriptorium Alignment
 
 **Date:** 2026-03-24
-**Status:** Proposed
+**Status:** Verification
 **Reference:** `docs/curating-ui/proposal_field-completeness_2026-03-24_1530.html`
 
 ---

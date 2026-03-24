@@ -23,6 +23,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
   const metalVocab = useVocabularies('metal');
   const dieAxisVocab = useVocabularies('die_axis');
   const gradeVocab = useVocabularies('grade');
+  const rarityVocab = useVocabularies('rarity');
   return (
     <div className="right-folio">
       <div className="folio-header">
@@ -225,6 +226,22 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
           />
         </div>
         <div className="metric-item">
+          <button className="metric-label" onClick={() => openField('rarity')} aria-label={t('glossary.hintLabel', { field: 'rarity' })}>
+            <span className="label-text">{t('ledger.rarity')}</span>
+            <span className="glossary-hint" aria-hidden="true">†</span>
+          </button>
+          <AutocompleteField
+            field="rarity"
+            value={formData.rarity || ''}
+            onChange={(v) => updateField('rarity', v)}
+            onAddNew={(v) => { rarityVocab.addVocabulary(v); updateField('rarity', v); }}
+            options={rarityVocab.options}
+            placeholder={t('ledger.placeholders.rarity')}
+            onReset={rarityVocab.resetVocabularies}
+            hasUserValues={false}
+          />
+        </div>
+        <div className="metric-item">
           <button className="metric-label" onClick={() => openField('year_numeric')} aria-label={t('glossary.hintLabel', { field: 'year_numeric' })}>
             <span className="label-text">{t('ledger.yearCe')}</span>
             <span className="glossary-hint" aria-hidden="true">†</span>
@@ -281,6 +298,20 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
           placeholder={t('ledger.placeholders.reverseDesc')}
           value={formData.reverse_desc || ''}
           onChange={(e) => updateField('reverse_desc', e.target.value)}
+        />
+      </div>
+
+      {/* Edge Description */}
+      <div className="numismatic-section">
+        <button className="section-label" onClick={() => openField('edge_desc')} aria-label={t('glossary.hintLabel', { field: 'edge_desc' })}>
+          <span className="label-text">{t('ledger.edge')}</span>
+          <span className="glossary-hint" aria-hidden="true">†</span>
+        </button>
+        <textarea
+          className="input-block"
+          placeholder={t('ledger.placeholders.edgeDesc')}
+          value={formData.edge_desc || ''}
+          onChange={(e) => updateField('edge_desc', e.target.value)}
         />
       </div>
 

@@ -64,6 +64,7 @@
     "obverse": "Anverso",
     "reverse": "Reverso",
     "edge": "Canto",
+    "rarity": "Rareza",
     "curatorsNote": "Nota del Curador",
     "provenance": "Procedencia",
     "acquired": "Adquirida",
@@ -93,7 +94,9 @@
       "curatorsNote": "Registra la importancia histórica o la narrativa única de este objeto...",
       "provenance": "ej. Ex. Colección BCD; Adquirida 2024",
       "acquired": "AAAA-MM-DD",
-      "source": "ej. CNG Auctions"
+      "source": "ej. CNG Auctions",
+      "edgeDesc": "ej. Acordonado / Liso / DECUS ET TUTAMEN",
+      "rarity": "ej. R / RR / Común"
     }
   },
   "detail": {

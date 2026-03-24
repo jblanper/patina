@@ -103,6 +103,7 @@ export const ALLOWED_VOCAB_FIELDS = [
   'era',
   'die_axis',
   'mint',
+  'rarity',
 ] as const;
 
 export type VocabField = typeof ALLOWED_VOCAB_FIELDS[number];

@@ -64,6 +64,7 @@
     "obverse": "Obverse",
     "reverse": "Reverse",
     "edge": "Edge",
+    "rarity": "Rarity",
     "curatorsNote": "Curator's Note",
     "provenance": "Provenance",
     "acquired": "Acquired",
@@ -93,7 +94,9 @@
       "curatorsNote": "Record the historical significance or unique narrative of this object...",
       "provenance": "e.g. Ex. BCD Collection; Purchased 2024",
       "acquired": "YYYY-MM-DD",
-      "source": "e.g. CNG Auctions"
+      "source": "e.g. CNG Auctions",
+      "edgeDesc": "e.g. Reeded / Plain / DECUS ET TUTAMEN",
+      "rarity": "e.g. R / RR / Common"
     }
   },
   "detail": {

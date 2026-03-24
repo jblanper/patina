@@ -83,6 +83,13 @@ function getSeedEntries(): Array<{ field: string; value: string; locale: string;
     { field: 'grade', value: 'G-4', locale: en, usage_count: 8 },
     { field: 'grade', value: 'AG-3', locale: en, usage_count: 6 },
     { field: 'grade', value: 'FR-2', locale: en, usage_count: 4 },
+    // Rarity (CNR scale)
+    { field: 'rarity', value: 'C',    locale: en, usage_count: 30 },
+    { field: 'rarity', value: 'S',    locale: en, usage_count: 20 },
+    { field: 'rarity', value: 'R',    locale: en, usage_count: 15 },
+    { field: 'rarity', value: 'RR',   locale: en, usage_count: 10 },
+    { field: 'rarity', value: 'RRR',  locale: en, usage_count: 5  },
+    { field: 'rarity', value: 'RRRR', locale: en, usage_count: 2  },
     // Eras (English)
     { field: 'era', value: 'Ancient', locale: en, usage_count: 30 },
     { field: 'era', value: 'Roman Republic', locale: en, usage_count: 40 },
@@ -413,7 +420,7 @@ export const dbService = {
   },
 
   seedVocabularies: (): void => {
-    const CURRENT_SEED_VERSION = '6c.1';
+    const CURRENT_SEED_VERSION = '6c.2';
     const row = db.prepare('SELECT value FROM preferences WHERE key = ?').get('vocab_seeded_version') as { value: string } | undefined;
     if (row?.value === CURRENT_SEED_VERSION) return;
 

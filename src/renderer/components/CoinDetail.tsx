@@ -145,7 +145,15 @@ export const CoinDetail: React.FC = () => {
              <h1 className="folio-title">{coin.title}</h1>
              <div className="subtitle">
                {isVisible('ledger.mint') && (coin.mint ? `${t('detail.mintedAt')} ${coin.mint}` : t('detail.mintUnknown'))}
-               {isVisible('ledger.year') && coin.year_display && ` // ${coin.year_display}`}
+               {isVisible('ledger.denomination') && coin.denomination && ` // ${coin.denomination}`}
+               {isVisible('ledger.year') && coin.year_display && (
+                 <>
+                   {` // ${coin.year_display}`}
+                   {coin.year_numeric != null && (
+                     <span className="year-numeric-annotation"> ({coin.year_numeric} CE)</span>
+                   )}
+                 </>
+               )}
                {isVisible('ledger.catalog_ref') && coin.catalog_ref && ` // ${coin.catalog_ref}`}
              </div>
            </header>
@@ -188,6 +196,12 @@ export const CoinDetail: React.FC = () => {
               <div className="metric-item">
                 <span className="metric-label">{t('ledger.grade')}</span>
                 <span className="metric-value">{coin.grade || '—'}</span>
+              </div>
+            )}
+            {isVisible('ledger.rarity') && (
+              <div className="metric-item">
+                <span className="metric-label">{t('ledger.rarity')}</span>
+                <span className="metric-value">{coin.rarity || '—'}</span>
               </div>
             )}
           </div>
