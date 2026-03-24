@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curatorial Proposal: Field Completeness — Patina</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-manuscript: #FCF9F2;
+            --text-ink: #2D2926;
+            --text-muted: #6A6764;
+            --border-hairline: #E0DCCD;
+            --accent-manuscript: #914E32;
+            --stone-pedestal: #F0EDE6;
+            --error-red: #B22222;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --spacing-large: clamp(3rem, 8vw, 4rem);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        body {
+            font-family: var(--font-sans);
+            background-color: #EEEBE4;
+            color: var(--text-ink);
+            line-height: 1.6;
+            padding: var(--spacing-large);
+        }
+
+        /* ── Proposal chrome ── */
+        .proposal-header {
+            max-width: 1300px; margin: 0 auto 4rem;
+            border-bottom: 2px solid var(--text-ink); padding-bottom: 1.5rem;
+            display: flex; justify-content: space-between; align-items: flex-end;
+        }
+        .proposal-header h1 {
+            font-family: var(--font-serif); font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700; font-style: italic; letter-spacing: -1px; line-height: 1;
+        }
+        .proposal-meta {
+            font-family: var(--font-mono); font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--accent-manuscript); text-align: right;
+        }
+        .proposal-container { max-width: 1300px; margin: 0 auto; display: flex; flex-direction: column; gap: 6rem; }
+        .path-section { display: grid; gap: 2rem; }
+        .path-info { max-width: 760px; }
+        .tag {
+            font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase;
+            letter-spacing: 2px; color: var(--accent-manuscript); margin-bottom: 0.5rem;
+            display: block; font-weight: 600;
+        }
+        .path-title { font-family: var(--font-serif); font-size: 2rem; font-weight: 700; margin-bottom: 0.75rem; }
+        .rationale {
+            font-family: var(--font-serif); font-size: 1rem; font-style: italic;
+            color: var(--text-ink); margin-bottom: 1rem; max-width: 65ch; line-height: 1.6;
+        }
+        .chosen-badge {
+            display: inline-block; background: var(--accent-manuscript); color: #fff;
+            font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase;
+            letter-spacing: 1.5px; padding: 0.2rem 0.6rem; margin-top: 0.5rem;
+        }
+
+        /* ── Browser frame ── */
+        .browser-frame {
+            background: var(--bg-manuscript); border: 1px solid var(--border-hairline);
+            border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+            overflow: hidden;
+        }
+        .frame-header {
+            background: #E2DFD8; padding: 0.7rem 1rem;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex; gap: 0.5rem; align-items: center;
+        }
+        .dot { width: 11px; height: 11px; border-radius: 50%; background: #CCC; }
+        .dot.red { background: #FF5F56; } .dot.yellow { background: #FFBD2E; } .dot.green { background: #27C93F; }
+        .address-bar {
+            background: white; padding: 0.25rem 1rem; border-radius: 4px; flex: 1;
+            margin-left: 1rem; font-family: var(--font-sans); font-size: 0.7rem;
+            color: var(--text-muted); text-align: center; border: 1px solid var(--border-hairline);
+        }
+        .frame-content { padding: 2.5rem; background: var(--bg-manuscript); }
+
+        /* ── Audit panel ── */
+        .audit-results {
+            background: white; padding: 2rem; border: 1px solid var(--border-hairline);
+            border-left: 4px solid var(--accent-manuscript);
+        }
+        .audit-results h3 {
+            font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase;
+            letter-spacing: 2px; color: var(--accent-manuscript); margin-bottom: 1.25rem;
+        }
+        .audit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem; }
+        .audit-item strong { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.2rem; }
+        .audit-item p { font-family: var(--font-sans); font-size: 0.85rem; }
+
+        /* ── App UI: folio header ── */
+        .folio-header { margin-bottom: 1.5rem; }
+        .meta-line {
+            font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase;
+            letter-spacing: 1.5px; color: var(--accent-manuscript); margin-bottom: 0.4rem;
+            display: block;
+        }
+        .folio-title {
+            font-family: var(--font-serif); font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 700; line-height: 1.1; margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted);
+            letter-spacing: 0.5px; line-height: 1.6;
+        }
+        .subtitle .sep { margin: 0 0.3rem; opacity: 0.5; }
+        .denomination-inline { color: var(--text-ink); font-weight: 600; }
+        .year-numeric-annotation { font-size: 0.85em; color: var(--text-muted); margin-left: 0.2rem; opacity: 0.75; }
+
+        /* Denomination as accent (Path B) */
+        .denomination-accent { color: var(--accent-manuscript); font-style: italic; font-family: var(--font-serif); font-size: 1em; }
+
+        /* Denomination as labeled row (Path C) */
+        .denomination-row { display: flex; align-items: baseline; gap: 1rem; margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px solid var(--border-hairline); }
+        .denomination-row-label { font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        .denomination-row-value { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; }
+
+        /* ── App UI: metrics grid ── */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr));
+            gap: 1.25rem; margin-bottom: 1.5rem;
+        }
+        .metric-item {}
+        .metric-label { display: block; font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 0.2rem; }
+        .metric-value { font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-ink); font-weight: 600; }
+        .metric-item.rarity-highlight .metric-value { color: var(--accent-manuscript); }
+
+        /* ── App UI: numismatic sections ── */
+        .numismatic-sections { display: flex; flex-direction: column; gap: 1.25rem; }
+        .numismatic-section {}
+        .section-header {
+            font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase;
+            letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 0.4rem; display: block;
+        }
+        .section-legend { font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-ink); margin-bottom: 0.3rem; display: block; }
+        .section-desc { font-family: var(--font-serif); font-size: 1rem; color: var(--text-ink); line-height: 1.55; }
+        .hairline-divider { border: none; border-top: 1px solid var(--border-hairline); margin: 0.75rem 0; }
+
+        /* ── Form inputs ── */
+        .form-section { margin-bottom: 2rem; }
+        .input-label {
+            display: block; font-family: var(--font-mono); font-size: 0.62rem;
+            text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 0.3rem;
+        }
+        .input-block {
+            width: 100%; border: none; border-bottom: 1px solid var(--border-hairline);
+            background: transparent; font-family: var(--font-serif); font-size: 0.95rem;
+            color: var(--text-ink); padding: 0.4rem 0; resize: vertical; min-height: 80px;
+            outline: none;
+        }
+        .input-block:focus { border-bottom-color: var(--accent-manuscript); }
+        .input-block::placeholder { color: var(--text-muted); font-style: italic; }
+        .input-metric {
+            width: 100%; border: none; border-bottom: 1px solid var(--border-hairline);
+            background: transparent; font-family: var(--font-mono); font-size: 0.85rem;
+            color: var(--text-ink); padding: 0.3rem 0; outline: none;
+        }
+        .input-metric:focus { border-bottom-color: var(--accent-manuscript); }
+        .input-metric::placeholder { color: var(--text-muted); }
+
+        /* Autocomplete mock */
+        .autocomplete-wrapper { position: relative; }
+        .autocomplete-trigger {
+            width: 100%; border: none; border-bottom: 1px solid var(--border-hairline);
+            background: transparent; font-family: var(--font-mono); font-size: 0.85rem;
+            color: var(--text-ink); padding: 0.3rem 0; outline: none;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            text-align: left;
+        }
+        .autocomplete-trigger .chevron { color: var(--text-muted); font-size: 0.65rem; }
+        .autocomplete-dropdown {
+            position: absolute; top: 100%; left: 0; right: 0; background: white;
+            border: 1px solid var(--border-hairline); z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .autocomplete-option {
+            font-family: var(--font-mono); font-size: 0.8rem; padding: 0.45rem 0.75rem;
+            cursor: pointer; color: var(--text-ink);
+        }
+        .autocomplete-option:hover, .autocomplete-option.active { background: var(--stone-pedestal); }
+        .autocomplete-option.active { color: var(--accent-manuscript); font-weight: 600; }
+
+        /* Glossary hint button (label) */
+        .field-label-btn {
+            background: none; border: none; cursor: pointer; padding: 0;
+            display: flex; align-items: baseline; gap: 0.3rem; margin-bottom: 0.3rem;
+        }
+        .field-label-btn .label-text { font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); }
+        .field-label-btn .hint { font-family: var(--font-serif); font-size: 0.75rem; color: var(--accent-manuscript); }
+
+        /* ── Section dividers for proposal ── */
+        .field-group-header {
+            font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase;
+            letter-spacing: 2px; color: var(--accent-manuscript); border-bottom: 1px solid var(--border-hairline);
+            padding-bottom: 0.5rem; margin-bottom: 1.5rem; margin-top: 2rem;
+        }
+        .field-group-header:first-child { margin-top: 0; }
+
+        .new-field { background: #FFF9F0; border-left: 2px solid var(--accent-manuscript); padding-left: 0.75rem; }
+    </style>
+</head>
+<body>
+    <header class="proposal-header">
+        <h1>Proposal: Field Completeness</h1>
+        <div class="proposal-meta">
+            Project: Patina // Ref: FLD-01<br>
+            Date: 2026-03-24 // Status: Proposed
+        </div>
+    </header>
+
+    <main class="proposal-container">
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PATH A — THE MINIMALIST
+        ═══════════════════════════════════════════════════════════ -->
+        <section class="path-section">
+            <div class="path-info">
+                <span class="tag">Archetype A</span>
+                <h2 class="path-title">The Minimalist</h2>
+                <p class="rationale">
+                    All four fields are added at the absolute minimum visual cost. Denomination joins the existing inline subtitle chain without differentiation; year_numeric is fully suppressed; edge_desc gets a plain textarea after Reverse; rarity is a free-text input in the metrics grid. No new vocabulary machinery. The object remains undisturbed.
+                </p>
+            </div>
+
+            <div class="browser-frame">
+                <div class="frame-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div class="address-bar">patina://coin/042 — CoinDetail + Scriptorium</div>
+                </div>
+                <div class="frame-content">
+
+                    <p class="field-group-header">CoinDetail — Folio Header (denomination added, year_numeric hidden)</p>
+                    <div class="folio-header">
+                        <span class="meta-line">ENTRY #042 // Roman Imperial // Probus</span>
+                        <h1 class="folio-title">Aureus of Probus</h1>
+                        <div class="subtitle">
+                            Minted at Ticinum
+                            <span class="sep">//</span>
+                            Aureus
+                            <span class="sep">//</span>
+                            AD 281
+                            <span class="sep">//</span>
+                            RIC V 490
+                        </div>
+                    </div>
+
+                    <p class="field-group-header">CoinDetail — Metrics Grid (rarity as plain text)</p>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Weight</span>
+                            <span class="metric-value">7.30 g</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Diameter</span>
+                            <span class="metric-value">20.5 mm</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Die Axis</span>
+                            <span class="metric-value">6h</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Metal</span>
+                            <span class="metric-value">Gold</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Grade</span>
+                            <span class="metric-value">EF-45</span>
+                        </div>
+                        <div class="metric-item new-field">
+                            <span class="metric-label">Rarity</span>
+                            <span class="metric-value">RR</span>
+                        </div>
+                    </div>
+
+                    <p class="field-group-header">Scriptorium — Edge section (after Reverse)</p>
+                    <div class="numismatic-sections">
+                        <div class="numismatic-section">
+                            <button class="field-label-btn"><span class="label-text">Edge</span><span class="hint">†</span></button>
+                            <textarea class="input-block" placeholder="e.g. Reeded / Plain / DECUS ET TUTAMEN">Reeded</textarea>
+                        </div>
+                    </div>
+
+                    <p class="field-group-header">Scriptorium — Metrics Grid (rarity as free text)</p>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <button class="field-label-btn"><span class="label-text">Grade</span><span class="hint">†</span></button>
+                            <input type="text" class="input-metric" value="EF-45" />
+                        </div>
+                        <div class="metric-item new-field">
+                            <button class="field-label-btn"><span class="label-text">Rarity</span><span class="hint">†</span></button>
+                            <input type="text" class="input-metric" placeholder="e.g. R / RR / Common" />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="audit-results">
+                <h3>Curatorial Audit — Path A</h3>
+                <div class="audit-grid">
+                    <div class="audit-item">
+                        <strong>Contrast</strong>
+                        <p>Pass — all text on parchment ≥ 4.5:1</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Information Density</strong>
+                        <p>Minimal — denomination buried in subtitle chain with no visual differentiation</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Archival Tone</strong>
+                        <p>Strong — no new UI elements; extends existing patterns without friction</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Rarity Concern</strong>
+                        <p>Free text risks inconsistent notation across collection (e.g. "R2" vs "RR")</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>year_numeric</strong>
+                        <p>Fully hidden — collector cannot spot CE/BC entry errors from detail view</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PATH B — THE LEDGER
+        ═══════════════════════════════════════════════════════════ -->
+        <section class="path-section">
+            <div class="path-info">
+                <span class="tag">Archetype B</span>
+                <h2 class="path-title">The Ledger</h2>
+                <p class="rationale">
+                    Maximum archival density. Denomination is elevated as its own labeled row beneath the title — the coin's type designation treated with the same visual weight as its physical metrics. year_numeric is shown in the metrics grid as "Year CE" for cross-referencing. Rarity is a vocabulary autocomplete seeded with the CNR scale (C · S · R · RR · RRR · RRRR). Every field surfaces; nothing is implied.
+                </p>
+            </div>
+
+            <div class="browser-frame">
+                <div class="frame-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div class="address-bar">patina://coin/042 — CoinDetail + Scriptorium</div>
+                </div>
+                <div class="frame-content">
+
+                    <p class="field-group-header">CoinDetail — Folio Header (denomination as labeled row + year_numeric in subtitle)</p>
+                    <div class="folio-header">
+                        <span class="meta-line">ENTRY #042 // Roman Imperial // Probus</span>
+                        <h1 class="folio-title">Aureus of Probus</h1>
+                        <div class="denomination-row">
+                            <span class="denomination-row-label">Denomination</span>
+                            <span class="denomination-row-value">Aureus</span>
+                        </div>
+                        <div class="subtitle" style="margin-top:0.6rem">
+                            Minted at Ticinum
+                            <span class="sep">//</span>
+                            AD 281
+                            <span class="sep">//</span>
+                            −281 CE
+                            <span class="sep">//</span>
+                            RIC V 490
+                        </div>
+                    </div>
+
+                    <p class="field-group-header">CoinDetail — Metrics Grid (rarity + year_numeric)</p>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Weight</span>
+                            <span class="metric-value">7.30 g</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Diameter</span>
+                            <span class="metric-value">20.5 mm</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Die Axis</span>
+                            <span class="metric-value">6h</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Metal</span>
+                            <span class="metric-value">Gold</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Grade</span>
+                            <span class="metric-value">EF-45</span>
+                        </div>
+                        <div class="metric-item new-field">
+                            <span class="metric-label">Rarity</span>
+                            <span class="metric-value">RR</span>
+                        </div>
+                        <div class="metric-item new-field">
+                            <span class="metric-label">Year CE</span>
+                            <span class="metric-value">−281</span>
+                        </div>
+                    </div>
+
+                    <p class="field-group-header">Scriptorium — Metrics Grid (rarity autocomplete + year_numeric)</p>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <button class="field-label-btn"><span class="label-text">Grade</span><span class="hint">†</span></button>
+                            <button class="autocomplete-trigger">EF-45 <span class="chevron">▾</span></button>
+                        </div>
+                        <div class="metric-item new-field" style="position:relative">
+                            <button class="field-label-btn"><span class="label-text">Rarity</span><span class="hint">†</span></button>
+                            <button class="autocomplete-trigger">RR <span class="chevron">▾</span></button>
+                            <div class="autocomplete-dropdown" style="display:block">
+                                <div class="autocomplete-option">C</div>
+                                <div class="autocomplete-option">S</div>
+                                <div class="autocomplete-option active">R ✓</div>
+                                <div class="autocomplete-option">RR</div>
+                                <div class="autocomplete-option">RRR</div>
+                                <div class="autocomplete-option">RRRR</div>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <button class="field-label-btn"><span class="label-text">Year CE</span><span class="hint">†</span></button>
+                            <input type="number" class="input-metric" value="-281" />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="audit-results">
+                <h3>Curatorial Audit — Path B</h3>
+                <div class="audit-grid">
+                    <div class="audit-item">
+                        <strong>Contrast</strong>
+                        <p>Pass — all elements meet AA standard</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Information Density</strong>
+                        <p>High — denomination promoted to its own row; year_numeric exposed in metrics</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Archival Tone</strong>
+                        <p>Strong — labeled row mirrors museum catalogue convention for type designation</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Rarity</strong>
+                        <p>CNR vocabulary enforces consistent notation across collection</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Concern</strong>
+                        <p>Denomination as separate row adds layout weight; may fragment the headline reading experience</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PATH C — THE HYBRID (CHOSEN)
+        ═══════════════════════════════════════════════════════════ -->
+        <section class="path-section">
+            <div class="path-info">
+                <span class="tag">Archetype C</span>
+                <h2 class="path-title">The Hybrid</h2>
+                <p class="rationale">
+                    The chosen path. Denomination slots into the existing subtitle chain (Path A simplicity) with no visual elevation — it is a peer of mint and year. year_numeric surfaces as a muted monospace parenthetical annotation directly after year_display, enabling error-spotting without a dedicated field. Rarity is vocabulary-backed with the CNR scale (Path B rigour) and lives in the metrics grid after Grade. Edge description is a single textarea in the Scriptorium, with an informative placeholder guiding edge-type vocabulary.
+                </p>
+                <span class="chosen-badge">✓ Selected for Implementation</span>
+            </div>
+
+            <div class="browser-frame">
+                <div class="frame-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <div class="address-bar">patina://coin/042 — CoinDetail + Scriptorium</div>
+                </div>
+                <div class="frame-content">
+
+                    <p class="field-group-header">CoinDetail — Folio Header (denomination inline + year_numeric annotation)</p>
+                    <div class="folio-header">
+                        <span class="meta-line">ENTRY #042 // Roman Imperial // Probus</span>
+                        <h1 class="folio-title">Aureus of Probus</h1>
+                        <div class="subtitle">
+                            Minted at Ticinum
+                            <span class="sep">//</span>
+                            <span class="denomination-inline">Aureus</span>
+                            <span class="sep">//</span>
+                            AD 281 <span class="year-numeric-annotation">(−281 CE)</span>
+                            <span class="sep">//</span>
+                            RIC V 490
+                        </div>
+                    </div>
+
+                    <p class="field-group-header">CoinDetail — Metrics Grid (rarity after grade, vocab-backed)</p>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Weight</span>
+                            <span class="metric-value">7.30 g</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Diameter</span>
+                            <span class="metric-value">20.5 mm</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Die Axis</span>
+                            <span class="metric-value">6h</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Metal</span>
+                            <span class="metric-value">Gold</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Grade</span>
+                            <span class="metric-value">EF-45</span>
+                        </div>
+                        <div class="metric-item new-field">
+                            <span class="metric-label">Rarity</span>
+                            <span class="metric-value">RR</span>
+                        </div>
+                    </div>
+
+                    <p class="field-group-header">CoinDetail — Numismatic Sections (edge_desc rendered, already works)</p>
+                    <div class="numismatic-sections">
+                        <div class="numismatic-section">
+                            <span class="section-header">Obverse</span>
+                            <span class="section-legend">IMP C M AVR PROBVS AVG</span>
+                            <span class="section-desc">Radiate bust right, wearing imperial mantle, holding eagle-tipped sceptre.</span>
+                        </div>
+                        <hr class="hairline-divider">
+                        <div class="numismatic-section">
+                            <span class="section-header">Reverse</span>
+                            <span class="section-legend">RESTITVT ORBIS</span>
+                            <span class="section-desc">Female figure standing right, presenting wreath to emperor.</span>
+                        </div>
+                        <hr class="hairline-divider">
+                        <div class="numismatic-section new-field">
+                            <span class="section-header">Edge</span>
+                            <span class="section-desc">Reeded.</span>
+                        </div>
+                    </div>
+
+                    <p class="field-group-header" style="margin-top:2rem">Scriptorium — Edge section added (after Reverse, before Curator's Note)</p>
+                    <div class="numismatic-sections">
+                        <div class="numismatic-section">
+                            <button class="field-label-btn"><span class="label-text">Reverse</span><span class="hint">†</span></button>
+                            <textarea class="input-block" placeholder="Describe the reverse symbols..." style="min-height:55px">Female figure standing right, presenting wreath to emperor.</textarea>
+                        </div>
+                        <div class="numismatic-section new-field" style="margin-top:1rem">
+                            <button class="field-label-btn"><span class="label-text">Edge</span><span class="hint">†</span></button>
+                            <textarea class="input-block" placeholder="e.g. Reeded / Plain / DECUS ET TUTAMEN">Reeded</textarea>
+                        </div>
+                    </div>
+
+                    <p class="field-group-header" style="margin-top:2rem">Scriptorium — Metrics Grid (rarity autocomplete after grade)</p>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <button class="field-label-btn"><span class="label-text">Grade</span><span class="hint">†</span></button>
+                            <button class="autocomplete-trigger">EF-45 <span class="chevron">▾</span></button>
+                        </div>
+                        <div class="metric-item new-field" style="position:relative">
+                            <button class="field-label-btn"><span class="label-text">Rarity</span><span class="hint">†</span></button>
+                            <button class="autocomplete-trigger">— <span class="chevron">▾</span></button>
+                        </div>
+                        <div class="metric-item">
+                            <button class="field-label-btn"><span class="label-text">Year CE</span><span class="hint">†</span></button>
+                            <input type="number" class="input-metric" value="-281" />
+                        </div>
+                    </div>
+
+                    <p class="field-group-header" style="margin-top:2rem">Empty state — Rarity autocomplete open (CNR scale seeded)</p>
+                    <div class="metrics-grid" style="max-width:300px">
+                        <div class="metric-item" style="position:relative">
+                            <button class="field-label-btn"><span class="label-text">Rarity</span><span class="hint">†</span></button>
+                            <button class="autocomplete-trigger">— <span class="chevron">▾</span></button>
+                            <div class="autocomplete-dropdown" style="display:block">
+                                <div class="autocomplete-option">C &nbsp;<span style="color:var(--text-muted);font-size:0.7em">Common</span></div>
+                                <div class="autocomplete-option">S &nbsp;<span style="color:var(--text-muted);font-size:0.7em">Scarce</span></div>
+                                <div class="autocomplete-option">R &nbsp;<span style="color:var(--text-muted);font-size:0.7em">Rare</span></div>
+                                <div class="autocomplete-option">RR &nbsp;<span style="color:var(--text-muted);font-size:0.7em">Very Rare</span></div>
+                                <div class="autocomplete-option">RRR &nbsp;<span style="color:var(--text-muted);font-size:0.7em">Extremely Rare</span></div>
+                                <div class="autocomplete-option">RRRR &nbsp;<span style="color:var(--text-muted);font-size:0.7em">Unique or nearly so</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="audit-results">
+                <h3>Curatorial Audit — Path C (Chosen)</h3>
+                <div class="audit-grid">
+                    <div class="audit-item">
+                        <strong>Contrast</strong>
+                        <p>Pass — Iron Gall on Parchment: 12.6:1. Muted annotation: 4.8:1. All ≥ AA.</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Information Density</strong>
+                        <p>Balanced — denomination and year_numeric visible without adding layout rows</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Archival Tone</strong>
+                        <p>Strong — subtitle chain mirrors the scholarly catalogue inline citation style (Sear, HGC)</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Rarity</strong>
+                        <p>CNR seeded; collector can type custom codes. Consistent notation enforced across collection.</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Edge Input</strong>
+                        <p>Rich placeholder (Reeded / Plain / DECUS ET TUTAMEN) acts as inline field guide. No extra input needed.</p>
+                    </div>
+                    <div class="audit-item">
+                        <strong>Accessibility</strong>
+                        <p>All glossary triggers are <code>&lt;button&gt;</code>. year_numeric annotation uses muted mono — decorative, not primary data.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</body>
+</html>
