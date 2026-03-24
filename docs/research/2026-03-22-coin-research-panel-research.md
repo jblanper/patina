@@ -1,8 +1,9 @@
 # Research Report: Coin Research Panel
 
 **Date:** 2026-03-22
+**Updated:** 2026-03-23 — Open questions resolved; field mapping table added
 **Idea source:** `docs/technical_plan.md` — Ideas Under Discussion
-**Status:** Draft
+**Status:** Proposed
 
 ---
 
@@ -136,15 +137,23 @@ Analogous patterns from comparable desktop tools (Zotero, MusicBrainz Picard, Ma
 
 ---
 
-## 6. Open Questions
+## 6. Open Questions — Resolved
 
-- [ ] **API key UX:** How does the collector obtain and enter a Numista API key? A settings screen with a direct link to numista.com/api/doc/ and a test button? First-run onboarding? This needs a UI design decision.
-- [ ] **Bundled ANS dataset: shipping or first-run download?** The OCRE/CRRO dataset (~50–200 MB RDF) could be bundled with the app (increases installer size) or downloaded once on first use with user consent. The download path is more privacy-transparent but adds friction. Decision required.
-- [ ] **Field mapping:** Which Numista API fields map to which Patina fields? Numista's `composition` is an object (`base_metal` + `fineness`); Patina's `metal` is a vocab field. The mapping may not be 1:1 for all fields. A mapping table needs to be designed before implementation.
-- [ ] **Staged suggestion UX:** When reference data is fetched, how does the panel present it? Does it show all fields and let the collector check boxes? Does it only show fields that differ from what the collector has already entered? This is a significant UX design question — the `/curating-ui` skill should be activated for it.
-- [ ] **Cache TTL and invalidation:** How long should fetched Numista type records be cached? 30 days is a reasonable default, but if Numista updates a type record, the cached version becomes stale. Should the user be able to force-refresh?
-- [ ] **Scope of bundled ANS data:** OCRE covers Roman Imperial only. Does Patina's target collector also want CRRO (Republican) and RPC (Provincial)? What about Greek coins (no comparable open dataset)? Scope of the initial bundle needs agreement.
-- [ ] **Panel placement in Scriptorium:** Where does the panel live? As a collapsible right-hand drawer? A bottom panel? Triggered by a search field at the top of the Scriptorium? This is an architectural question for the Scriptorium layout.
+All seven questions below were open as of the initial draft. Additional research (2026-03-23) has resolved each one. The field mapping detail is in Section 8.
+
+- [x] **API key UX:** A dedicated **Preferences screen** (accessible from the existing `Personalizar` menu, or the `Herramientas ▾` dropdown in the Cabinet Command Strip) should hold the Numista API key field. The input has two affordances: a **"Test connection"** button (calls `GET /v3/search_coins?q=test&api_key=…` and shows a success/failure badge), and a **"Get a key →"** link that opens `en.numista.com/api/doc/index.html` in the system browser. The key is stored in the existing `preferences` SQLite table (`key: 'numista_api_key'`). The panel does **not** block first-run — if no key is configured, the Numista search area shows a "Configure API key in Preferences" inline prompt. The API key flow belongs in a preferences UI, not onboarding, because the feature is optional and used only when the collector initiates it.
+
+- [x] **Bundled ANS dataset: ship with the app.** The raw RDF/TTL dumps from ANS GitHub (CC0) are verbose at 50–200 MB uncompressed, but when pre-processed at build time into a purpose-built SQLite file (only the fields Patina needs: type ID, catalog ref, authority, mint, date range, metal, weight, diameter, obverse/reverse description and legend), the bundle is approximately **15–35 MB compressed**. This is an acceptable installer cost for a desktop app and preserves offline-first without any user friction or consent prompt. The blueprint should specify a build-time conversion script (`scripts/build-ans-bundle.cjs`) that downloads the latest CC0 dumps, extracts the relevant Nomisma.org triples, and emits `data/ans-catalog.db`. The bundled file ships in `resources/` and is copied to the user data dir on first launch.
+
+- [x] **Field mapping:** See Section 8 for the full table. The key non-obvious decisions: (1) Numista's `composition.text` is the only available metal description — it is a free-text string ("Copper-nickel") that must be fuzzy-matched against Patina's `metal` vocabulary, not a structured field. (2) Numista's `orientation` enum ("coin", "medal", "variable") maps to die-axis degree notation used in Patina's vocab. (3) Individual coin year is on **issues** (variants), not the type — the panel should present the type's year range for display and let the collector enter a specific year manually. (4) `fineness` has no Numista equivalent; it remains blank.
+
+- [x] **Staged suggestion UX:** The panel has two states: **Search** (default) and **Stage** (after a match is selected). In Search state: a text input for catalog number or title, a source toggle (Numista / ANS Local), a "Look up" button, and a results list. In Stage state: a per-field suggestion list where each row shows the Patina field name, the collector's current value (may be empty), and the reference value from the lookup. Fields where the reference value differs from the current value are shown with both values side by side. Checkboxes are **pre-checked for empty Patina fields** and **pre-unchecked for fields the collector has already entered** — protecting existing work by default. An "Apply selected" button at the bottom writes the checked fields into the form (not the DB — only into `formData`, leaving the collector in control of the final save). This exact pattern (proposed value staged into form state, not auto-committed) mirrors Zotero's DOI import and MusicBrainz Picard's tag review panel. **`/curating-ui` should be engaged before the panel is built** — this is the design-critical interaction in the feature.
+
+- [x] **Cache TTL and invalidation:** 30 days default. Cached Numista responses are stored in a new `reference_cache` SQLite table: `(id TEXT PRIMARY KEY, source TEXT, data TEXT, cached_at INTEGER)` where `id` is `"numista:{N-number}"` or `"ans:{catalog-ref}"`. A **force-refresh icon** (↻) appears in the panel header whenever the active result is served from cache — clicking it discards the cached entry and re-fetches. The 30-day default is appropriate because Numista type records change infrequently (catalog data is stable). The `cached_at` epoch comparison happens at lookup time; stale entries are silently replaced on the next fetch. No background cache-warming — all cache misses are user-initiated.
+
+- [x] **Scope of bundled ANS data:** **OCRE + CRRO in v1.** OCRE (~50k Roman Imperial types, 27 BCE–491 CE) and CRRO (~2,500 Roman Republican types, Crawford numbers) together cover the highest-pain ancient coin segment and are both CC0, from the same ANS GitHub repository, using the same Nomisma.org RDF vocabulary. **RPC Online** (Roman Provincial, Oxford) uses the same architecture and should be **Phase 2** — its scope is significantly larger and its data is more fragmented across volumes. **Greek coins** (SNG material) have no comparable open CC0 dataset; Greek coin collectors in v1 fall back to Numista search. This boundary is acceptable: the majority of ancient coin collectors focus on Roman coinage, and Numista covers Greek world coins via its general catalog. Patina should document this scope clearly in the panel's source selector.
+
+- [x] **Panel placement in Scriptorium:** A **right-hand collapsible push drawer**, 300–340 px wide when open. The existing `ledger-layout` grid (currently 45/55 — PlateEditor | LedgerForm) gains a third collapsible column when the panel is open; the LedgerForm column is compressed proportionally. At window width < 1100 px, the panel defaults to closed and the layout reverts to the existing two-column grid. The toggle affordance is a narrow tab handle on the right edge of the LedgerForm column (16 px wide, full height, labelled "Referencia" rotated 90°). Keyboard shortcut: `Cmd+Shift+L` (macOS) / `Ctrl+Shift+L` (Windows/Linux) — registered only when focus is not in a text input, preventing conflicts with form typing. DOM order: reference panel node comes after `LedgerForm` in source (correct reading order for screen readers). See Section 8 for layout arithmetic. **This placement matches the "marginalia" metaphor** of the Manuscript Hybrid design language — the primary text (form) is the main column; the reference data occupies a narrower commentary column to the right.
 
 ---
 
@@ -152,12 +161,93 @@ Analogous patterns from comparable desktop tools (Zotero, MusicBrainz Picard, Ma
 
 **Verdict: Ready for blueprint**
 
-The research confirms strong collector demand, a clear and unoccupied market position, two distinct and technically viable data paths (ANS CC0 bundled for ancient coins; Numista API with local caching for world/modern coins), and proven UX precedents from analogous reference-manager tools. The privacy constraints are tractable: outbound requests carry only a catalog number string, are user-triggered, and require the user's own API key. No Patina data ever leaves the machine.
+The research confirms strong collector demand, a clear and unoccupied market position, two technically viable data paths (ANS CC0 bundled for ancient coins; Numista API with local caching for world/modern coins), and proven UX precedents from analogous reference-manager tools (Zotero, MusicBrainz Picard). All seven open questions from the initial draft have been resolved. The privacy constraints are tractable: outbound requests carry only a catalog number string, are user-triggered, and use the collector's own API key. No Patina data ever leaves the machine.
 
-The blueprint architect should respect three key constraints: (1) the lookup is always additive — data entry must be fully functional with the panel absent or offline; (2) reference results are staged as suggestions, never auto-committed to the coin record; (3) the ANS dataset bundle is the right first scope — it is CC0, finite in size, covers the highest-pain collector segment (ancient Roman), and requires no API key, making it the zero-friction entry point for the feature.
+The blueprint architect must respect four key constraints:
+1. **Additive only** — data entry is fully functional with the panel absent or offline; the feature never blocks entry.
+2. **Staged, never auto-committed** — reference results land in `formData`, not the DB; the collector always saves explicitly.
+3. **ANS bundle is the zero-friction entry point** — no API key required, CC0, offline; this must work before any network feature is tested.
+4. **`/curating-ui` must be engaged before the staged-suggestion panel is built** — the per-field review interaction is design-critical and should go through the three-path proposal process.
 
-Activate `/curating-blueprints` next, referencing this report in Phase 0. The `/curating-ui` skill should be engaged early for the staged-suggestion panel UX, as this is the design-critical interaction in the feature.
+Activate `/curating-blueprints` next, referencing this report in Phase 0.
 
 ---
 
-*If proceeding: activate `/curating-blueprints` and reference this report in Phase 0.*
+## 8. Implementation Notes — Field Mapping & Layout
+
+### 8a. Numista API → Patina Field Mapping
+
+Full endpoint: `GET https://api.numista.com/api/v3/coins/{id}?api_key=…`
+Search endpoint: `GET https://api.numista.com/api/v3/search_coins?q={term}&api_key=…`
+
+Rate limit: ~100 requests/day per key (free, non-commercial). Attribution required in UI: "Data from Numista (CC BY-NC-SA)."
+
+| Patina field | Numista path | Notes |
+|---|---|---|
+| `title` | `title` | Direct |
+| `issuer` | `issuer.name` | `issuer` is an object; extract `.name` string |
+| `denomination` | `value.text` | e.g. `"1 Euro"` — run through vocab normalisation |
+| `year_display` | `min_year` + `max_year` | Render as `"1958–1970"` or `"1958"` if equal; individual issue year requires second call to `/coins/{id}/issues` |
+| `year_numeric` | `/coins/{id}/issues[0].year` | Optional second call; skip in v1 — present the range and let collector enter the specific year manually |
+| `metal` | `composition.text` | Free-text string ("Copper-nickel"); fuzzy-match against Patina `metal` vocabulary; present as suggestion, not auto-applied |
+| `fineness` | — | Not available in Numista public API; leave blank |
+| `weight` | `weight` | Plain number (grams); direct map |
+| `diameter` | `diameter` | Plain number (mm); direct map |
+| `die_axis` | `orientation` | `"coin"` → `"180°"` (coin alignment); `"medal"` → `"0°"` (medal alignment); `"variable"` → `"Variable"` |
+| `obverse_legend` | `obverse.lettering` | May be absent; skip if missing |
+| `obverse_desc` | `obverse.description` | Direct |
+| `reverse_legend` | `reverse.lettering` | May be absent; skip if missing |
+| `reverse_desc` | `reverse.description` | Direct |
+| `edge_desc` | `edge.description` | Fallback: `edge.type` ("reeded") if description absent |
+| `catalog_ref` | `references` array | Format: `"{catalogue.name} {number}"` for the first entry (typically KM#); surface all references in the panel for the collector to choose |
+| `mint` | `mints[0].name` | Array — if multiple mints, show picker in the panel; first mint as default suggestion |
+| `era` | Derived from `min_year` | Apply heuristic: ≤ −500 → "Ancient Greek"; −500–476 CE → "Roman"; 477–1453 → "Medieval"; 1454–1799 → "Early Modern"; ≥ 1800 → "Modern" |
+
+**Fields with no Numista equivalent** (collector must fill manually): `fineness`, `grade`, `rarity`, `provenance`, `story`, `purchase_price`, `purchase_date`, `purchase_source`.
+
+**Die-axis terminology note:** Numista's `"coin"` orientation means the reverse die is rotated 180° relative to the obverse — what standard numismatic English calls **coin alignment** or **coin axis**. Numista's `"medal"` means the dies are aligned 0° — **medal alignment**. This matches standard usage; no inversion needed.
+
+---
+
+### 8b. ANS Local Dataset — Scope and Build Pipeline
+
+**v1 bundle: OCRE + CRRO**
+
+| Dataset | Records | Source | License |
+|---|---|---|---|
+| OCRE (Roman Imperial) | ~50,000 types | `github.com/AmericanNumismaticSociety/ocre-data` | CC0 |
+| CRRO (Roman Republican / Crawford) | ~2,500 types | ANS GitHub | CC0 |
+
+**v2 scope (deferred):** RPC Online (Roman Provincial, Oxford/ANS) — larger, more fragmented. Greek coins: no comparable open CC0 dataset exists; Numista covers this segment for world-catalog purposes.
+
+**Build pipeline** (to be specced in blueprint):
+1. `scripts/build-ans-bundle.cjs` — runs at build time, not at app install.
+2. Downloads CC0 RDF/TTL dumps from ANS GitHub tagged releases.
+3. Parses Nomisma.org triples; extracts: type ID, catalog ref (RIC/Crawford), authority name, mint, `nmo:hasStartDate`, `nmo:hasEndDate`, metal (`nmo:hasMaterial`), weight, diameter, obverse/reverse description and legend.
+4. Writes to `data/ans-catalog.db` (SQLite, FTS5 on description fields for text search).
+5. Compressed size target: ≤ 35 MB.
+6. Versioned — app checks `ans_catalog_version` in preferences on startup; regenerates if stale.
+
+**Lookup by catalog ref:** OCRE URIs encode the catalog reference directly (e.g. `ric.1(2).aug.1A`). The local lookup parses a user-typed `RIC I Augustus 1A` string into URI components and queries the FTS table. CRRO uses Crawford notation (`rrc.494/32`).
+
+---
+
+### 8c. Scriptorium Layout Arithmetic
+
+Current `ledger-layout` at ≥ 1000 px: `grid-template-columns: 45% 55%` (PlateEditor | LedgerForm).
+
+With reference panel open (≥ 1100 px window):
+```
+grid-template-columns: 40% 1fr 320px
+```
+- PlateEditor: 40% (slight compression)
+- LedgerForm: fluid remainder (min-width: 480px enforced on the column)
+- Reference panel: 320 px fixed
+
+At < 1100 px: panel is hidden (`display: none` on the column); layout reverts to existing two-column grid. The toggle button remains visible in the LedgerForm header as a collapsed tab handle.
+
+`BrowserWindow` minimum width should be set to `900` px (already recommended for general usability at the 45/55 split).
+
+---
+
+*Activate `/curating-blueprints` and reference this report in Phase 0. Engage `/curating-ui` before designing the staged-suggestion interaction (Section 6, question 4).*
