@@ -1488,6 +1488,53 @@ main {
   margin-top: 2px;
 }
 
+.required-dot {
+  color: var(--accent-manuscript);
+  font-size: 0.7rem;
+  margin-left: 0.2rem;
+  vertical-align: super;
+}
+
+.required-note {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+}
+
+.submission-error {
+  background: rgba(180, 50, 30, 0.08);
+  border-left: 4px solid var(--error-red);
+  padding: 0.75rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--error-red);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.submission-error-dismiss {
+  background: none;
+  border: none;
+  color: var(--error-red);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.75rem;
+  min-width: 44px;
+  min-height: 44px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* QR Overlay for Lens */
 .qr-overlay {
   position: fixed;
@@ -1861,6 +1908,10 @@ main {
 .autocomplete-input:focus {
   border-bottom: 1px solid var(--text-ink);
   color: var(--text-ink);
+}
+
+.autocomplete-input--error {
+  border-bottom-color: var(--error-red);
 }
 
 .autocomplete-input::placeholder {

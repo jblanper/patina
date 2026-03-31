@@ -37,14 +37,18 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             placeholder={t('ledger.designation')}
             value={formData.title}
             onChange={(e) => updateField('title', e.target.value)}
+            aria-required="true"
           />
+          <span className="required-dot" aria-hidden="true">*</span>
           {errors.title && <span className="error-hint">{errors.title}</span>}
         </div>
+        <p className="required-note">{t('ledger.requiredNote')}</p>
 
         <div className="subtitle-stack">
           <div className="subtitle-item">
             <button className="subtitle-label" onClick={() => openField('era')} aria-label={t('glossary.hintLabel', { field: 'era' })}>
               <span className="label-text">{t('ledger.era')}</span>
+              <span className="required-dot" aria-hidden="true">*</span>
               <span className="glossary-hint" aria-hidden="true">†</span>
             </button>
             <AutocompleteField
@@ -56,7 +60,10 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
               placeholder={t('ledger.placeholders.era')}
               onReset={eraVocab.resetVocabularies}
               hasUserValues={false}
+              required={true}
+              error={errors.era}
             />
+            {errors.era && <span className="error-hint">{errors.era}</span>}
           </div>
           <div className="subtitle-item">
             <button className="subtitle-label" onClick={() => openField('mint')} aria-label={t('glossary.hintLabel', { field: 'mint' })}>
@@ -381,7 +388,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             <input
               type="number"
               className="input-metric"
-              placeholder="0.00"
+              placeholder={t('ledger.placeholders.cost')}
               value={formData.purchase_price || ''}
               onChange={(e) => updateField('purchase_price', e.target.value ? parseFloat(e.target.value) : null)}
             />

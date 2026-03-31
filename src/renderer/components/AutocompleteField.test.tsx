@@ -255,3 +255,17 @@ describe('AutocompleteField — scroll close', () => {
     });
   });
 });
+
+describe('AutocompleteField — error and required props', () => {
+  it('TC-AC-25: renders autocomplete-input--error class on inner input when error prop is set', () => {
+    render(<AutocompleteField {...DEFAULT_PROPS} error="Era is required" />);
+    const input = screen.getByPlaceholderText('Select era');
+    expect(input.className).toContain('autocomplete-input--error');
+  });
+
+  it('TC-AC-26: inner input has aria-required="true" when required prop is true', () => {
+    render(<AutocompleteField {...DEFAULT_PROPS} required={true} />);
+    const input = screen.getByPlaceholderText('Select era');
+    expect(input).toHaveAttribute('aria-required', 'true');
+  });
+});

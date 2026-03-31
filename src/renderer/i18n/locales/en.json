@@ -96,8 +96,10 @@
       "acquired": "YYYY-MM-DD",
       "source": "e.g. CNG Auctions",
       "edgeDesc": "e.g. Reeded / Plain / DECUS ET TUTAMEN",
-      "rarity": "e.g. R / RR / Common"
-    }
+      "rarity": "e.g. R / RR / Common",
+      "cost": "0.00"
+    },
+    "requiredNote": "* Required to index"
   },
   "detail": {
     "loading": "Retrieving archival record...",
@@ -128,7 +130,8 @@
     "draftPreserved": "Draft Preserved",
     "indexing": "Indexing...",
     "indexToLedger": "Index to Ledger",
-    "updateLedger": "Update Ledger"
+    "updateLedger": "Update Ledger",
+    "dismissError": "Dismiss error"
   },
   "plateEditor": {
     "slots": {

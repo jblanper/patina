@@ -170,4 +170,58 @@ describe('LedgerForm', () => {
       expect(updateField).toHaveBeenCalledWith('purchase_source', 'Nomos AG');
     });
   });
+
+  describe('F-01 — era error propagation', () => {
+    it('shows error-hint beneath era AutocompleteField when errors.era is set', () => {
+      renderForm(
+        <LedgerForm formData={baseFormData} errors={{ era: 'Era is required' }} updateField={updateField} />
+      );
+      expect(screen.getByText('Era is required')).toBeInTheDocument();
+    });
+
+    it('does not show error-hint for other AutocompleteFields when only era has an error', () => {
+      renderForm(
+        <LedgerForm formData={baseFormData} errors={{ era: 'Era is required' }} updateField={updateField} />
+      );
+      const hints = screen.getAllByText('Era is required');
+      expect(hints).toHaveLength(1);
+    });
+  });
+
+  describe('L-01 — required field indicators', () => {
+    it('renders exactly 2 required-dot elements (title and era)', () => {
+      const { container } = renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />
+      );
+      expect(container.querySelectorAll('.required-dot')).toHaveLength(2);
+    });
+
+    it('renders exactly 1 required-note element', () => {
+      const { container } = renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />
+      );
+      expect(container.querySelectorAll('.required-note')).toHaveLength(1);
+    });
+  });
+
+  describe('L-05 — purchase_price placeholder i18n', () => {
+    it('uses i18n translation for purchase_price placeholder', () => {
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      expect(screen.getByPlaceholderText('0.00')).toBeInTheDocument();
+    });
+  });
+
+  describe('A-02 — aria-required on mandatory inputs', () => {
+    it('title input has aria-required="true"', () => {
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      const titleInput = screen.getByPlaceholderText('Designation');
+      expect(titleInput).toHaveAttribute('aria-required', 'true');
+    });
+
+    it('era AutocompleteField inner input has aria-required="true"', () => {
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      const eraInput = screen.getByPlaceholderText('e.g. Roman Imperial');
+      expect(eraInput).toHaveAttribute('aria-required', 'true');
+    });
+  });
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Scriptorium } from '../Scriptorium';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
@@ -23,12 +23,16 @@ vi.mock('../../hooks/useCoinForm', () => ({
     formData: { title: '', era: 'Ancient', images: {} },
     errors: {},
     isSaving: false,
+    submitError: null,
+    clearError: vi.fn(),
     updateField: vi.fn(),
     updateImage: vi.fn(),
     submit: vi.fn(),
     setFormData: vi.fn()
   }))
 }));
+
+import * as useCoinFormHook from '../../hooks/useCoinForm';
 
 vi.mock('../../hooks/useLens', () => ({
   useLens: vi.fn(() => ({
@@ -78,6 +82,67 @@ describe('Scriptorium', () => {
     const backButton = screen.getByText(/Close Ledger Entry/i);
     fireEvent.click(backButton);
     // Navigation is mocked by MemoryRouter, we just check if it was clickable
+  });
+
+  describe('F-02 — submit error banner', () => {
+    it('renders error banner when submitError is set and dismisses on button click', async () => {
+      const clearError = vi.fn();
+      vi.mocked(useCoinFormHook.useCoinForm).mockReturnValue({
+        formData: { title: 'Test', era: 'Ancient', images: {} },
+        errors: {},
+        isSaving: false,
+        submitError: 'DB write failed',
+        clearError,
+        updateField: vi.fn(),
+        updateImage: vi.fn(),
+        submit: vi.fn().mockResolvedValue(false),
+        clearDraft: vi.fn(),
+        setFormData: vi.fn()
+      });
+
+      render(
+        <GlossaryContext.Provider value={mockGlossaryContext}>
+          <MemoryRouter initialEntries={['/scriptorium/add']}>
+            <Routes>
+              <Route path="/scriptorium/add" element={<Scriptorium />} />
+            </Routes>
+          </MemoryRouter>
+        </GlossaryContext.Provider>
+      );
+
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('DB write failed');
+
+      fireEvent.click(screen.getByRole('button', { name: /dismiss error/i }));
+      expect(clearError).toHaveBeenCalled();
+    });
+
+    it('does not render error banner when submitError is null', () => {
+      vi.mocked(useCoinFormHook.useCoinForm).mockReturnValue({
+        formData: { title: '', era: 'Ancient', images: {} },
+        errors: {},
+        isSaving: false,
+        submitError: null,
+        clearError: vi.fn(),
+        updateField: vi.fn(),
+        updateImage: vi.fn(),
+        submit: vi.fn().mockResolvedValue(true),
+        clearDraft: vi.fn(),
+        setFormData: vi.fn()
+      });
+
+      render(
+        <GlossaryContext.Provider value={mockGlossaryContext}>
+          <MemoryRouter initialEntries={['/scriptorium/add']}>
+            <Routes>
+              <Route path="/scriptorium/add" element={<Scriptorium />} />
+            </Routes>
+          </MemoryRouter>
+        </GlossaryContext.Provider>
+      );
+
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 
   it('shows zero-padded coin ID in meta line when editing an existing coin', () => {

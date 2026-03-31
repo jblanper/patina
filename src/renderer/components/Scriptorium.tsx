@@ -16,6 +16,8 @@ export const Scriptorium: React.FC = () => {
     formData,
     errors,
     isSaving,
+    submitError,
+    clearError,
     updateField,
     updateImage,
     submit,
@@ -41,6 +43,7 @@ export const Scriptorium: React.FC = () => {
   }, [coin, existingImages, setFormData]);
 
   const handleSubmit = async () => {
+    clearError();
     const success = await submit();
     if (success) {
       navigate('/');
@@ -74,6 +77,13 @@ export const Scriptorium: React.FC = () => {
           </button>
         </div>
       </header>
+
+      {submitError && (
+        <div className="submission-error" role="alert">
+          <span>{submitError}</span>
+          <button className="submission-error-dismiss" onClick={clearError} aria-label={t('scriptorium.dismissError')}>×</button>
+        </div>
+      )}
 
       <div className="ledger-layout">
         <PlateEditor

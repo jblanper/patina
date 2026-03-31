@@ -96,8 +96,10 @@
       "acquired": "AAAA-MM-DD",
       "source": "ej. CNG Auctions",
       "edgeDesc": "ej. Acordonado / Liso / DECUS ET TUTAMEN",
-      "rarity": "ej. R / RR / Común"
-    }
+      "rarity": "ej. R / RR / Común",
+      "cost": "0.00"
+    },
+    "requiredNote": "* Obligatorio para indexar"
   },
   "detail": {
     "loading": "Recuperando registro del archivo...",
@@ -128,7 +130,8 @@
     "draftPreserved": "Borrador Guardado",
     "indexing": "Indexando...",
     "indexToLedger": "Indexar al Registro",
-    "updateLedger": "Actualizar Registro"
+    "updateLedger": "Actualizar Registro",
+    "dismissError": "Descartar error"
   },
   "plateEditor": {
     "slots": {

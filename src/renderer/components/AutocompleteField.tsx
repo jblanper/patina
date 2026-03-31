@@ -11,6 +11,7 @@ interface AutocompleteFieldProps {
   placeholder?: string;
   label?: string;
   required?: boolean;
+  error?: string;
   onReset?: () => void;
   hasUserValues?: boolean;
 }
@@ -22,6 +23,8 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   onAddNew,
   options,
   placeholder,
+  required,
+  error,
   onReset,
   hasUserValues,
 }) => {
@@ -48,9 +51,6 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   const showAddNew =
     inputValue.trim().length > 0 &&
     !options.some(opt => opt.toLowerCase() === inputValue.trim().toLowerCase());
-
-  // Total navigable items: filteredOptions + optional add-new
-  const totalItems = filteredOptions.length + (showAddNew ? 1 : 0);
 
   const open = useCallback(() => {
     setIsOpen(true);
@@ -175,7 +175,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
       <input
         ref={inputRef}
         type="text"
-        className="autocomplete-input"
+        className={`autocomplete-input${error ? ' autocomplete-input--error' : ''}`}
         placeholder={placeholder}
         value={inputValue}
         autoComplete="off"
@@ -183,6 +183,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
         aria-expanded={isOpen}
         aria-controls={listboxId}
         aria-activedescendant={activeDescendant}
+        aria-required={required ?? false}
         onChange={e => {
           setInputValue(e.target.value);
           if (!isOpen) open();
