@@ -296,4 +296,60 @@ describe('CoinDetail Component', () => {
     const metrics = document.querySelector('.metrics-grid');
     expect(metrics?.textContent).not.toContain('XF');
   });
+
+  // ── TC-FLD — Field Completeness (denomination, year_numeric, rarity) ─────
+
+  it('TC-FLD-01: denomination renders in subtitle when visible and set', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: { ...mockCoin, denomination: 'Denarius' },
+      images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.denomination': true });
+    expect(screen.getByText(/Denarius/)).toBeInTheDocument();
+  });
+
+  it('TC-FLD-02: denomination absent when ledger.denomination=false', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: { ...mockCoin, denomination: 'Denarius' },
+      images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.denomination': false });
+    expect(screen.queryByText(/Denarius/)).not.toBeInTheDocument();
+  });
+
+  it('TC-FLD-03: year_numeric annotation renders when coin.year_numeric is set', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: { ...mockCoin, year_numeric: -44 },
+      images: mockImages, isLoading: false, error: null,
+    });
+    renderWithAllVisible(<CoinDetail />);
+    expect(screen.getByText(/\(-44 CE\)/)).toBeInTheDocument();
+  });
+
+  it('TC-FLD-04: year_numeric annotation absent when coin.year_numeric is null', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: { ...mockCoin, year_numeric: null as unknown as number },
+      images: mockImages, isLoading: false, error: null,
+    });
+    renderWithAllVisible(<CoinDetail />);
+    expect(screen.queryByText(/CE\)/)).not.toBeInTheDocument();
+  });
+
+  it('TC-FLD-05: rarity metric renders when ledger.rarity=true', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin, images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.rarity': true });
+    const metrics = document.querySelector('.metrics-grid');
+    expect(metrics?.textContent).toContain('Common');
+  });
+
+  it('TC-FLD-06: rarity metric absent when ledger.rarity=false', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin, images: mockImages, isLoading: false, error: null,
+    });
+    renderWithVisibility(<CoinDetail />, { 'ledger.rarity': false });
+    const metrics = document.querySelector('.metrics-grid');
+    expect(metrics?.textContent).not.toContain('Common');
+  });
 });

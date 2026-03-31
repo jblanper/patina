@@ -5,3 +5,7 @@ release
 *.log
 data/images/*
 !data/images/.gitkeep
+data/*.db
+data/*.db-shm
+data/*.db-wal
+coverage/

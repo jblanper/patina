@@ -126,6 +126,26 @@ describe('LedgerForm', () => {
     });
   });
 
+  describe('TC-FLD — Field Completeness (edge_desc, rarity)', () => {
+    it('TC-FLD-07: edge_desc textarea is present in LedgerForm', () => {
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      expect(screen.getByPlaceholderText('e.g. Reeded / Plain / DECUS ET TUTAMEN')).toBeInTheDocument();
+    });
+
+    it('TC-FLD-08: updating edge_desc textarea calls updateField with edge_desc', () => {
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      fireEvent.change(screen.getByPlaceholderText('e.g. Reeded / Plain / DECUS ET TUTAMEN'), {
+        target: { value: 'Reeded' },
+      });
+      expect(updateField).toHaveBeenCalledWith('edge_desc', 'Reeded');
+    });
+
+    it('TC-FLD-09: rarity AutocompleteField is present in LedgerForm metrics grid', () => {
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      expect(screen.getByPlaceholderText('e.g. R / RR / Common')).toBeInTheDocument();
+    });
+  });
+
   describe('acquisition footer', () => {
     it('renders Acquired, Source, and Cost inputs', () => {
       renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);

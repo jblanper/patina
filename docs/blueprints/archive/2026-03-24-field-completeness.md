@@ -1,7 +1,7 @@
 # Implementation Blueprint: Field Completeness — CoinDetail & Scriptorium Alignment
 
 **Date:** 2026-03-24
-**Status:** Verification
+**Status:** Completed
 **Reference:** `docs/curating-ui/proposal_field-completeness_2026-03-24_1530.html`
 
 ---
@@ -339,7 +339,29 @@ Verified: All four field additions are consistent with professional numismatic c
 
 ## 10. Post-Implementation Retrospective
 
-*(To be filled after implementation is verified)*
+**Date:** 2026-03-31
+**Outcome:** Completed — all TC-FLD-01 through TC-FLD-12 pass; `npx tsc --noEmit` clean; 367 tests passing.
+
+### Summary of Work
+
+Four field gaps between schema, Scriptorium, and CoinDetail were closed in a single focused pass:
+
+- **`denomination`** — added to CoinDetail subtitle chain, visibility-gated via `isVisible('ledger.denomination')`.
+- **`year_numeric`** — annotates `year_display` in CoinDetail as `(−44 CE)` when non-null; CSS class `.year-numeric-annotation` applies `font-mono`, muted colour, and reduced size.
+- **`edge_desc`** — textarea added to LedgerForm between Reverse and Curator's Note sections; wired to `updateField`.
+- **`rarity`** — vocabulary-backed (`CNR` scale: C · S · R · RR · RRR · RRRR) added to both LedgerForm metrics grid (AutocompleteField) and CoinDetail metrics grid. `'rarity'` added to `ALLOWED_VOCAB_FIELDS`; seed version bumped to `'6c.2'`.
+
+All changes were purely renderer-side or seed-level. No IPC handler changes required.
+
+### Pain Points
+
+None significant. The `year_numeric` annotation required verifying that `undefined != null` evaluates to `false` in JavaScript (it does — `undefined == null` is `true`), confirming the `!= null` guard correctly suppresses the annotation when the field is absent.
+
+### Things to Consider
+
+- TC-FLD-03 and TC-FLD-04 (year_numeric annotation present/absent) were the most easily missed branches — both are now covered.
+- The CNR rarity scale is seeded for English locale only. If Spanish vocabulary seeding is extended in a future pass, `rarity` values should be added with `locale: 'es'` entries matching the same usage-count distribution.
+- **Core Doc Revision:** No changes to `AGENTS.md` or `style_guide.md` were required — no new UI primitives or patterns were introduced.
 
 ---
 
