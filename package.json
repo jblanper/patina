@@ -20,7 +20,8 @@
 
     "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
     "type-check": "tsc --noEmit && tsc -p tsconfig.main.json --noEmit",
-    "db:seed": "tsc scripts/seed_data.ts --module commonjs --target es2020 --esModuleInterop && electron scripts/seed_data.js && rm scripts/seed_data.js"
+    "db:seed": "tsc scripts/seed_data.ts --module commonjs --target es2020 --esModuleInterop && electron scripts/seed_data.js && rm scripts/seed_data.js",
+    "dist:win": "electron-builder --win --publish never"
   },
   "keywords": [],
   "author": "",
@@ -60,6 +61,20 @@
     "wait-on": "^9.0.4"
   },
   "build": {
+    "appId": "com.patina.collector",
+    "productName": "Patina",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "!dist/**/*.map",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "**/node_modules/better-sqlite3/**/*",
+      "**/node_modules/bindings/**/*"
+    ],
     "extraResources": [
       {
         "from": "assets/fonts/",
@@ -68,7 +83,17 @@
           "**/*.ttf"
         ]
       }
-    ]
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Patina"
+    }
   },
   "dependencies": {
     "archiver": "^7.0.1",
