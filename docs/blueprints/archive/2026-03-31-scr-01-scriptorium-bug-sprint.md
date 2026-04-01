@@ -1,7 +1,7 @@
 # Implementation Blueprint: SCR-01 · Scriptorium Bug Sprint
 
 **Date:** 2026-03-31
-**Status:** In-Progress (Reopened 2026-04-01)
+**Status:** Completed (Reopened & Resolved 2026-04-01)
 **Reference:** `docs/audits/2026-03-31-scriptorium-audit.md` — items F-01, F-02, L-01, L-05, A-02
 
 ---
@@ -463,7 +463,7 @@ The practical UX rationale for requiring `era` is sound: a record without it can
 
 ## 11. Follow-up Sprint: Post-Completion Bugs (2026-04-01)
 
-**Status:** In-Progress
+**Status:** Completed — 2026-04-01
 
 Four bugs found after deployment, plus one confirmed UX removal. All are renderer-only. No schema changes, no new IPC handlers.
 
@@ -599,3 +599,39 @@ const { ..., availableEras } = useCoins();
 - B-03 and B-05 require visual verification only; no logic change.
 
 **TypeScript:** Run `npx tsc --noEmit` after all changes before committing.
+
+---
+
+### Section 11 — Post-Implementation Retrospective
+
+**Date:** 2026-04-01
+**Outcome:** Completed — all 5 defects resolved, 381 tests passing (1 new), 0 TypeScript errors. Commits `1701668`, `40b9885`, `54ca360`.
+
+#### Summary of Work
+
+- **B-01:** Added `useTranslation` to `useCoinForm`. `FIELD_ERROR_KEYS` map routes `title`/`era` Zod errors to `validation.*` i18n keys. Both locales updated. Post-audit correction: EN copy updated from `"Title is required"` → `"Designation is required"` to match the displayed field label (`ledger.designation = "Designation"`). ES copy `"La designación es obligatoria"` was already consistent.
+- **B-02:** CSS-only fix — `.subtitle-item > .error-hint { grid-column: 2 }` added to `index.css`. Forces era error hint into the input column of the `display: contents` subtitle grid. No markup change required.
+- **B-03:** `CoinDetail.tsx` delete confirmation button `btn-primary` → `btn-solid`. No standalone `.btn-primary` rule existed; `btn-solid` provides correct dark-ink styling consistent with other primary actions.
+- **B-04:** `availableEras` derived via `useMemo` from `coins[].era` in `useCoins`. Passed through `Cabinet` → `PatinaSidebar`. Static `ERAS` constant removed; era group uses `renderOverflowGroup` with the same truncation/overflow pattern as metals and grades. Two `(B-04)` test cases added to `PatinaSidebar.test.tsx`. `availableEras` derivation test added to `useCoins.test.ts`.
+- **B-05:** All `<span className="glossary-hint" aria-hidden="true">†</span>` spans removed from `LedgerForm.tsx` (~20 total — 7 in subtitle section, 13 in metric/numismatic/acquisition sections). `.glossary-hint` CSS rules and associated hover overrides removed from `index.css`. Hover-underline affordance via `.metric-label:hover .label-text` / `.subtitle-label:hover .label-text` / `.section-label:hover .label-text` rules is preserved.
+
+#### Re-Audit Results
+
+| Specialist | Verdict | Key Findings |
+|---|---|---|
+| `securing-electron` | PASS | No XSS or injection vectors; no new IPC/contextBridge surface; contextIsolation and sandbox confirmed intact. B-05 HTML incompleteness flagged (resolved before audit delivery). |
+| `assuring-quality` | PASS | B-04 fully tested with correct prop-driven assertions. B-01 hook assertion strengthened (`.toBeDefined()` → `.toBe('Designation is required')`). `availableEras` test added to `useCoins.test.ts`. |
+| `curating-ui` | CONDITIONAL PASS | B-02/B-04/B-05 pass. B-03: `btn-solid` is functionally correct and WCAG-order-compliant; `.btn-delete` (error-red hover) exists and is more semantically appropriate for a final destructive confirmation — flagged as follow-up. |
+| `curating-coins` | PASS (after fix) | EN validation copy mismatch (`"Title"` vs `"Designation"`) found and corrected. ES side already consistent. Removed Ancient/Medieval/Modern taxonomy is correct decision for a multi-civilisation collection. |
+
+#### Pain Points
+
+- The `replace_all` edit tool removed the subtitle-section `†` spans but silently missed the metric/numismatic/acquisition sections (13 spans). The tool reported success — the spans used a different indentation character width that was not matched. Grep verification after replace_all is mandatory for B-05-style markup removal tasks.
+- The original B-01 EN copy `"Title is required"` was drafted without checking the displayed field label (`"Designation"`, not `"Title"`). The field is stored as `title` in the DB schema and `NewCoin.title` in TypeScript, but the user-facing label is `"Designation"`. Always align validation copy with the displayed label, not the schema field name.
+
+#### Follow-up Backlog (non-blocking)
+
+1. **`sidebar.era.*` dead keys** — `sidebar.era.ancient`, `sidebar.era.medieval`, `sidebar.era.modern` remain in both locale files but are no longer referenced anywhere in the codebase after the `ERAS` constant was removed from `PatinaSidebar`. Remove in a locale cleanup pass.
+2. **Sidebar aria-labels hardcoded in EN** — `PatinaSidebar.tsx` lines ~151, ~168, ~184 use hardcoded English strings in template literals for `aria-label` (e.g. `\`Filter by ${v} era\``). These are not routed through `t()`, violating the no-hardcoded-strings mandate. Add `sidebar.ariaFilter.*` i18n keys.
+3. **`btn-delete` for delete confirmation** — Consider swapping `btn-solid` → `btn-delete` on `CoinDetail.tsx` line 94 for the final delete confirmation button. `btn-delete` provides an error-red hover signal that is semantically appropriate for a destructive action. Note: both buttons in the modal would then be link-style — verify visual distinction is adequate before swapping.
+4. **Era vocabulary normalization** — `era` is free-text; case variants ("roman imperial" vs "Roman Imperial") produce separate `availableEras` entries and non-matching filter results. Consider adding `era` to the vocabulary/autocomplete system (`ALLOWED_VOCAB_FIELDS`) to normalize at entry time, matching the pattern for `metal`, `denomination`, and `grade`.
