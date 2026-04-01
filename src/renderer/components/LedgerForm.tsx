@@ -138,7 +138,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         <div className="metric-item">
           <button className="metric-label" onClick={() => openField('weight')} aria-label={t('glossary.hintLabel', { field: 'weight' })}>
             <span className="label-text">{t('ledger.weight')}</span>
-            <span className="glossary-hint" aria-hidden="true">†</span>
           </button>
           <input
             type="number"
@@ -153,7 +152,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         <div className="metric-item">
           <button className="metric-label" onClick={() => openField('diameter')} aria-label={t('glossary.hintLabel', { field: 'diameter' })}>
             <span className="label-text">{t('ledger.diameter')}</span>
-            <span className="glossary-hint" aria-hidden="true">†</span>
           </button>
           <input
             type="number"
@@ -168,7 +166,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         <div className="metric-item">
           <button className="metric-label" onClick={() => openField('die_axis')} aria-label={t('glossary.hintLabel', { field: 'die_axis' })}>
             <span className="label-text">{t('ledger.dieAxis')}</span>
-            <span className="glossary-hint" aria-hidden="true">†</span>
           </button>
           <AutocompleteField
             field="die_axis"
@@ -184,7 +181,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         <div className="metric-item">
           <button className="metric-label" onClick={() => openField('metal')} aria-label={t('glossary.hintLabel', { field: 'metal' })}>
             <span className="label-text">{t('ledger.material')}</span>
-            <span className="glossary-hint" aria-hidden="true">†</span>
           </button>
           <AutocompleteField
             field="metal"
@@ -200,7 +196,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         <div className="metric-item">
           <button className="metric-label" onClick={() => openField('fineness')} aria-label={t('glossary.hintLabel', { field: 'fineness' })}>
             <span className="label-text">{t('ledger.fineness')}</span>
-            <span className="glossary-hint" aria-hidden="true">†</span>
           </button>
           <input
             type="text"
@@ -213,7 +208,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         <div className="metric-item">
           <button className="metric-label" onClick={() => openField('grade')} aria-label={t('glossary.hintLabel', { field: 'grade' })}>
             <span className="label-text">{t('ledger.grade')}</span>
-            <span className="glossary-hint" aria-hidden="true">†</span>
           </button>
           <AutocompleteField
             field="grade"
@@ -229,7 +223,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         <div className="metric-item">
           <button className="metric-label" onClick={() => openField('rarity')} aria-label={t('glossary.hintLabel', { field: 'rarity' })}>
             <span className="label-text">{t('ledger.rarity')}</span>
-            <span className="glossary-hint" aria-hidden="true">†</span>
           </button>
           <AutocompleteField
             field="rarity"
@@ -245,7 +238,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         <div className="metric-item">
           <button className="metric-label" onClick={() => openField('year_numeric')} aria-label={t('glossary.hintLabel', { field: 'year_numeric' })}>
             <span className="label-text">{t('ledger.yearCe')}</span>
-            <span className="glossary-hint" aria-hidden="true">†</span>
           </button>
           <input
             type="number"
@@ -265,7 +257,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
       <div className="numismatic-section">
         <button className="section-label" onClick={() => openField('obverse_legend')} aria-label={t('glossary.hintLabel', { field: 'obverse_legend' })}>
           <span className="label-text">{t('ledger.obverse')}</span>
-          <span className="glossary-hint" aria-hidden="true">†</span>
         </button>
         <input
           type="text"
@@ -285,7 +276,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
       <div className="numismatic-section">
         <button className="section-label" onClick={() => openField('reverse_legend')} aria-label={t('glossary.hintLabel', { field: 'reverse_legend' })}>
           <span className="label-text">{t('ledger.reverse')}</span>
-          <span className="glossary-hint" aria-hidden="true">†</span>
         </button>
         <input
           type="text"
@@ -306,7 +296,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
       <div className="numismatic-section">
         <button className="section-label" onClick={() => openField('edge_desc')} aria-label={t('glossary.hintLabel', { field: 'edge_desc' })}>
           <span className="label-text">{t('ledger.edge')}</span>
-          <span className="glossary-hint" aria-hidden="true">†</span>
         </button>
         <textarea
           className="input-block"
@@ -320,7 +309,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
       <div className="numismatic-section">
         <button className="section-label" onClick={() => openField('story')} aria-label={t('glossary.hintLabel', { field: 'story' })}>
           <span className="label-text">{t('ledger.curatorsNote')}</span>
-          <span className="glossary-hint" aria-hidden="true">†</span>
         </button>
         <textarea
           className="input-block input-block-tall"
@@ -334,7 +322,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
       <div className="numismatic-section">
         <button className="section-label" onClick={() => openField('provenance')} aria-label={t('glossary.hintLabel', { field: 'provenance' })}>
           <span className="label-text">{t('ledger.provenance')}</span>
-          <span className="glossary-hint" aria-hidden="true">†</span>
         </button>
         <input
           type="text"
