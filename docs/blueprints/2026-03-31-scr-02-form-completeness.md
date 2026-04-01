@@ -9,7 +9,7 @@
 
 ## 1. Objective
 
-Harden the Scriptorium's editing experience and improve field-level data quality. This sprint covers eight improvements across two categories:
+Harden the Scriptorium's editing experience and improve field-level data quality. This sprint covers eight improvements across two categories, **plus three follow-up items carried over from SCR-01 Section 11**:
 
 **Editing Integrity** — Prevent data loss when editing existing records and clarify draft-related UI state:
 - F-03: "Draft Preserved" label misleads users in edit mode
@@ -23,6 +23,11 @@ Harden the Scriptorium's editing experience and improve field-level data quality
 - L-06: `purchase_date` accepts free text; no ISO format enforcement
 - V-01: Visibility preferences are not reflected in the form — low-priority fields clutter the editing surface
 
+**SCR-01 Backlog** — Cleanup and correctness items identified during SCR-01 Section 11 re-audits:
+- C-01: Dead `sidebar.era.*` locale keys (`ancient`, `medieval`, `modern`) no longer referenced after ERAS constant removal
+- C-02: Sidebar filter `aria-label` strings hardcoded in English — not routed through `t()`
+- C-03: Delete confirmation button in `CoinDetail` uses `btn-solid`; `btn-delete` (error-red hover) is semantically appropriate for a final destructive action
+
 | Audit ID | Severity | Description |
 |----------|----------|-------------|
 | F-03 | 🟡 Medium | "Draft Preserved" shown in edit mode (misleading) |
@@ -33,6 +38,11 @@ Harden the Scriptorium's editing experience and improve field-level data quality
 | L-04 | 🟡 Medium | Metrics grid 8-item orphan layout |
 | L-06 | 🟡 Medium | `purchase_date` accepts unvalidated free text |
 | V-01 | 🟡 Medium | Visibility-hidden fields clutter the form |
+| C-01 | 🟢 Low | Dead `sidebar.era.*` i18n keys — locale maintenance debt |
+| C-02 | 🟡 Medium | Sidebar filter aria-labels hardcoded EN — a11y/i18n defect |
+| C-03 | 🟡 Medium | `btn-solid` on delete confirmation — swap to `btn-delete` |
+
+**Out of sprint scope (own blueprint):** Era vocabulary normalization — adding `era` to `ALLOWED_VOCAB_FIELDS` and the autocomplete system to prevent case-variant drift across entries. Identified in SCR-01 §11 numismatic re-audit; warrants a dedicated `SCR-03` blueprint before implementation.
 
 ### Philosophical Alignment
 
@@ -362,6 +372,81 @@ details[open] .hidden-fields-toggle::before {
 "hiddenFields": "{{count}} hidden field(s) — click to expand"
 ```
 
+### 2.9 C-01 — Remove dead `sidebar.era.*` locale keys
+
+**Files:** `src/renderer/i18n/locales/en.json`, `src/renderer/i18n/locales/es.json`
+
+The keys `sidebar.era.ancient`, `sidebar.era.medieval`, and `sidebar.era.modern` were rendered by the static `ERAS` constant in `PatinaSidebar.tsx`, which was removed in SCR-01 B-04. No remaining code references these keys. Remove the entire `sidebar.era` sub-object from both locale files.
+
+```json
+// Remove from both en.json and es.json — sidebar section:
+"era": {
+  "ancient": "...",
+  "medieval": "...",
+  "modern": "..."
+}
+```
+
+**Verification:** Run `npm test` — the `translations.test.ts` i18n parity test will enforce that both locales remain in sync after removal.
+
+---
+
+### 2.10 C-02 — Translate sidebar filter aria-labels
+
+**File:** `src/renderer/components/PatinaSidebar.tsx`
+
+Three `renderOverflowGroup` call-sites use hardcoded English template literals for `ariaLabel`:
+- Era: `` `Filter by ${v} era` ``
+- Metal: `` `Filter by ${v} metal` ``
+- Grade: `` `Filter by grade ${v}` ``
+
+Replace with `t()` calls using new parameterised keys:
+
+```tsx
+// era call-site:
+v => t('sidebar.ariaFilter.era', { value: v })
+
+// metal call-site:
+v => t('sidebar.ariaFilter.metal', { value: v })
+
+// grade call-site:
+v => t('sidebar.ariaFilter.grade', { value: v })
+```
+
+**i18n addition** (`en.json` / `es.json` — `sidebar` section):
+```json
+// en.json
+"ariaFilter": {
+  "era":   "Filter by {{value}} era",
+  "metal": "Filter by {{value}} metal",
+  "grade": "Filter by grade {{value}}"
+}
+
+// es.json
+"ariaFilter": {
+  "era":   "Filtrar por época {{value}}",
+  "metal": "Filtrar por metal {{value}}",
+  "grade": "Filtrar por grado {{value}}"
+}
+```
+
+---
+
+### 2.11 C-03 — `btn-delete` for delete confirmation
+
+**File:** `src/renderer/components/CoinDetail.tsx`
+
+The final destructive action in the delete confirmation modal currently uses `btn-solid` (dark ink fill). The `.btn-delete` class exists in `index.css` (lines 125–142) and provides a link-style button that transitions to `var(--error-red)` on hover — semantically appropriate for the final step of a destructive workflow.
+
+```tsx
+// before:
+<button className="btn-solid" onClick={handleDelete}>
+// after:
+<button className="btn-delete" onClick={handleDelete}>
+```
+
+**Visual note:** Both Cancel (`btn-minimal`) and Delete (`btn-delete`) will be link-style in their resting state. The `.btn-delete` hover state (error-red text and underline) provides the destructive signal. The modal heading `{t('detail.confirm.title')}` ("Confirm Deletion") and body text establish sufficient context. Verify visually before merging.
+
 ---
 
 ## 3. Verification Strategy
@@ -389,6 +474,18 @@ details[open] .hidden-fields-toggle::before {
 
 12. **F-04:** Initialize hook with an `initialCoin`. Modify a field with `updateField`. Assert `isDirty === true`. Reset the field to its original value. Assert `isDirty === false`.
 13. **F-04:** Initialize hook without `initialCoin`. Assert `isDirty === false` (add mode always returns false).
+
+**`PatinaSidebar.test.tsx`** — extend existing:
+
+12. **C-02:** Render sidebar with `availableEras={['Roman Imperial']}`. Assert the era checkbox `aria-label` equals `t('sidebar.ariaFilter.era', { value: 'Roman Imperial' })` — i.e. not the hardcoded `"Filter by Roman Imperial era"` English string.
+
+**`CoinDetail.test.tsx`** — extend existing:
+
+13. **C-03:** Render in delete-confirm state. Assert the delete button has class `btn-delete`, not `btn-solid`.
+
+**`translations.test.ts`** — automatic:
+
+14. **C-01:** The existing i18n parity test enforces that `en.json` and `es.json` share the same key structure. Removing `sidebar.era.*` from both locales simultaneously will not trigger a failure. A grep check after removal confirms zero remaining references to `sidebar.era.ancient/medieval/modern`.
 
 ### Colocation Check
 - `Scriptorium.test.tsx` → `src/renderer/components/__tests__/Scriptorium.test.tsx`
