@@ -49,7 +49,7 @@ const MOCK_COINS: Coin[] = [
 describe('useCoins', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (window.electronAPI.getCoins as any).mockResolvedValue(MOCK_COINS); // eslint-disable-line @typescript-eslint/no-explicit-any
+    (window.electronAPI.getCoins as any).mockResolvedValue(MOCK_COINS);
   });
 
   it('should fetch coins on mount', async () => {
@@ -158,6 +158,16 @@ describe('useCoins', () => {
     });
 
     expect(result.current.availableGrades).toEqual(['Choice VF', 'XF']);
+  });
+
+  it('should derive availableEras from collection data', async () => {
+    const { result } = renderHook(() => useCoins());
+
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    expect(result.current.availableEras).toEqual(['Ancient', 'Medieval']);
   });
 
   it('should sort by title ascending and descending', async () => {

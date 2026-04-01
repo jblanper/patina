@@ -40,7 +40,8 @@ describe('useCoinForm', () => {
     });
 
     expect(success).toBe(false);
-    expect(result.current.errors.title).toBeDefined();
+    expect(result.current.errors.title).toBe('Designation is required');
+    expect(result.current.errors.era).toBe('Era is required');
   });
 
   it('should handle auto-drafting', () => {

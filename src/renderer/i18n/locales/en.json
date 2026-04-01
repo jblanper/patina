@@ -246,7 +246,7 @@
     "cardNote":         "These badges appear on every card in the gallery. Keep this list short."
   },
   "validation": {
-    "title": "Title is required",
+    "title": "Designation is required",
     "era": "Era is required"
   },
   "common": {
