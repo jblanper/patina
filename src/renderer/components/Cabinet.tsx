@@ -22,7 +22,8 @@ export const Cabinet: React.FC = () => {
     updateFilters,
     clearFilters,
     availableMetals,
-    availableGrades
+    availableGrades,
+    availableEras
   } = useCoins();
 
   const { language } = useLanguage();
@@ -60,6 +61,7 @@ export const Cabinet: React.FC = () => {
           clearFilters={clearFilters}
           availableMetals={availableMetals}
           availableGrades={availableGrades}
+          availableEras={availableEras}
         />
 
         <main className="app-main">

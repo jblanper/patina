@@ -9,15 +9,10 @@ interface PatinaSidebarProps {
   clearFilters: () => void;
   availableMetals: string[];
   availableGrades: string[];
+  availableEras: string[];
 }
 
 const TRUNCATION_THRESHOLD = 8;
-
-const ERAS = [
-  { value: 'Ancient',  labelKey: 'sidebar.era.ancient'  },
-  { value: 'Medieval', labelKey: 'sidebar.era.medieval' },
-  { value: 'Modern',   labelKey: 'sidebar.era.modern'   },
-] as const;
 
 /**
  * PatinaSidebar Component
@@ -30,10 +25,12 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
   updateFilters,
   clearFilters,
   availableMetals,
-  availableGrades
+  availableGrades,
+  availableEras
 }) => {
   const { t } = useTranslation();
 
+  const [erasExpanded,   setErasExpanded]   = useState(false);
   const [metalsExpanded, setMetalsExpanded] = useState(false);
   const [gradeExpanded,  setGradeExpanded]  = useState(false);
 
@@ -57,7 +54,7 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
   };
 
   const renderOverflowGroup = (
-    key: 'metal' | 'grade',
+    key: 'era' | 'metal' | 'grade',
     values: string[],
     expanded: boolean,
     setExpanded: (v: boolean) => void,
@@ -145,23 +142,19 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
 
       <div className="filter-group">
         <span className="type-meta filter-label">{t('sidebar.eras')}</span>
-        <ul className="filter-list">
-          {ERAS.map(({ value, labelKey }) => (
-            <li key={value}>
-              <label className={`filter-item-label ${isSelected('era', value) ? 'active' : ''}`}>
-                <input
-                  type="checkbox"
-                  className="filter-input"
-                  checked={isSelected('era', value)}
-                  onChange={() => toggleFilter('era', value)}
-                  aria-label={`Filter by ${t(labelKey)} era`}
-                />
-                <span className="filter-checkbox" aria-hidden="true"></span>
-                <span className="filter-text">{t(labelKey)}</span>
-              </label>
-            </li>
-          ))}
-        </ul>
+        {availableEras.length > 0 ? (
+          renderOverflowGroup(
+            'era',
+            availableEras,
+            erasExpanded,
+            setErasExpanded,
+            v => `Filter by ${v} era`
+          )
+        ) : (
+          <ul className="filter-list">
+            <li className="filter-item disabled">{t('sidebar.noEras')}</li>
+          </ul>
+        )}
       </div>
 
       <div className="filter-group">

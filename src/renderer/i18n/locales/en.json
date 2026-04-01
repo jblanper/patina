@@ -16,6 +16,7 @@
     },
     "metals": "Metals",
     "grade": "Grade",
+    "noEras": "No eras recorded",
     "noMetals": "No metals indexed",
     "noGrades": "No grades recorded",
     "showMore": "Show {{count}} more",
@@ -243,6 +244,10 @@
     "resetToDefaults":  "Reset to Defaults",
     "liveIndicator":    "● Live",
     "cardNote":         "These badges appear on every card in the gallery. Keep this list short."
+  },
+  "validation": {
+    "title": "Title is required",
+    "era": "Era is required"
   },
   "common": {
     "comingSoon": "Coming soon"

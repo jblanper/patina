@@ -16,6 +16,7 @@
     },
     "metals": "Metales",
     "grade": "Grado",
+    "noEras": "Sin épocas registradas",
     "noMetals": "Sin metales indexados",
     "noGrades": "Sin grados registrados",
     "showMore": "Mostrar {{count}} más",
@@ -243,6 +244,10 @@
     "resetToDefaults":  "Restaurar valores predeterminados",
     "liveIndicator":    "● En vivo",
     "cardNote":         "Estos datos aparecen en cada tarjeta de la galería. Mantén la lista corta."
+  },
+  "validation": {
+    "title": "La designación es obligatoria",
+    "era": "La época es obligatoria"
   },
   "common": {
     "comingSoon": "Próximamente"

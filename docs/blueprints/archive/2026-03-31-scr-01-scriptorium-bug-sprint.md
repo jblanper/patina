@@ -1,7 +1,7 @@
 # Implementation Blueprint: SCR-01 · Scriptorium Bug Sprint
 
 **Date:** 2026-03-31
-**Status:** Completed
+**Status:** In-Progress (Reopened 2026-04-01)
 **Reference:** `docs/audits/2026-03-31-scriptorium-audit.md` — items F-01, F-02, L-01, L-05, A-02
 
 ---
@@ -458,3 +458,144 @@ The practical UX rationale for requiring `era` is sound: a record without it can
 
 - `NewCoinSchema` currently requires only `title` and `era`. If new required fields are added in future, the pattern established here — `.required-dot` + `aria-required` + `error` prop on `AutocompleteField` + `error-hint` span — must be applied consistently.
 - **Core Doc Revision:** Update `docs/guides/testing_standards.md` to note that `AutocompleteField` now has a test suite (TC-AC-01 through TC-AC-26) and that `error` / `required` props must be covered in any future extensions to the component.
+
+---
+
+## 11. Follow-up Sprint: Post-Completion Bugs (2026-04-01)
+
+**Status:** In-Progress
+
+Four bugs found after deployment, plus one confirmed UX removal. All are renderer-only. No schema changes, no new IPC handlers.
+
+| ID | Severity | Description |
+|----|----------|-------------|
+| B-01 | 🔴 Critical | Validation errors always in English — never translated |
+| B-02 | 🟠 High | Era error-hint appears in label column, not below the input |
+| B-03 | 🟠 High | Delete-confirmation "Eliminar" button has no CSS styling |
+| B-04 | 🟠 High | Era sidebar filters show 3 hardcoded values, not actual coin eras |
+| B-05 | 🟡 Medium | Remove `†` glossary-hint indicator from all field labels (user decision) |
+
+---
+
+### B-01 — Validation errors not translated
+
+**Root cause:** `useCoinForm.ts` `validateForm` copies `issue.message` (raw Zod English string) into `errors` state. The schema messages are `"Title is required"` (explicit) and `"Too small: expected string to have ≥1 characters"` (Zod default for era).
+
+**Fix:**
+
+`src/renderer/hooks/useCoinForm.ts` — add `useTranslation` and map field errors:
+```ts
+import { useTranslation } from 'react-i18next';
+// inside useCoinForm:
+const { t } = useTranslation();
+
+// in validateForm, replace issue.message assignment:
+const FIELD_ERROR_KEYS: Record<string, string> = {
+  title: 'validation.title',
+  era: 'validation.era',
+};
+newErrors[path] = FIELD_ERROR_KEYS[path] ? t(FIELD_ERROR_KEYS[path]) : issue.message;
+```
+
+`src/renderer/i18n/locales/en.json` — add `validation` section:
+```json
+"validation": {
+  "title": "Title is required",
+  "era": "Era is required"
+}
+```
+
+`src/renderer/i18n/locales/es.json` — add `validation` section:
+```json
+"validation": {
+  "title": "La designación es obligatoria",
+  "era": "La época es obligatoria"
+}
+```
+
+---
+
+### B-02 — Era error-hint in wrong grid column
+
+**Root cause:** `.subtitle-item { display: contents }` makes all children direct grid children of `.subtitle-stack` (2-column: `130px 1fr`). The `error-hint` span after the `AutocompleteField` falls into column 1 of the next row (under the label), not column 2 (under the input).
+
+**Fix** — CSS-only, `src/renderer/styles/index.css`:
+```css
+.subtitle-item > .error-hint {
+  grid-column: 2;
+}
+```
+
+No markup changes needed.
+
+---
+
+### B-03 — Delete confirmation button unstyled
+
+**Root cause:** `CoinDetail.tsx` line 94 uses `className="btn-primary"`. No standalone `.btn-primary` rule exists in `index.css` — only context-scoped rules (`.cabinet-toolbar .btn-primary`, `.export-result .btn-primary`, `.btn-action.btn-primary`).
+
+**Fix** — `src/renderer/components/CoinDetail.tsx` line 94:
+```tsx
+// before:
+<button className="btn-primary" onClick={handleDelete}>
+// after:
+<button className="btn-solid" onClick={handleDelete}>
+```
+
+`.btn-solid` (lines 87–103 of `index.css`) provides the correct dark-ink background, consistent with other primary actions in the app.
+
+---
+
+### B-04 — Era sidebar filter hardcoded
+
+**Root cause:** `PatinaSidebar.tsx` uses a static `ERAS` constant `['Ancient', 'Medieval', 'Modern']`. Metals and grades are dynamic (derived from actual coin data) but eras are not. Coins can have any free-text era (e.g. "Roman Imperial", "Byzantine").
+
+**Fix — three files:**
+
+`src/renderer/hooks/useCoins.ts` — add `availableEras` memoized alongside `availableMetals` (after line 107):
+```ts
+const availableEras = useMemo(() => {
+  const eras = new Set<string>();
+  coins.forEach(c => c.era && eras.add(c.era));
+  return Array.from(eras).sort();
+}, [coins]);
+```
+Return `availableEras` from the hook.
+
+`src/renderer/components/Cabinet.tsx` — destructure `availableEras` from `useCoins()` and pass to `PatinaSidebar`:
+```tsx
+const { ..., availableEras } = useCoins();
+// ...
+<PatinaSidebar availableEras={availableEras} ... />
+```
+
+`src/renderer/components/PatinaSidebar.tsx` — replace the static `ERAS` constant and its render block:
+- Remove `const ERAS = [...]` (lines 16–20)
+- Add `availableEras: string[]` to `PatinaSidebarProps`
+- Replace the era `<ul>` with `renderOverflowGroup('era', availableEras, ...)` (same pattern as metals/grades)
+- Remove now-unused i18n keys `sidebar.era.ancient/medieval/modern` from render (keep in JSON for now, clean up separately)
+
+**Note:** era filter labels will show raw stored values (e.g. "Roman Imperial") since era is free-text. The exact-match filter logic in `useCoins.ts` line 49 is already correct for this.
+
+---
+
+### B-05 — Remove † glossary-hint indicator
+
+**User decision:** Remove. The hover underline on label buttons provides sufficient affordance.
+
+**Fix — `src/renderer/components/LedgerForm.tsx`:** Delete every `<span className="glossary-hint" aria-hidden="true">†</span>` line. There are ~20 occurrences (one per field label button).
+
+**Fix — `src/renderer/styles/index.css`:** Remove or comment the `.glossary-hint` rule and its associated hover rules (`.metric-label:hover .glossary-hint`, `.subtitle-label:hover .glossary-hint`, `.section-label:hover .glossary-hint`).
+
+---
+
+### Verification
+
+**Tests to update/add:**
+
+- `LedgerForm.test.tsx`: Update B-01 assertions — error text should now be `"La designación es obligatoria"` / `"La época es obligatoria"` (Spanish, default locale), not the Zod English strings. Existing tests checking `"Title is required"` must be updated.
+- `LedgerForm.test.tsx`: Add B-02 — submit empty era, assert `error-hint` has no `grid-column` fighting (smoke test; layout assertions are hard in jsdom — verify visually).
+- `PatinaSidebar.test.tsx`: Update B-04 — pass `availableEras` prop, assert era checkboxes render from prop values not hardcoded strings.
+- B-03 and B-05 require visual verification only; no logic change.
+
+**TypeScript:** Run `npx tsc --noEmit` after all changes before committing.

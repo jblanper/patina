@@ -17,7 +17,8 @@ const defaultProps = {
   updateFilters: vi.fn(),
   clearFilters: vi.fn(),
   availableMetals: ['Silver', 'Gold'],
-  availableGrades: ['Choice VF', 'XF']
+  availableGrades: ['Choice VF', 'XF'],
+  availableEras: ['Ancient', 'Medieval', 'Modern']
 };
 
 describe('PatinaSidebar', () => {
@@ -149,6 +150,18 @@ describe('PatinaSidebar', () => {
     // Select M9 — it should pin to the top on re-render
     rerender(<PatinaSidebar {...defaultProps} filters={{ ...defaultFilters, metal: ['M9'] }} availableMetals={metals} />);
     expect(screen.getByRole('checkbox', { name: 'Filter by M9 metal' })).toBeInTheDocument();
+  });
+
+  it('renders era checkboxes from availableEras prop (B-04)', () => {
+    render(<PatinaSidebar {...defaultProps} availableEras={['Roman Imperial', 'Byzantine', 'Medieval']} />);
+    expect(screen.getByRole('checkbox', { name: /Filter by Roman Imperial era/i })).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /Filter by Byzantine era/i })).toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', { name: /Filter by Ancient era/i })).toBeNull();
+  });
+
+  it('renders empty state when availableEras is empty (B-04)', () => {
+    render(<PatinaSidebar {...defaultProps} availableEras={[]} />);
+    expect(screen.getByText('No eras recorded')).toBeInTheDocument();
   });
 
   it('does not render "Show more" for Eras or Order By groups', () => {

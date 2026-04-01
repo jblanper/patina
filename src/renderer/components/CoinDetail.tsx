@@ -91,7 +91,7 @@ export const CoinDetail: React.FC = () => {
             <p>{t('detail.confirm.message')}</p>
             <div className="modal-actions">
               <button className="btn-minimal" onClick={() => setShowDeleteConfirm(false)}>{t('detail.confirm.cancel')}</button>
-              <button className="btn-primary" onClick={handleDelete}>{t('detail.confirm.delete')}</button>
+              <button className="btn-solid" onClick={handleDelete}>{t('detail.confirm.delete')}</button>
             </div>
           </div>
         </div>

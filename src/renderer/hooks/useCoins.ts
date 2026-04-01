@@ -112,6 +112,12 @@ export function useCoins() {
     return Array.from(grades).sort();
   }, [coins]);
 
+  const availableEras = useMemo(() => {
+    const eras = new Set<string>();
+    coins.forEach(c => c.era && eras.add(c.era));
+    return Array.from(eras).sort();
+  }, [coins]);
+
   /**
    * Mutation Wrappers
    */
@@ -162,6 +168,7 @@ export function useCoins() {
     filters,
     availableMetals,
     availableGrades,
+    availableEras,
     addCoin,
     updateCoin,
     deleteCoin,

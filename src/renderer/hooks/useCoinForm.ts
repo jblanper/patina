@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NewCoin, Coin, CoinImage } from '../../common/types';
 import { NewCoinSchema } from '../../common/validation';
 
@@ -16,7 +17,13 @@ const DEFAULT_STATE: CoinFormState = {
   images: {}
 };
 
+const FIELD_ERROR_KEYS: Record<string, string> = {
+  title: 'validation.title',
+  era:   'validation.era',
+};
+
 export function useCoinForm(initialCoin?: Coin | null, existingImages: CoinImage[] = []) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<CoinFormState>(() => {
     // Try to load from auto-draft if no initial coin
     if (!initialCoin) {
@@ -31,7 +38,7 @@ export function useCoinForm(initialCoin?: Coin | null, existingImages: CoinImage
     }
     
     if (initialCoin) {
-      const { id, created_at, ...rest } = initialCoin;
+      const { id: _id, created_at: _created_at, ...rest } = initialCoin;
       return { ...rest, images: {} }; // Images will be handled separately
     }
     
@@ -49,7 +56,7 @@ export function useCoinForm(initialCoin?: Coin | null, existingImages: CoinImage
   // Sync formData when initialCoin changes (for Edit mode)
   useEffect(() => {
     if (initialCoin) {
-      const { id, created_at, ...rest } = initialCoin;
+      const { id: _id, created_at: _created_at, ...rest } = initialCoin;
       setFormData(prev => ({
         ...rest,
         images: prev.images // Keep currently selected images
@@ -89,13 +96,13 @@ export function useCoinForm(initialCoin?: Coin | null, existingImages: CoinImage
   }, []);
 
   const validateForm = useCallback(() => {
-    const { images, ...coinData } = formData;
+    const { images: _images, ...coinData } = formData;
     const result = NewCoinSchema.safeParse(coinData);
     if (!result.success) {
       const newErrors: Record<string, string> = {};
       result.error.issues.forEach(issue => {
         const path = issue.path[0] as string;
-        newErrors[path] = issue.message;
+        newErrors[path] = FIELD_ERROR_KEYS[path] ? t(FIELD_ERROR_KEYS[path]) : issue.message;
       });
       setErrors(newErrors);
       return false;

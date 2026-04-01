@@ -1342,6 +1342,10 @@ main {
   display: contents;
 }
 
+.subtitle-item > .error-hint {
+  grid-column: 2;
+}
+
 .subtitle-label {
   font-family: var(--font-sans);
   font-size: 0.7rem;
@@ -2278,18 +2282,6 @@ main {
 }
 .glossary-browse-all:hover { color: var(--accent-manuscript); }
 
-/* † hint dagger — superscript, now a non-interactive span */
-.glossary-hint {
-  font: 0.65rem var(--font-mono);
-  color: var(--accent-manuscript);
-  position: relative;
-  top: -0.4em;
-  margin-left: 0.5em;
-  padding: 0.25em 0.3em;
-  line-height: 1;
-  opacity: 0.75;
-  transition: opacity 0.15s ease;
-}
 .metric-label:hover,
 .subtitle-label:hover { color: var(--text-ink); }
 .metric-label:hover .label-text,
@@ -2298,9 +2290,6 @@ main {
   text-decoration: underline dotted var(--text-muted);
   text-underline-offset: 3px;
 }
-.metric-label:hover .glossary-hint,
-.subtitle-label:hover .glossary-hint,
-.section-label:hover .glossary-hint { opacity: 1; }
 
 /* ── Field Visibility Drawer ──────────────────────────────── */
 
