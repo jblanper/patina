@@ -86,9 +86,19 @@ Maintain a strict horizontal breath around the central divider:
 - **Interaction:** Subtle background darkening on hover (`#F4F1E9`). Support `focus-visible` with `var(--accent-manuscript)`.
 
 ### Action Elements
-- **Solid Actions:** `--text-ink` background with white text. High-contrast, no rounding.
-- **Minimal Actions:** Text-only with a bottom border using `var(--font-mono)`.
-- **Hover:** All actions transition to `--accent-manuscript`.
+
+Button variant inventory:
+
+| Class | Use-case | Resting state | Hover state |
+|-------|----------|---------------|-------------|
+| `.btn-solid` | Primary CTA (submit, save) | `--text-ink` fill, white text | `--accent-manuscript` fill |
+| `.btn-minimal` | Secondary / cancel | Text-only + bottom border, `--font-mono` | `--accent-manuscript` color |
+| `.btn-ghost` | Header destructive-secondary (e.g. "Discard Draft") | Hairline border, muted mono text | `--text-ink` border + color |
+| `.btn-delete` | Final destructive confirmation | Muted text + muted bottom border | `--error-red` color + border |
+| `.btn-tools` | Toolbar dropdown trigger | Hairline border, muted mono text | `--accent-manuscript` |
+
+**Distinguishing `.btn-ghost` from `.btn-tools`:** Both share the same mono/uppercase/hairline-border resting state. `.btn-ghost` is reserved for header-level destructive-secondary actions and nudges toward `--text-ink` on hover. `.btn-tools` is a toolbar dropdown trigger that nudges toward `--accent-manuscript`. Do not use either interchangeably.
+
 - **Destructive Actions (`.btn-delete`):** Rendered in `--text-muted` with a `--text-muted` bottom border at rest — visually de-prioritised to avoid drawing attention. On hover only, transitions to `--error-red` color and border. This "deferred disclosure" pattern surfaces the destructive signal only on deliberate approach, preventing accidental triggering while maintaining discoverability. Apply `.btn-delete` to any action that permanently removes data (coin records, images). Never use `--error-red` at rest state.
 
 ### Form Inputs
