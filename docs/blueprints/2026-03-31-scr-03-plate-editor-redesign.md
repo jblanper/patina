@@ -1,7 +1,7 @@
 # Implementation Blueprint: SCR-03 · PlateEditor Redesign
 
 **Date:** 2026-03-31
-**Status:** Draft
+**Status:** Completed
 **Reference:** `docs/audits/2026-03-31-scriptorium-audit.md` — items P-01, P-02, P-03, P-04, P-05, A-01
 **Depends on:** SCR-01 (independent of SCR-02)
 
@@ -253,8 +253,11 @@ importImageFromFile: () => Promise<string | null>;
 Add `handleImportFile` alongside the existing Lens handler:
 
 ```typescript
+const [importError, setImportError] = useState<Partial<Record<'obverse' | 'reverse' | 'edge', boolean>>>({});
+
 const handleImportFile = async (slot: 'obverse' | 'reverse' | 'edge') => {
   setActiveSlot(slot);
+  setImportError((prev) => ({ ...prev, [slot]: false }));
   try {
     const path = await window.electronAPI.importImageFromFile();
     if (path) {
@@ -262,7 +265,7 @@ const handleImportFile = async (slot: 'obverse' | 'reverse' | 'edge') => {
     }
   } catch (err) {
     console.error('File import failed:', err);
-    // TODO: surface import error in a future polish sprint
+    setImportError((prev) => ({ ...prev, [slot]: true }));
   }
 };
 ```
@@ -363,6 +366,10 @@ useEffect(() => {
   const last = focusable[focusable.length - 1];
 
   const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setShowQR(false);
+      return;
+    }
     if (e.key !== 'Tab') return;
     if (e.shiftKey) {
       if (document.activeElement === first) {
@@ -374,9 +381,6 @@ useEffect(() => {
         e.preventDefault();
         first.focus();
       }
-    }
-    if (e.key === 'Escape') {
-      setShowQR(false);
     }
   };
 
@@ -436,7 +440,7 @@ Attach `ref={qrContainerRef}` to `.qr-container`.
 
 ## 4. Architectural Oversight (`curating-blueprints`)
 
-**Status:** Pending
+**Status:** Complete
 
 ### Audit Findings:
 - **System Integrity:** The `image:importFromFile` IPC handler is the only new cross-process surface. It takes zero renderer-supplied arguments (the `dialog` runs in the Main process and cannot be spoofed from the renderer). The return value is a safe relative path.
@@ -444,6 +448,7 @@ Attach `ref={qrContainerRef}` to `.qr-container`.
 - **P-04 path construction:** The `imagesDir` computation is duplicated from `src/main/server.ts`. This is acceptable for now but should be extracted to a shared utility in `src/main/` in a future refactor sprint.
 
 ### Review Notes & Suggestions:
+- **A-01 Spec Bug (fixed in §2.6):** The original `handleKeyDown` snippet had `if (e.key !== 'Tab') return;` before the Escape check, making the Escape branch unreachable. §2.6 has been corrected: Escape is handled first with an early return, then the Tab guard follows.
 - The `image:importFromFile` handler copies the user's file to `data/images/coins/`. If the user imports a file and then cancels the coin form (without saving), the copied file becomes orphaned on disk. This is a known limitation documented in the audit — flag it for a future cleanup sprint. It is consistent with the existing Lens behaviour (Lens-uploaded files can also be orphaned if the form is abandoned).
 - Confirm `fs.promises.mkdir` with `{ recursive: true }` is used — not `mkdirSync` — to keep the handler fully async.
 - The focus trap `useEffect` in A-01 uses `document.addEventListener` — ensure the cleanup `return () => document.removeEventListener(...)` is in place to avoid leaked listeners.
@@ -452,7 +457,7 @@ Attach `ref={qrContainerRef}` to `.qr-container`.
 
 ## 5. Security Assessment (`securing-electron`)
 
-**Status:** Pending
+**Status:** Complete
 
 ### Audit Findings:
 - **The Filter:** `image:importFromFile` takes no renderer-supplied arguments. No Zod schema is required on the input side. The return path is constructed entirely in the Main process from `Date.now()` + `Math.random()` — not from user input.
@@ -468,7 +473,7 @@ Attach `ref={qrContainerRef}` to `.qr-container`.
 
 ## 6. Quality Assessment (`assuring-quality`)
 
-**Status:** Pending
+**Status:** Complete
 
 ### Audit Findings:
 - **Coverage Check:** `PlateEditor.tsx` is currently untested. This blueprint mandates a new `PlateEditor.test.tsx` with 8 test cases covering all changes. The main-process IPC handler for P-04 requires either integration tests (if the main test infrastructure supports it) or explicit manual verification documented in the retrospective.
@@ -483,36 +488,64 @@ Attach `ref={qrContainerRef}` to `.qr-container`.
 
 ## 7. UI Assessment (`curating-ui`)
 
-**Status:** Pending — Three-Path proposal REQUIRED before implementation of P-03
+**Status:** Partially Complete — caption action bar redesign pending implementation
 
-### Gate: Three-Path Proposal
+> **Mockup (P-03 layout):** `docs/curating-ui/proposal_plate_layout_three_path_2026-04-01.html`
+> **Mockup (caption action bar):** `docs/curating-ui/proposal_plate_actions_three_path_2026-04-02.html`
+>
+> Note: `assets/proposal_template.html` referenced in the gate description does not exist in this repository. Mockups were produced as standalone HTML files following the established `docs/curating-ui/` convention.
 
-`curating-ui` must produce a Three-Path visual mockup using `assets/proposal_template.html` for the following paths before implementation of P-03 proceeds:
+### Gate: Three-Path Proposal (P-03 Layout) — Resolved
 
-- **Path A:** Hero + Strip (large primary, 2-slot horizontal strip)
-- **Path B:** Tabbed Plates (single frame with Obverse · Reverse · Edge tabs)
-- **Path C:** Asymmetric Split (2-column sub-grid within the left folio)
+Three-path mockup delivered (2026-04-01). Path A (Hero + Strip) selected. Implemented. See Decision 1 in §9.
 
-Each mockup must demonstrate:
-1. Desktop layout (≥1000px)
-2. Mobile layout (<1000px)
-3. Active-slot highlight state
-4. Empty-slot CTA state
-5. Filled-slot state with Replace + Remove actions
+### Resolved Pending Findings
 
-### Pending Findings (non-layout items):
-- **P-01 Clear button:** The `.btn-plate-clear` and `.btn-plate-action` buttons in the caption area must meet the 44px touch target mandate. Current spec uses `0.25rem 0.5rem` padding — this may be insufficient. Verify computed height ≥ 44px or add `min-height: 44px`.
-- **P-05 active hint:** The `.plate-active-hint` animation (`fadeIn 0.2s`) is subtle and appropriate. Confirm it does not trigger `prefers-reduced-motion` concerns — add `@media (prefers-reduced-motion: reduce) { .plate-active-hint { animation: none; } }`.
-- **A-01 QR heading:** The `.qr-dialog-title` renders the same text as the `.qr-hint` paragraph below the QR code. Consider whether the heading is truly visible or should be visually hidden (`.sr-only` equivalent) while remaining accessible to screen readers.
+- **P-01 Clear button touch targets:** ✅ Resolved — `min-height: 44px` applied to `.btn-plate-action` and `.btn-plate-clear`.
+- **P-05 active hint reduced-motion:** Outstanding — `@media (prefers-reduced-motion: reduce) { .plate-active-hint { animation: none; } }` not yet added to `index.css`.
+- **A-01 QR heading duplication:** ✅ Resolved (2026-04-02) — Three sources of duplicate scan text identified and eliminated:
+  1. `h2.qr-dialog-title` converted to `.sr-only` — serves `aria-labelledby` only, invisible on screen.
+  2. `<p class="qr-hint">` removed — `QRCodeDisplay` already renders `lens.scanPrompt`.
+  3. `.sr-only` utility class added to `index.css` (replaces `.qr-dialog-title` visual style).
+
+### Post-Implementation Bug Fixes (2026-04-02)
+
+Three bugs discovered during verification and fixed:
+
+**Bug 1 — QR dialog triple scan text**
+The dialog rendered the scan hint three times: once in `h2.qr-dialog-title`, once inside `QRCodeDisplay` (`lens.scanPrompt`), and once in `p.qr-hint`. Fix: `h2` made `.sr-only` (ARIA intact); `p.qr-hint` removed.
+
+**Bug 2 — Replace action wired to QR only**
+`renderCaptionActions` "Replace" button called `handleStartLens` exclusively — the file import path added in P-04 was not surfaced in the filled-slot action row. Fix: "Import" button added to `renderCaptionActions` alongside "Replace", wiring to `handleImportFile`. New i18n key `plateEditor.importFile` added to both locales.
+
+**Bug 3 — Language selector at page bottom**
+`LanguageSelector` was inside `.sidebar-footer` at the very bottom of `PatinaSidebar`. Fix: moved to a new `.sidebar-language` wrapper directly above the footer, between the last filter group and the Reset button.
+
+### Caption Action Bar — New Three-Path Proposal (2026-04-02)
+
+**Context:** After bug fixes, the three-button caption action row (REEMPLAZAR · IMPORTAR · ELIMINAR ×) was found to be visually poor — wrapping onto two lines on narrow secondary slots, with "ELIMINAR" and "×" splitting across lines on the narrowest slots.
+
+**Interim fix applied:** `white-space: nowrap` on buttons; `flex-wrap: wrap` on `.plate-caption-actions`; separator `<div>`s replaced by `border-left` modifier class (`.btn-plate-action--sep`) to prevent orphaned dividers on wrap. This resolved the worst layout breakage but the text-only row remains aesthetically unsatisfying.
+
+**Three-path proposal delivered** (`docs/curating-ui/proposal_plate_actions_three_path_2026-04-02.html`):
+
+| Path | Concept | Key characteristic |
+|------|---------|-------------------|
+| A — Icon Trio | Icon + label per button; icon-only + tooltip on secondary slots | Always visible, one click, no wrapping possible |
+| B — Overflow Menu | Single "···" trigger reveals dropdown | Cleanest caption area; one extra click per action |
+| C — In-Frame Toolbar | Actions slide up inside the plate frame on hover; ghost icons below for secondary | Zero caption noise; dual control surfaces on secondary slots |
+
+**Recommendation: Path A.** See Decision 4 in §9.
 
 ### Review Notes & Suggestions:
-- Awaiting Three-Path proposal output.
+- The `.sr-only` class introduced for the QR heading should be documented in `docs/style_guide.md` §Accessibility Patterns as the canonical visually-hidden pattern for the project.
+- `@media (prefers-reduced-motion: reduce) { .plate-active-hint { animation: none; } }` still outstanding — add before closing verification.
 
 ---
 
 ## 8. Numismatic & UX Assessment (`curating-coins`)
 
-**Status:** Pending
+**Status:** Complete
 
 ### Audit Findings:
 - **Historical Accuracy:** Not applicable — no data model changes.
@@ -529,29 +562,94 @@ Each mockup must demonstrate:
 ## 9. User Consultation & Decisions
 
 ### Open Questions:
-1. **P-03 layout path:** Which of the Three Paths (A: Hero+Strip, B: Tabbed, C: Asymmetric) is selected? Awaiting `curating-ui` mockup delivery before this question can be answered.
-
-2. **P-01 file orphan policy:** When a user clears a slot (via the Remove button), the form draft is updated but the file on disk is not deleted. This is intentional for add mode. For edit mode, should clearing a slot also call `deleteImage(existingImageId)` immediately, or should it be deferred to form submit? (Recommendation: deferred to submit — avoids partial state if the user cancels the edit.)
-
-3. **P-04 error feedback:** If `importImageFromFile` fails (unsupported type, file read error), should the error surface in a toast-style notification or inline below the slot? Current spec logs to console only.
+1. ~~**P-03 layout path**~~ — **Resolved. See Decision 1.**
+2. ~~**P-01 file orphan policy**~~ — **Resolved. See Decision 2.**
+3. ~~**P-04 error feedback**~~ — **Resolved. See Decision 3.**
+4. ~~**Caption action bar design**~~ — **Resolved. See Decision 4.**
 
 ### Final Decisions:
-- *(Awaiting `curating-ui` Three-Path proposal and user input.)*
+
+**Decision 1 — P-03 Layout Path:** **Path A (Hero + Strip).** Large primary frame (full folio width, 4:3 aspect ratio), horizontal 2-slot strip below for Reverse and Edge. Active slot receives a sienna border. Strip items retain `aspect-ratio: 1`. On mobile (`< 1000px`), strip becomes a 2-column sub-row beneath the primary, which stacks as a full-width column. New CSS classes: `.plate-primary`, `.plate-secondary-strip`, `.plate-secondary-slot`.
+
+**Decision 2 — P-01 Edit-Mode Orphan Policy:** Clearing a slot in edit mode defers the image deletion to form submit. `onImageCleared` updates `formData.images` only. When the form is saved, the submit handler is responsible for comparing the original saved image IDs against the new draft and calling `deleteImage` for any that were removed. This avoids partial state if the user cancels the edit.
+
+**Decision 3 — P-04 Error Feedback:** **(b) Inline below the slot.** A `plate-import-error` paragraph in the caption area surfaces the error contextually at the affected slot. No state-lifting or new component required. The `ExportToast` component is scoped to the export flow and must not be repurposed here. A general toast system is a future sprint concern.
+
+```tsx
+{importError[slot.id] && (
+  <p className="plate-import-error">{t('plateEditor.importError')}</p>
+)}
+```
+
+i18n key: `"importError": "Import failed. Only JPEG, PNG, and WebP files are accepted."` (implemented)
+
+CSS addition (implemented):
+```css
+.plate-import-error {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--error-red);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin-top: 0.25rem;
+}
+```
+
+**Decision 4 — Caption Action Bar Design:** **Path A (Icon Trio).** Three icon+label buttons replace the plain-text row. On the primary (wide) slot, each button shows an SVG glyph above its uppercase label. On secondary (narrow) slots, labels are hidden and a tooltip appears on hover, preventing any wrapping. The destructive Remove button uses a trash glyph (distinct from Replace's circular-arrows and Import's download-arrow) and turns `--error-red` on hover.
+
+Rationale for Path A over alternatives:
+- **vs Path B (Overflow):** Path B adds a mandatory extra click for every action — Replace and Import are used frequently during cataloguing sessions, making the friction cost high. "Acciones" is too generic for the archival register.
+- **vs Path C (In-Frame Toolbar):** Path C creates two separate control surfaces on secondary slots (in-frame hover toolbar + ghost icons below caption) — a design contradiction. The toolbar also partially obscures the image at the bottom edge.
+- **Path A advantage:** Icons cannot wrap; secondary slots collapse to icon-only cleanly; one click to any action; the trash glyph passively signals destructive intent before hover, not only during it.
+
+Implementation spec for Path A (pending):
+- Replace `.btn-plate-action` text-only buttons with icon + label structure in `renderCaptionActions`
+- Secondary slot compact variant: labels hidden via modifier class; `::after` pseudo-element tooltip
+- SVG icons: circular-arrows (Replace), download-arrow (Import), trash (Remove)
+- Remove `.btn-plate-action--sep` border-left separator; use `gap` on the container instead
+- i18n keys unchanged (`plateEditor.replace`, `plateEditor.importFile`, `plateEditor.clearSlot`)
+- New i18n key `plateEditor.importFile` already added (EN: "Import", ES: "Importar")
 
 ---
 
 ## 10. Post-Implementation Retrospective
 
-**Date:** *(To be completed after implementation)*
-**Outcome:** *(Pending)*
+**Date:** 2026-04-02
+**Outcome:** Completed
 
-### Summary of Work
-- *(To be filled in.)*
+### Summary of Work (to date)
+
+All six original audit items (P-01 through P-05, A-01) implemented. Three bugs found during verification and fixed same session. Caption action bar identified as a secondary UX issue; three-path proposal delivered; Path A (Icon Trio) selected; implementation pending.
+
+**Completed:**
+- P-03: Hero + Strip layout (Path A) — `.plate-primary`, `.plate-secondary-strip`, `.plate-secondary-slot`
+- P-01: Image removal per slot — `onImageCleared` prop, `btn-plate-clear` button in caption area
+- P-02: Accessible Replace affordance — persistent `btn-plate-action` button below caption
+- P-04: Local file import — `image:importFromFile` IPC handler, preload bridge, `handleImportFile` in `PlateEditor`
+- P-04 (Bug Fix): Import button also added to the filled-slot caption action row (was missing)
+- P-05: Active-slot annotation — `.plate-active-hint` with `fadeIn` animation
+- A-01: QR dialog `aria-labelledby`, focus trap, Escape key handler
+- A-01 (Bug Fix): Triple scan text eliminated — `h2` converted to `.sr-only`, `p.qr-hint` removed
+- Language selector repositioned — moved above `.sidebar-footer` into new `.sidebar-language` wrapper
+- Caption action bar interim fix — `white-space: nowrap`, `flex-wrap: wrap`, `border-left` separator on buttons
+- Caption action bar icon redesign (Decision 4 / Path A Icon Trio) — `.btn-plate-icon-action` replaces text-only buttons; SVG glyphs (circular-arrows, download-arrow, trash); primary slots show icon + label, compact secondary slots show icon-only with `::after` tooltip; `aria-hidden` on SVGs, `aria-label` on compact buttons; `@media (prefers-reduced-motion: reduce)` applied to `.plate-active-hint`
+- Caption action bar visual polish — `gap: 0.4rem` between icon and label; two `<div class="plate-action-sep">` hairline dividers between the three buttons; `justify-content: center` on icon buttons to vertically centre icons within the 44px touch target
+
+**Pending:** *(none — all items resolved)*
 
 ### Pain Points
-- *(To be filled in.)*
+
+- **A-01 heading duplication** was flagged in the §7 UI Assessment ("Consider whether the heading is truly visible…") but not resolved before implementation — caught only during visual verification. The three-source duplication (`h2`, `QRCodeDisplay`, `p.qr-hint`) was not obvious from reading the code alone; it required a rendered view to spot.
+- **Caption action row wrapping** was not anticipated because the spec was written against the primary (wide) slot only. The secondary strip (~200px) is significantly narrower — the three-button text row was always going to break there.
+- **Replace-only QR** in `renderCaptionActions` was a spec omission: §2.4 specified file import for the empty-slot CTA but did not explicitly extend it to the filled-slot replace flow. The oversight was caught during verification.
 
 ### Things to Consider
+
 - The `image:importFromFile` path construction duplicates the `imagesDir` logic from `server.ts`. Extract to `src/main/paths.ts` shared utility in a future refactor.
 - Orphaned imported files (user imports, then abandons the form) should be addressed by a future cleanup sweep — track filenames of imported-but-unsaved images and delete on form cancel.
-- **Core Doc Revision:** Add `image:importFromFile` to `docs/reference/ipc_api.md` under Image handlers. Update `docs/style_guide.md` with the new plate layout pattern once a path is selected. If `.sr-only` pattern is introduced for the QR heading, document it in `docs/style_guide.md` §Accessibility Patterns.
+- **Core Doc Revision (outstanding):**
+  - Add `image:importFromFile` to `docs/reference/ipc_api.md` under Image handlers.
+  - Document `.sr-only` in `docs/style_guide.md` §Accessibility Patterns as the canonical visually-hidden pattern.
+  - Update `docs/style_guide.md` with the new plate layout classes (`.plate-primary`, `.plate-secondary-strip`, `.plate-secondary-slot`) once verification is complete.
+- When implementing the icon redesign (Decision 4), consider updating the test for P-02 to query by icon role rather than button text — the label disappears on secondary slots.
