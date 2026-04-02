@@ -1,6 +1,6 @@
 {
   "name": "patina",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "dist/main/main/index.js",
   "directories": {
@@ -17,7 +17,6 @@
     "build:main": "tsc -p tsconfig.main.json",
     "preview": "vite preview",
     "test": "vitest",
-
     "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
     "type-check": "tsc --noEmit && tsc -p tsconfig.main.json --noEmit",
     "db:seed": "tsc scripts/seed_data.ts --module commonjs --target es2020 --esModuleInterop && electron scripts/seed_data.js && rm scripts/seed_data.js",

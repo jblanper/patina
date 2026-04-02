@@ -25,14 +25,19 @@ else
 fi
 
 # ── Group by conventional commit prefix ────────────────────────────────────
+# Match both plain (feat:) and scoped (feat(scope):) conventional commits.
 section() {
   local label=$1 prefix=$2
   local lines
-  lines=$(printf '%s\n' "$LOG" | grep -E "^[0-9a-f]+ ${prefix}:" | sed "s/^[0-9a-f]* ${prefix}: /- /" || true)
-  [[ -n "$lines" ]] && printf "### %s\n%s\n\n" "$label" "$lines"
+  lines=$(echo "$LOG" | grep -E "^[0-9a-f]+ ${prefix}[:(]" | sed -E "s/^[0-9a-f]+ ${prefix}(\([^)]*\))?: /- /" || true)
+  if [[ -n "$lines" ]]; then
+    echo "### ${label}"
+    echo "$lines"
+    echo
+  fi
 }
 
-OTHER=$(printf '%s\n' "$LOG" | grep -Ev "^[0-9a-f]+ (feat|fix|docs|chore):" | sed 's/^[0-9a-f]* /- /' || true)
+OTHER=$(echo "$LOG" | grep -Ev "^[0-9a-f]+ (feat|fix|docs|chore)[:(]" | sed 's/^[0-9a-f]* /- /' || true)
 
 # ── Build changelog entry ───────────────────────────────────────────────────
 TODAY=$(date +%Y-%m-%d)
@@ -44,8 +49,13 @@ ENTRY_FILE=$(mktemp)
   section "Fixes"     "fix"
   section "Docs"      "docs"
   section "Chores"    "chore"
-  [[ -n "$OTHER" ]] && printf "### Other\n%s\n\n" "$OTHER"
-  printf "---\n\n"
+  if [[ -n "$OTHER" ]]; then
+    echo "### Other"
+    echo "$OTHER"
+    echo
+  fi
+  echo "---"
+  echo
 } > "$ENTRY_FILE"
 
 # ── Prepend to CHANGELOG.md ─────────────────────────────────────────────────
