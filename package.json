@@ -1,11 +1,8 @@
 {
   "name": "patina",
   "version": "1.1.0",
-  "description": "",
+  "description": "Privacy-first desktop application for historical coin collectors",
   "main": "dist/main/main/index.js",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:main-tsc\" \"npm run dev:electron\"",
     "dev:fresh": "npm run build && npm run dev",
