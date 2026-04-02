@@ -161,3 +161,59 @@ Dynamic filter groups (Metals, Grade) truncate to 8 values when the list exceeds
 - **Expand state is local, not persisted** — The sidebar opens in compact state on every session. Do not lift this state to `localStorage` or a hook.
 - **Fixed groups are never truncated** — Sort and Eras have small, fixed value sets. Do not apply `renderOverflowGroup` to them.
 - **No expand/collapse animation** — Do not add `transition` on `max-height`. Animated reflow shifts the sidebar while the user is interacting with it.
+
+---
+
+## 6. Accessibility Patterns
+
+### Visually Hidden (`.sr-only`)
+
+Use `.sr-only` to make an element available to screen readers while keeping it invisible on screen. This is the canonical visually-hidden pattern for the project — do not use `display: none` or `visibility: hidden` when the element must remain in the accessibility tree.
+
+```css
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+```
+
+**Use cases:**
+- Dialog titles referenced by `aria-labelledby` that should not appear visually (e.g. the QR dialog `<h2 id="qr-dialog-title">`)
+- Supplementary labels for icon-only controls
+
+---
+
+## 7. PlateEditor (Scriptorium — Left Folio)
+
+### Layout: Hero + Strip (Path A)
+
+The left folio uses a two-tier plate layout:
+
+| Class | Role |
+|-------|------|
+| `.plate-primary` | Obverse — full-width primary frame (4:3 aspect ratio). Visually dominant. |
+| `.plate-secondary-strip` | Horizontal strip below the primary; houses Reverse and Edge side by side. |
+| `.plate-secondary-slot` | Individual slot within the strip. Keeps `aspect-ratio: 1`. |
+
+Active slot is indicated by a `--accent-manuscript` (Burnt Sienna) border. On mobile (`< 1000px`) the strip becomes a 2-column sub-row beneath the primary.
+
+### Caption Action Bar: Icon Trio
+
+When a slot contains an image, three icon buttons appear below the caption:
+
+| Class | Icon | Action | Hover colour |
+|-------|------|--------|--------------|
+| `.btn-plate-icon-action` | Circular arrows | Replace (opens Lens) | `--accent-manuscript` |
+| `.btn-plate-icon-action` | Download arrow | Import from file | `--accent-manuscript` |
+| `.btn-plate-icon-action.btn-plate-icon-action--remove` | Trash | Clear slot | `--error-red` |
+
+Two `.plate-action-sep` hairline dividers (1px × 24px, `--border-hairline`) separate the three buttons.
+
+**Compact variant (secondary slots):** `.btn-plate-icon-action--compact` hides the text label and shows a dark pill tooltip via `::after { content: attr(data-tooltip) }` on hover/focus. All compact buttons carry an explicit `aria-label` for screen readers; SVGs are `aria-hidden="true"`.

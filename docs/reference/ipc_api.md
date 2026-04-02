@@ -129,6 +129,22 @@ await window.electronAPI.deleteImage(id: number);
 
 ---
 
+### `image:importFromFile`
+
+Opens a native file-picker dialog (Main process) and copies the selected image into `data/images/coins/`. Takes no renderer-supplied arguments — the dialog runs entirely in the Main process.
+
+```typescript
+const relativePath = await window.electronAPI.importImageFromFile();
+```
+
+**Returns:** `string | null` — relative path (`coins/<filename>`) on success, `null` if the user cancelled.
+
+**Allowed extensions:** `.jpg`, `.jpeg`, `.png`, `.webp`. SVG is explicitly blocked.
+
+> The copied file is given a collision-safe name (`import-<timestamp>-<random>.<ext>`). If the user abandons the form without saving, the file becomes orphaned on disk — this is consistent with the Lens behaviour and is addressed by a future cleanup sweep.
+
+---
+
 ## Lens Handlers
 
 ### `lens:start`
