@@ -148,7 +148,7 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
             availableEras,
             erasExpanded,
             setErasExpanded,
-            v => `Filter by ${v} era`
+            v => t('sidebar.ariaFilter.era', { value: v })
           )
         ) : (
           <ul className="filter-list">
@@ -165,7 +165,7 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
             availableMetals,
             metalsExpanded,
             setMetalsExpanded,
-            v => `Filter by ${v} metal`
+            v => t('sidebar.ariaFilter.metal', { value: v })
           )
         ) : (
           <ul className="filter-list">
@@ -182,13 +182,17 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
             availableGrades,
             gradeExpanded,
             setGradeExpanded,
-            v => `Filter by grade ${v}`
+            v => t('sidebar.ariaFilter.grade', { value: v })
           )
         ) : (
           <ul className="filter-list">
             <li className="filter-item disabled">{t('sidebar.noGrades')}</li>
           </ul>
         )}
+      </div>
+
+      <div className="sidebar-language">
+        <LanguageSelector />
       </div>
 
       <div className="sidebar-footer">
@@ -204,7 +208,6 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
         >
           {t('sidebar.reset')}
         </button>
-        <LanguageSelector />
       </div>
     </aside>
   );

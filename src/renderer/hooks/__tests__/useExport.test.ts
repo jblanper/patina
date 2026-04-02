@@ -8,7 +8,7 @@ const mockExportToPdf = vi.fn();
 window.electronAPI = {
   exportToZip: mockExportToZip,
   exportToPdf: mockExportToPdf,
-} as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+} as any;
 
 describe('useExport Hook', () => {
   beforeEach(() => {

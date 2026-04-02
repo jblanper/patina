@@ -228,6 +228,22 @@ describe('CoinDetail Component', () => {
     expect(screen.queryByText('Confirm Deletion')).not.toBeInTheDocument();
   });
 
+  it('C-03: delete confirmation button uses btn-delete class (not btn-solid)', () => {
+    vi.spyOn(useCoinHook, 'useCoin').mockReturnValue({
+      coin: mockCoin,
+      images: mockImages,
+      isLoading: false,
+      error: null,
+    });
+
+    renderWithAllVisible(<CoinDetail />);
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Record' }));
+
+    const deleteBtn = screen.getByRole('button', { name: 'Delete' });
+    expect(deleteBtn).toHaveClass('btn-delete');
+    expect(deleteBtn).not.toHaveClass('btn-solid');
+  });
+
   // ── Conditional field rendering (isVisible guards) ───────────────────────
 
   it('TC-CD-VIS-01: hides die_axis metric when ledger.die_axis=false', () => {
@@ -323,7 +339,7 @@ describe('CoinDetail Component', () => {
       images: mockImages, isLoading: false, error: null,
     });
     renderWithAllVisible(<CoinDetail />);
-    expect(screen.getByText(/\(-44 CE\)/)).toBeInTheDocument();
+    expect(screen.getByText(/· -44 CE/)).toBeInTheDocument();
   });
 
   it('TC-FLD-04: year_numeric annotation absent when coin.year_numeric is null', () => {
@@ -332,7 +348,7 @@ describe('CoinDetail Component', () => {
       images: mockImages, isLoading: false, error: null,
     });
     renderWithAllVisible(<CoinDetail />);
-    expect(screen.queryByText(/CE\)/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/· -\d+ CE/)).not.toBeInTheDocument();
   });
 
   it('TC-FLD-05: rarity metric renders when ledger.rarity=true', () => {

@@ -177,6 +177,22 @@ describe('PatinaSidebar', () => {
     expect(screen.queryByRole('button', { name: /show/i })).toBeNull();
   });
 
+  it('C-02: era aria-label is routed through t() with correct interpolation', () => {
+    render(<PatinaSidebar {...defaultProps} availableEras={['Roman Imperial']} />);
+    // The i18n mock resolves sidebar.ariaFilter.era to "Filter by Roman Imperial era"
+    expect(screen.getByRole('checkbox', { name: 'Filter by Roman Imperial era' })).toBeInTheDocument();
+  });
+
+  it('C-02: metal aria-label is routed through t() with correct interpolation', () => {
+    render(<PatinaSidebar {...defaultProps} availableMetals={['Silver']} />);
+    expect(screen.getByRole('checkbox', { name: 'Filter by Silver metal' })).toBeInTheDocument();
+  });
+
+  it('C-02: grade aria-label is routed through t() with correct interpolation', () => {
+    render(<PatinaSidebar {...defaultProps} availableGrades={['VF-30']} />);
+    expect(screen.getByRole('checkbox', { name: 'Filter by grade VF-30' })).toBeInTheDocument();
+  });
+
   it('Reset button is disabled when no filters are active', () => {
     render(<PatinaSidebar {...defaultProps} />);
     const resetBtn = screen.getByRole('button', { name: /Reset Archive View/i });

@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { app } from 'electron';
 import { z } from 'zod';
-import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage, Vocabulary, FieldVisibilityMap } from '../common/types';
+import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage, FieldVisibilityMap } from '../common/types';
 import { NewCoinSchema, NewCoinImageSchema, ALLOWED_VOCAB_FIELDS, VocabField, ALLOWED_VISIBILITY_KEYS, DEFAULT_FIELD_VISIBILITY, VisibilityKey } from '../common/validation';
 
 import { SCHEMA, generateSQL } from '../common/schema';
@@ -186,7 +186,7 @@ db.exec(generateSQL(SCHEMA));
 // Migration: Add UNIQUE constraint on images(coin_id, path) if not exists
 try {
   db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_images_coin_path ON images(coin_id, path)');
-} catch (e) {
+} catch {
   // Index may already exist in some SQLite versions
 }
 

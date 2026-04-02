@@ -57,4 +57,5 @@ window.electronAPI = {
   prefsGetVisibility: vi.fn().mockResolvedValue({ ...DEFAULT_FIELD_VISIBILITY }),
   prefsSetVisibility: vi.fn().mockResolvedValue(undefined),
   prefsResetVisibility: vi.fn().mockResolvedValue({ ...DEFAULT_FIELD_VISIBILITY }),
+  importImageFromFile: vi.fn().mockResolvedValue(null),
 };

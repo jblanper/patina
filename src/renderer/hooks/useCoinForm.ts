@@ -48,6 +48,24 @@ export function useCoinForm(initialCoin?: Coin | null, existingImages: CoinImage
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // F-04: isDirty — true when edit-mode form data differs from initial coin snapshot
+  const isDirty = useMemo(() => {
+    if (!initialCoin) return false;
+    const { id: _id, created_at: _created_at, ...initial } = initialCoin;
+    const { images: _images, ...current } = formData;
+    return JSON.stringify(current) !== JSON.stringify(initial);
+  }, [formData, initialCoin]);
+
+  // F-04: imagesChanged — true when new images (not in existingImages) have been added
+  const imagesChanged = useMemo(() => {
+    if (!initialCoin) {
+      return Object.keys(formData.images).length > 0;
+    }
+    const existingPaths = new Set(existingImages.map(img => img.path));
+    return Object.values(formData.images).some(p => p && !existingPaths.has(p));
+  }, [formData.images, initialCoin, existingImages]);
+
   const existingImagePaths = useMemo(
     () => new Set(existingImages.map(img => img.path)),
     [existingImages]
@@ -167,6 +185,8 @@ export function useCoinForm(initialCoin?: Coin | null, existingImages: CoinImage
     errors,
     isSaving,
     submitError,
+    isDirty,
+    imagesChanged,
     clearError: () => setSubmitError(null),
     updateField,
     updateImage,

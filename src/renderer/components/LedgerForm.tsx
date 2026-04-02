@@ -4,6 +4,7 @@ import { NewCoin } from '../../common/types';
 import { AutocompleteField } from './AutocompleteField';
 import { useVocabularies } from '../hooks/useVocabularies';
 import { useGlossaryContext } from '../contexts/GlossaryContext';
+import { useFieldVisibility } from '../contexts/FieldVisibilityContext';
 
 interface LedgerFormProps {
   formData: NewCoin;
@@ -15,6 +16,7 @@ interface LedgerFormProps {
 export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, updateField, coinId }) => {
   const { t } = useTranslation();
   const { openField } = useGlossaryContext();
+  const { isVisible } = useFieldVisibility();
   const entryLabel = coinId ? `#${String(coinId).padStart(3, '0')}` : t('ledger.newEntryId');
 
   const eraVocab = useVocabularies('era');
@@ -24,6 +26,24 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
   const dieAxisVocab = useVocabularies('die_axis');
   const gradeVocab = useVocabularies('grade');
   const rarityVocab = useVocabularies('rarity');
+
+  // V-01: determine which fields are hidden
+  const showDieAxis    = isVisible('ledger.die_axis');
+  const showFineness   = isVisible('ledger.fineness');
+  const showEdgeDesc   = isVisible('ledger.edge_desc');
+  const showProvenance = isVisible('ledger.provenance');
+  const showAcquisition = isVisible('ledger.acquisition');
+
+  const hiddenMetricFields: Array<'die_axis' | 'fineness'> = [];
+  if (!showDieAxis)  hiddenMetricFields.push('die_axis');
+  if (!showFineness) hiddenMetricFields.push('fineness');
+
+  const hiddenSectionCount =
+    hiddenMetricFields.length +
+    (showEdgeDesc ? 0 : 1) +
+    (showProvenance ? 0 : 1) +
+    (showAcquisition ? 0 : 1);
+
   return (
     <div className="right-folio">
       <div className="folio-header">
@@ -79,6 +99,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
               hasUserValues={false}
             />
           </div>
+          {/* L-02: year_display and year_numeric paired in subtitle-stack */}
           <div className="subtitle-item">
             <button className="subtitle-label" onClick={() => openField('year_display')} aria-label={t('glossary.hintLabel', { field: 'year_display' })}>
               <span className="label-text">{t('ledger.year')}</span>
@@ -89,6 +110,22 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
               placeholder={t('ledger.placeholders.year')}
               value={formData.year_display || ''}
               onChange={(e) => updateField('year_display', e.target.value)}
+            />
+          </div>
+          <div className="subtitle-item subtitle-item--linked">
+            <button className="subtitle-label subtitle-label--linked" onClick={() => openField('year_numeric')} aria-label={t('glossary.hintLabel', { field: 'year_numeric' })}>
+              <span className="label-text">{t('ledger.yearCe')}</span>
+            </button>
+            <input
+              type="number"
+              className="input-sub"
+              placeholder={t('ledger.placeholders.yearCe')}
+              value={formData.year_numeric ?? ''}
+              onChange={(e) => {
+                const raw = e.target.value;
+                const parsed = parseInt(raw, 10);
+                updateField('year_numeric', raw === '' || isNaN(parsed) ? null : parsed);
+              }}
             />
           </div>
           <div className="subtitle-item">
@@ -133,7 +170,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         </div>
       </div>
 
-      {/* Technical Metrics */}
+      {/* Technical Metrics — L-04: Option C sequence (Weight·Diameter / Material·Fineness / Grade·Rarity / Die Axis) */}
       <div className="metrics-grid">
         <div className="metric-item">
           <button className="metric-label" onClick={() => openField('weight')} aria-label={t('glossary.hintLabel', { field: 'weight' })}>
@@ -164,21 +201,6 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
           {errors.diameter && <span className="error-hint">{errors.diameter}</span>}
         </div>
         <div className="metric-item">
-          <button className="metric-label" onClick={() => openField('die_axis')} aria-label={t('glossary.hintLabel', { field: 'die_axis' })}>
-            <span className="label-text">{t('ledger.dieAxis')}</span>
-          </button>
-          <AutocompleteField
-            field="die_axis"
-            value={formData.die_axis || ''}
-            onChange={(v) => updateField('die_axis', v)}
-            onAddNew={(v) => { dieAxisVocab.addVocabulary(v); updateField('die_axis', v); }}
-            options={dieAxisVocab.options}
-            placeholder={t('ledger.placeholders.dieAxis')}
-            onReset={dieAxisVocab.resetVocabularies}
-            hasUserValues={false}
-          />
-        </div>
-        <div className="metric-item">
           <button className="metric-label" onClick={() => openField('metal')} aria-label={t('glossary.hintLabel', { field: 'metal' })}>
             <span className="label-text">{t('ledger.material')}</span>
           </button>
@@ -193,18 +215,20 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             hasUserValues={false}
           />
         </div>
-        <div className="metric-item">
-          <button className="metric-label" onClick={() => openField('fineness')} aria-label={t('glossary.hintLabel', { field: 'fineness' })}>
-            <span className="label-text">{t('ledger.fineness')}</span>
-          </button>
-          <input
-            type="text"
-            className="input-metric"
-            placeholder={t('ledger.placeholders.fineness')}
-            value={formData.fineness || ''}
-            onChange={(e) => updateField('fineness', e.target.value)}
-          />
-        </div>
+        {showFineness && (
+          <div className="metric-item">
+            <button className="metric-label" onClick={() => openField('fineness')} aria-label={t('glossary.hintLabel', { field: 'fineness' })}>
+              <span className="label-text">{t('ledger.fineness')}</span>
+            </button>
+            <input
+              type="text"
+              className="input-metric"
+              placeholder={t('ledger.placeholders.fineness')}
+              value={formData.fineness || ''}
+              onChange={(e) => updateField('fineness', e.target.value)}
+            />
+          </div>
+        )}
         <div className="metric-item">
           <button className="metric-label" onClick={() => openField('grade')} aria-label={t('glossary.hintLabel', { field: 'grade' })}>
             <span className="label-text">{t('ledger.grade')}</span>
@@ -235,23 +259,136 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             hasUserValues={false}
           />
         </div>
-        <div className="metric-item">
-          <button className="metric-label" onClick={() => openField('year_numeric')} aria-label={t('glossary.hintLabel', { field: 'year_numeric' })}>
-            <span className="label-text">{t('ledger.yearCe')}</span>
-          </button>
-          <input
-            type="number"
-            className="input-metric"
-            placeholder={t('ledger.placeholders.yearCe')}
-            value={formData.year_numeric ?? ''}
-            onChange={(e) => {
-              const raw = e.target.value;
-              const parsed = parseInt(raw, 10);
-              updateField('year_numeric', raw === '' || isNaN(parsed) ? null : parsed);
-            }}
-          />
-        </div>
+        {showDieAxis && (
+          <div className="metric-item">
+            <button className="metric-label" onClick={() => openField('die_axis')} aria-label={t('glossary.hintLabel', { field: 'die_axis' })}>
+              <span className="label-text">{t('ledger.dieAxis')}</span>
+            </button>
+            <AutocompleteField
+              field="die_axis"
+              value={formData.die_axis || ''}
+              onChange={(v) => updateField('die_axis', v)}
+              onAddNew={(v) => { dieAxisVocab.addVocabulary(v); updateField('die_axis', v); }}
+              options={dieAxisVocab.options}
+              placeholder={t('ledger.placeholders.dieAxis')}
+              onReset={dieAxisVocab.resetVocabularies}
+              hasUserValues={false}
+            />
+          </div>
+        )}
       </div>
+
+      {/* V-01: Hidden Fields Accordion — single disclosure for all visibility-off fields */}
+      {hiddenSectionCount > 0 && (
+        <details className="hidden-fields-accordion">
+          <summary className="hidden-fields-toggle">
+            {t('ledger.hiddenFields', { count: hiddenSectionCount })}
+          </summary>
+          {hiddenMetricFields.length > 0 && (
+            <div className="metrics-grid hidden-fields-grid">
+              {hiddenMetricFields.includes('die_axis') && (
+                <div className="metric-item">
+                  <button className="metric-label" onClick={() => openField('die_axis')} aria-label={t('glossary.hintLabel', { field: 'die_axis' })}>
+                    <span className="label-text">{t('ledger.dieAxis')}</span>
+                  </button>
+                  <AutocompleteField
+                    field="die_axis"
+                    value={formData.die_axis || ''}
+                    onChange={(v) => updateField('die_axis', v)}
+                    onAddNew={(v) => { dieAxisVocab.addVocabulary(v); updateField('die_axis', v); }}
+                    options={dieAxisVocab.options}
+                    placeholder={t('ledger.placeholders.dieAxis')}
+                    onReset={dieAxisVocab.resetVocabularies}
+                    hasUserValues={false}
+                  />
+                </div>
+              )}
+              {hiddenMetricFields.includes('fineness') && (
+                <div className="metric-item">
+                  <button className="metric-label" onClick={() => openField('fineness')} aria-label={t('glossary.hintLabel', { field: 'fineness' })}>
+                    <span className="label-text">{t('ledger.fineness')}</span>
+                  </button>
+                  <input
+                    type="text"
+                    className="input-metric"
+                    placeholder={t('ledger.placeholders.fineness')}
+                    value={formData.fineness || ''}
+                    onChange={(e) => updateField('fineness', e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          {!showEdgeDesc && (
+            <div className="numismatic-section">
+              <button className="section-label" onClick={() => openField('edge_desc')} aria-label={t('glossary.hintLabel', { field: 'edge_desc' })}>
+                <span className="label-text">{t('ledger.edge')}</span>
+              </button>
+              <textarea
+                className="input-block"
+                placeholder={t('ledger.placeholders.edgeDesc')}
+                value={formData.edge_desc || ''}
+                onChange={(e) => updateField('edge_desc', e.target.value)}
+              />
+            </div>
+          )}
+          {!showProvenance && (
+            <div className="numismatic-section">
+              <button className="section-label" onClick={() => openField('provenance')} aria-label={t('glossary.hintLabel', { field: 'provenance' })}>
+                <span className="label-text">{t('ledger.provenance')}</span>
+              </button>
+              <textarea
+                className="input-block"
+                placeholder={t('ledger.placeholders.provenance')}
+                value={formData.provenance || ''}
+                onChange={(e) => updateField('provenance', e.target.value)}
+              />
+            </div>
+          )}
+          {!showAcquisition && (
+            <footer className="ledger-footer">
+              <div className="metrics-grid metrics-grid--3col">
+                <div className="metric-item">
+                  <button className="metric-label" onClick={() => openField('purchase_date')} aria-label={t('glossary.hintLabel', { field: 'purchase_date' })}>
+                    <span className="label-text">{t('ledger.acquired')}</span>
+                  </button>
+                  {/* L-06: type="date" enforces ISO YYYY-MM-DD */}
+                  <input
+                    type="date"
+                    className="input-metric"
+                    value={formData.purchase_date || ''}
+                    onChange={(e) => updateField('purchase_date', e.target.value || null)}
+                  />
+                </div>
+                <div className="metric-item">
+                  <button className="metric-label" onClick={() => openField('purchase_source')} aria-label={t('glossary.hintLabel', { field: 'purchase_source' })}>
+                    <span className="label-text">{t('ledger.source')}</span>
+                  </button>
+                  <input
+                    type="text"
+                    className="input-metric"
+                    placeholder={t('ledger.placeholders.source')}
+                    value={formData.purchase_source || ''}
+                    onChange={(e) => updateField('purchase_source', e.target.value)}
+                  />
+                </div>
+                <div className="metric-item">
+                  <button className="metric-label" onClick={() => openField('purchase_price')} aria-label={t('glossary.hintLabel', { field: 'purchase_price' })}>
+                    <span className="label-text">{t('ledger.cost')}</span>
+                  </button>
+                  <input
+                    type="number"
+                    className="input-metric"
+                    placeholder={t('ledger.placeholders.cost')}
+                    value={formData.purchase_price || ''}
+                    onChange={(e) => updateField('purchase_price', e.target.value ? parseFloat(e.target.value) : null)}
+                  />
+                </div>
+              </div>
+            </footer>
+          )}
+        </details>
+      )}
 
       {/* Numismatic Data */}
       <div className="numismatic-section">
@@ -292,18 +429,20 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         />
       </div>
 
-      {/* Edge Description */}
-      <div className="numismatic-section">
-        <button className="section-label" onClick={() => openField('edge_desc')} aria-label={t('glossary.hintLabel', { field: 'edge_desc' })}>
-          <span className="label-text">{t('ledger.edge')}</span>
-        </button>
-        <textarea
-          className="input-block"
-          placeholder={t('ledger.placeholders.edgeDesc')}
-          value={formData.edge_desc || ''}
-          onChange={(e) => updateField('edge_desc', e.target.value)}
-        />
-      </div>
+      {/* Edge Description — visible only when not hidden by visibility prefs */}
+      {showEdgeDesc && (
+        <div className="numismatic-section">
+          <button className="section-label" onClick={() => openField('edge_desc')} aria-label={t('glossary.hintLabel', { field: 'edge_desc' })}>
+            <span className="label-text">{t('ledger.edge')}</span>
+          </button>
+          <textarea
+            className="input-block"
+            placeholder={t('ledger.placeholders.edgeDesc')}
+            value={formData.edge_desc || ''}
+            onChange={(e) => updateField('edge_desc', e.target.value)}
+          />
+        </div>
+      )}
 
       {/* Curator's Note */}
       <div className="numismatic-section">
@@ -318,61 +457,64 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
         />
       </div>
 
-      {/* Provenance */}
-      <div className="numismatic-section">
-        <button className="section-label" onClick={() => openField('provenance')} aria-label={t('glossary.hintLabel', { field: 'provenance' })}>
-          <span className="label-text">{t('ledger.provenance')}</span>
-        </button>
-        <input
-          type="text"
-          className="input-metric provenance-input"
-          placeholder={t('ledger.placeholders.provenance')}
-          value={formData.provenance || ''}
-          onChange={(e) => updateField('provenance', e.target.value)}
-        />
-      </div>
-
-      {/* Acquisition Footer */}
-      <footer className="ledger-footer">
-        <div className="metrics-grid">
-          <div className="metric-item">
-            <button className="metric-label" onClick={() => openField('purchase_date')} aria-label={t('glossary.hintLabel', { field: 'purchase_date' })}>
-              <span className="label-text">{t('ledger.acquired')}</span>
-            </button>
-            <input
-              type="text"
-              className="input-metric"
-              placeholder={t('ledger.placeholders.acquired')}
-              value={formData.purchase_date || ''}
-              onChange={(e) => updateField('purchase_date', e.target.value)}
-            />
-          </div>
-          <div className="metric-item">
-            <button className="metric-label" onClick={() => openField('purchase_source')} aria-label={t('glossary.hintLabel', { field: 'purchase_source' })}>
-              <span className="label-text">{t('ledger.source')}</span>
-            </button>
-            <input
-              type="text"
-              className="input-metric"
-              placeholder={t('ledger.placeholders.source')}
-              value={formData.purchase_source || ''}
-              onChange={(e) => updateField('purchase_source', e.target.value)}
-            />
-          </div>
-          <div className="metric-item">
-            <button className="metric-label" onClick={() => openField('purchase_price')} aria-label={t('glossary.hintLabel', { field: 'purchase_price' })}>
-              <span className="label-text">{t('ledger.cost')}</span>
-            </button>
-            <input
-              type="number"
-              className="input-metric"
-              placeholder={t('ledger.placeholders.cost')}
-              value={formData.purchase_price || ''}
-              onChange={(e) => updateField('purchase_price', e.target.value ? parseFloat(e.target.value) : null)}
-            />
-          </div>
+      {/* L-03: Provenance as textarea — visible only when not hidden */}
+      {showProvenance && (
+        <div className="numismatic-section">
+          <button className="section-label" onClick={() => openField('provenance')} aria-label={t('glossary.hintLabel', { field: 'provenance' })}>
+            <span className="label-text">{t('ledger.provenance')}</span>
+          </button>
+          <textarea
+            className="input-block"
+            placeholder={t('ledger.placeholders.provenance')}
+            value={formData.provenance || ''}
+            onChange={(e) => updateField('provenance', e.target.value)}
+          />
         </div>
-      </footer>
+      )}
+
+      {/* Acquisition Footer — visible only when not hidden */}
+      {showAcquisition && (
+        <footer className="ledger-footer">
+          <div className="metrics-grid metrics-grid--3col">
+            <div className="metric-item">
+              <button className="metric-label" onClick={() => openField('purchase_date')} aria-label={t('glossary.hintLabel', { field: 'purchase_date' })}>
+                <span className="label-text">{t('ledger.acquired')}</span>
+              </button>
+              {/* L-06: type="date" enforces ISO YYYY-MM-DD */}
+              <input
+                type="date"
+                className="input-metric"
+                value={formData.purchase_date || ''}
+                onChange={(e) => updateField('purchase_date', e.target.value || null)}
+              />
+            </div>
+            <div className="metric-item">
+              <button className="metric-label" onClick={() => openField('purchase_source')} aria-label={t('glossary.hintLabel', { field: 'purchase_source' })}>
+                <span className="label-text">{t('ledger.source')}</span>
+              </button>
+              <input
+                type="text"
+                className="input-metric"
+                placeholder={t('ledger.placeholders.source')}
+                value={formData.purchase_source || ''}
+                onChange={(e) => updateField('purchase_source', e.target.value)}
+              />
+            </div>
+            <div className="metric-item">
+              <button className="metric-label" onClick={() => openField('purchase_price')} aria-label={t('glossary.hintLabel', { field: 'purchase_price' })}>
+                <span className="label-text">{t('ledger.cost')}</span>
+              </button>
+              <input
+                type="number"
+                className="input-metric"
+                placeholder={t('ledger.placeholders.cost')}
+                value={formData.purchase_price || ''}
+                onChange={(e) => updateField('purchase_price', e.target.value ? parseFloat(e.target.value) : null)}
+              />
+            </div>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };

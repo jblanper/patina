@@ -9,11 +9,6 @@
     "asc": "↑ Asc",
     "desc": "↓ Desc",
     "eras": "Eras",
-    "era": {
-      "ancient": "Ancient",
-      "medieval": "Medieval",
-      "modern": "Modern"
-    },
     "metals": "Metals",
     "grade": "Grade",
     "noEras": "No eras recorded",
@@ -22,7 +17,12 @@
     "showMore": "Show {{count}} more",
     "showLess": "Show less",
     "reset": "Reset Archive View",
-    "language": "Language"
+    "language": "Language",
+    "ariaFilter": {
+      "era":   "Filter by {{value}} era",
+      "metal": "Filter by {{value}} metal",
+      "grade": "Filter by grade {{value}}"
+    }
   },
   "cabinet": {
     "header": "Patina — The Cabinet",
@@ -100,7 +100,8 @@
       "rarity": "e.g. R / RR / Common",
       "cost": "0.00"
     },
-    "requiredNote": "* Required to index"
+    "requiredNote": "* Required to index",
+    "hiddenFields": "{{count}} hidden field(s) — click to expand"
   },
   "detail": {
     "loading": "Retrieving archival record...",
@@ -132,7 +133,21 @@
     "indexing": "Indexing...",
     "indexToLedger": "Index to Ledger",
     "updateLedger": "Update Ledger",
-    "dismissError": "Dismiss error"
+    "dismissError": "Dismiss error",
+    "editingRecord": "Editing Record",
+    "discardDraft": "Discard Draft",
+    "leaveConfirm": {
+      "title": "Unsaved Changes",
+      "message": "Your changes to this record have not been saved. Leave without indexing?",
+      "cancel": "Continue Editing",
+      "discard": "Discard Changes"
+    },
+    "discardConfirm": {
+      "title": "Discard Draft",
+      "message": "This will permanently clear the current draft. This cannot be undone.",
+      "cancel": "Keep Draft",
+      "confirm": "Discard"
+    }
   },
   "plateEditor": {
     "slots": {
@@ -141,6 +156,7 @@
       "edge": "Edge"
     },
     "replace": "Replace",
+    "importFile": "Import",
     "establishBridge": "Activate Connection",
     "importArchive": "Import from Digital Archive",
     "plateCaption": {
@@ -149,7 +165,10 @@
       "edge": "PLATE III"
     },
     "scanHint": "Scan with mobile to capture {{slot}}",
-    "closeQr": "Close QR code"
+    "closeQr": "Close QR code",
+    "clearSlot": "Remove {{slot}}",
+    "activeHint": "← Next capture will land here",
+    "importError": "Import failed. Only JPEG, PNG, and WebP files are accepted."
   },
   "autocomplete": {
     "addNew": "Add \u201C{{value}}\u201D",

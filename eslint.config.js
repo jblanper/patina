@@ -2,7 +2,7 @@ const tseslint = require("typescript-eslint");
 
 module.exports = tseslint.config(
   {
-    ignores: [],
+    ignores: ["**/coverage/**"],
   },
   ...tseslint.configs.recommended,
   {
@@ -19,11 +19,22 @@ module.exports = tseslint.config(
     },
     rules: {
       "react/react-in-jsx-scope": "off",
+      "@typescript-eslint/no-unused-vars": ["error", {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
+      }],
     },
     settings: {
       react: {
         version: "detect",
       },
+    },
+  },
+  {
+    files: ["**/*.test.{ts,tsx}", "**/__tests__/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
     },
   }
 );

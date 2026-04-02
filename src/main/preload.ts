@@ -57,4 +57,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   prefsResetVisibility: () =>
     ipcRenderer.invoke('prefs:resetVisibility'),
+
+  // Image Import API
+  importImageFromFile: (): Promise<string | null> =>
+    ipcRenderer.invoke('image:importFromFile'),
 });

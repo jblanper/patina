@@ -247,6 +247,38 @@ app.whenReady().then(() => {
 
   ipcMain.handle('prefs:resetVisibility', () => dbService.resetFieldVisibility());
 
+  // Image Import IPC Handler
+  ipcMain.handle('image:importFromFile', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: 'Import Image',
+      properties: ['openFile'],
+      filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp'] }]
+    });
+
+    if (canceled || filePaths.length === 0) return null;
+
+    const sourcePath = filePaths[0];
+    const ext = path.extname(sourcePath).toLowerCase();
+    const ALLOWED_EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp']);
+
+    if (!ALLOWED_EXTS.has(ext)) {
+      throw new Error('Unsupported file type. Only JPEG, PNG, and WebP are accepted.');
+    }
+
+    const imagesDir = isDev
+      ? path.join(process.cwd(), 'data', 'images', 'coins')
+      : path.join(app.getPath('userData'), 'images', 'coins');
+
+    await fs.promises.mkdir(imagesDir, { recursive: true });
+
+    const uniqueName = `import-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    const destPath = path.join(imagesDir, uniqueName);
+
+    await fs.promises.copyFile(path.resolve(sourcePath), destPath);
+
+    return path.join('coins', uniqueName);
+  });
+
   ipcMain.handle('ping', () => 'pong');
   createWindow();
 

@@ -39,6 +39,9 @@ export interface IElectronAPI {
   prefsGetVisibility: () => Promise<FieldVisibilityMap>;
   prefsSetVisibility: (key: string, visible: boolean) => Promise<void>;
   prefsResetVisibility: () => Promise<FieldVisibilityMap>;
+
+  // Image Import API
+  importImageFromFile: () => Promise<string | null>;
 }
 
 declare global {

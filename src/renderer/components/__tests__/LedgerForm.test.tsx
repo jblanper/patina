@@ -5,6 +5,9 @@ import { MemoryRouter } from 'react-router-dom';
 import { LedgerForm } from '../LedgerForm';
 import { NewCoin } from '../../../common/types';
 import { GlossaryContext } from '../../contexts/GlossaryContext';
+import { FieldVisibilityContext } from '../../contexts/FieldVisibilityContext';
+import { DEFAULT_FIELD_VISIBILITY } from '../../../common/validation';
+import type { FieldVisibilityMap } from '../../../common/types';
 
 const mockGlossaryContext = {
   drawerState: { open: false, field: null },
@@ -13,11 +16,23 @@ const mockGlossaryContext = {
   close: vi.fn(),
 };
 
-const renderForm = (ui: React.ReactElement) =>
+const makeVisibilityContext = (overrides: Partial<FieldVisibilityMap> = {}) => ({
+  visibility: { ...DEFAULT_FIELD_VISIBILITY, ...overrides } as FieldVisibilityMap,
+  isVisible: (key: string) => {
+    const map = { ...DEFAULT_FIELD_VISIBILITY, ...overrides } as Record<string, boolean>;
+    return map[key] ?? true;
+  },
+  setVisibility: vi.fn(),
+  resetToDefaults: vi.fn(),
+});
+
+const renderForm = (ui: React.ReactElement, visibilityOverrides: Partial<FieldVisibilityMap> = {}) =>
   render(
-    <GlossaryContext.Provider value={mockGlossaryContext}>
-      <MemoryRouter>{ui}</MemoryRouter>
-    </GlossaryContext.Provider>
+    <FieldVisibilityContext.Provider value={makeVisibilityContext(visibilityOverrides)}>
+      <GlossaryContext.Provider value={mockGlossaryContext}>
+        <MemoryRouter>{ui}</MemoryRouter>
+      </GlossaryContext.Provider>
+    </FieldVisibilityContext.Provider>
   );
 
 const baseFormData: NewCoin = {
@@ -78,13 +93,24 @@ describe('LedgerForm', () => {
     });
   });
 
-  describe('year CE input', () => {
-    it('renders year CE input in metrics grid', () => {
-      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
-      expect(screen.getByPlaceholderText('e.g. −44 or 134')).toBeInTheDocument();
+  describe('L-02 — year_display and year_numeric in subtitle-stack', () => {
+    it('renders year_numeric input within .subtitle-stack (not .metrics-grid)', () => {
+      const { container } = renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      const subtitleStack = container.querySelector('.subtitle-stack');
+      expect(subtitleStack).not.toBeNull();
+      // year_numeric uses yearCe placeholder — must be found inside subtitle-stack
+      const yearCeInput = screen.getByPlaceholderText('e.g. −44 or 134');
+      expect(subtitleStack!.contains(yearCeInput)).toBe(true);
     });
 
-    it('calls updateField with integer on change', () => {
+    it('year_numeric is NOT inside .metrics-grid', () => {
+      const { container } = renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      const metricsGrid = container.querySelector('.metrics-grid');
+      const yearCeInput = screen.getByPlaceholderText('e.g. −44 or 134');
+      expect(metricsGrid!.contains(yearCeInput)).toBe(false);
+    });
+
+    it('calls updateField with integer on year_numeric change', () => {
       renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
       fireEvent.change(screen.getByPlaceholderText('e.g. −44 or 134'), {
         target: { value: '134' },
@@ -92,7 +118,7 @@ describe('LedgerForm', () => {
       expect(updateField).toHaveBeenCalledWith('year_numeric', 134);
     });
 
-    it('calls updateField with negative integer on change', () => {
+    it('calls updateField with negative integer on year_numeric change', () => {
       renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
       fireEvent.change(screen.getByPlaceholderText('e.g. −44 or 134'), {
         target: { value: '-44' },
@@ -100,7 +126,7 @@ describe('LedgerForm', () => {
       expect(updateField).toHaveBeenCalledWith('year_numeric', -44);
     });
 
-    it('calls updateField with null when cleared', () => {
+    it('calls updateField with null when year_numeric cleared', () => {
       renderForm(<LedgerForm formData={{ ...baseFormData, year_numeric: 134 }} errors={{}} updateField={updateField} />);
       fireEvent.change(screen.getByPlaceholderText('e.g. −44 or 134'), {
         target: { value: '' },
@@ -109,7 +135,6 @@ describe('LedgerForm', () => {
     });
 
     it('renders empty when formData.year_numeric is null', () => {
-      // Cast needed: Coin type uses number | undefined but DB can return null at runtime
       renderForm(<LedgerForm formData={{ ...baseFormData, year_numeric: null as unknown as number }} errors={{}} updateField={updateField} />);
       expect(screen.getByPlaceholderText('e.g. −44 or 134')).toHaveValue(null);
     });
@@ -126,14 +151,133 @@ describe('LedgerForm', () => {
     });
   });
 
+  describe('L-03 — provenance as textarea', () => {
+    it('renders provenance as a textarea when visible', () => {
+      const { container } = renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        { 'ledger.provenance': true }
+      );
+      const provenance = container.querySelector('textarea[placeholder="e.g. Ex. BCD Collection; Purchased 2024"]');
+      expect(provenance).not.toBeNull();
+      expect(provenance!.tagName).toBe('TEXTAREA');
+    });
+  });
+
+  describe('L-04 — metrics grid item count after year_numeric removal', () => {
+    it('main metrics-grid has 7 items (excludes year_numeric which moved to subtitle-stack)', () => {
+      const { container } = renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        {
+          'ledger.die_axis': true,
+          'ledger.fineness': true,
+        }
+      );
+      // The first .metrics-grid is the main one (not the footer or hidden-fields-grid)
+      const metricsGrid = container.querySelector('.metrics-grid');
+      expect(metricsGrid!.querySelectorAll('.metric-item')).toHaveLength(7);
+    });
+  });
+
+  describe('L-06 — purchase_date as type="date"', () => {
+    it('renders purchase_date as type="date" input when acquisition is visible', () => {
+      const { container } = renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        { 'ledger.acquisition': true }
+      );
+      const dateInputs = container.querySelectorAll('input[type="date"]');
+      expect(dateInputs.length).toBeGreaterThan(0);
+    });
+
+    it('calls updateField with purchase_date value on date input change', () => {
+      renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        { 'ledger.acquisition': true }
+      );
+      // There's no placeholder on type="date"; query by type
+      const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+      fireEvent.change(dateInput, { target: { value: '2024-06-15' } });
+      expect(updateField).toHaveBeenCalledWith('purchase_date', '2024-06-15');
+    });
+
+    it('calls updateField with purchase_source on Source input change', () => {
+      renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        { 'ledger.acquisition': true }
+      );
+      fireEvent.change(screen.getByPlaceholderText('e.g. CNG Auctions'), {
+        target: { value: 'Nomos AG' },
+      });
+      expect(updateField).toHaveBeenCalledWith('purchase_source', 'Nomos AG');
+    });
+  });
+
+  describe('V-01 — hidden fields accordion', () => {
+    it('accordion is not rendered when all fields are visible', () => {
+      const { container } = renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        {
+          'ledger.die_axis':    true,
+          'ledger.fineness':    true,
+          'ledger.edge_desc':   true,
+          'ledger.provenance':  true,
+          'ledger.acquisition': true,
+        }
+      );
+      expect(container.querySelector('.hidden-fields-accordion')).toBeNull();
+    });
+
+    it('accordion renders when die_axis is hidden', () => {
+      const { container } = renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        { 'ledger.die_axis': false }
+      );
+      expect(container.querySelector('.hidden-fields-accordion')).not.toBeNull();
+    });
+
+    it('die_axis field is inside .hidden-fields-accordion when hidden', () => {
+      const { container } = renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        { 'ledger.die_axis': false }
+      );
+      const accordion = container.querySelector('.hidden-fields-accordion');
+      const dieAxisInput = screen.getByPlaceholderText('e.g. 6h');
+      expect(accordion!.contains(dieAxisInput)).toBe(true);
+    });
+
+    it('accordion is closed by default', () => {
+      const { container } = renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        { 'ledger.die_axis': false }
+      );
+      const details = container.querySelector('details.hidden-fields-accordion');
+      expect(details).not.toHaveAttribute('open');
+    });
+
+    it('die_axis field is NOT in main metrics-grid when hidden', () => {
+      const { container } = renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        { 'ledger.die_axis': false }
+      );
+      const mainMetricsGrid = container.querySelector('.metrics-grid:not(.hidden-fields-grid)');
+      const dieAxisInput = screen.getByPlaceholderText('e.g. 6h');
+      expect(mainMetricsGrid!.contains(dieAxisInput)).toBe(false);
+    });
+  });
+
   describe('TC-FLD — Field Completeness (edge_desc, rarity)', () => {
-    it('TC-FLD-07: edge_desc textarea is present in LedgerForm', () => {
-      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+    it('TC-FLD-07: edge_desc textarea is present in LedgerForm when visible', () => {
+      renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        { 'ledger.edge_desc': true }
+      );
       expect(screen.getByPlaceholderText('e.g. Reeded / Plain / DECUS ET TUTAMEN')).toBeInTheDocument();
     });
 
     it('TC-FLD-08: updating edge_desc textarea calls updateField with edge_desc', () => {
-      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+      renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        { 'ledger.edge_desc': true }
+      );
       fireEvent.change(screen.getByPlaceholderText('e.g. Reeded / Plain / DECUS ET TUTAMEN'), {
         target: { value: 'Reeded' },
       });
@@ -143,31 +287,6 @@ describe('LedgerForm', () => {
     it('TC-FLD-09: rarity AutocompleteField is present in LedgerForm metrics grid', () => {
       renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
       expect(screen.getByPlaceholderText('e.g. R / RR / Common')).toBeInTheDocument();
-    });
-  });
-
-  describe('acquisition footer', () => {
-    it('renders Acquired, Source, and Cost inputs', () => {
-      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
-      expect(screen.getByPlaceholderText('YYYY-MM-DD')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('e.g. CNG Auctions')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('0.00')).toBeInTheDocument();
-    });
-
-    it('calls updateField with purchase_date on Acquired input change', () => {
-      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
-      fireEvent.change(screen.getByPlaceholderText('YYYY-MM-DD'), {
-        target: { value: '2024-06-15' },
-      });
-      expect(updateField).toHaveBeenCalledWith('purchase_date', '2024-06-15');
-    });
-
-    it('calls updateField with purchase_source on Source input change', () => {
-      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
-      fireEvent.change(screen.getByPlaceholderText('e.g. CNG Auctions'), {
-        target: { value: 'Nomos AG' },
-      });
-      expect(updateField).toHaveBeenCalledWith('purchase_source', 'Nomos AG');
     });
   });
 
@@ -205,8 +324,11 @@ describe('LedgerForm', () => {
   });
 
   describe('L-05 — purchase_price placeholder i18n', () => {
-    it('uses i18n translation for purchase_price placeholder', () => {
-      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+    it('uses i18n translation for purchase_price placeholder when acquisition is visible', () => {
+      renderForm(
+        <LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />,
+        { 'ledger.acquisition': true }
+      );
       expect(screen.getByPlaceholderText('0.00')).toBeInTheDocument();
     });
   });

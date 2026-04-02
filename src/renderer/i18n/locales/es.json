@@ -9,11 +9,6 @@
     "asc": "↑ Asc",
     "desc": "↓ Desc",
     "eras": "Épocas",
-    "era": {
-      "ancient": "Antiguo",
-      "medieval": "Medieval",
-      "modern": "Moderno"
-    },
     "metals": "Metales",
     "grade": "Grado",
     "noEras": "Sin épocas registradas",
@@ -22,7 +17,12 @@
     "showMore": "Mostrar {{count}} más",
     "showLess": "Mostrar menos",
     "reset": "Restablecer Filtros",
-    "language": "Idioma"
+    "language": "Idioma",
+    "ariaFilter": {
+      "era":   "Filtrar por época {{value}}",
+      "metal": "Filtrar por metal {{value}}",
+      "grade": "Filtrar por grado {{value}}"
+    }
   },
   "cabinet": {
     "header": "Patina — El Gabinete",
@@ -100,7 +100,8 @@
       "rarity": "ej. R / RR / Común",
       "cost": "0.00"
     },
-    "requiredNote": "* Obligatorio para indexar"
+    "requiredNote": "* Obligatorio para indexar",
+    "hiddenFields": "{{count}} campo(s) oculto(s) — click para expandir"
   },
   "detail": {
     "loading": "Recuperando registro del archivo...",
@@ -132,7 +133,21 @@
     "indexing": "Indexando...",
     "indexToLedger": "Indexar al Registro",
     "updateLedger": "Actualizar Registro",
-    "dismissError": "Descartar error"
+    "dismissError": "Descartar error",
+    "editingRecord": "Editando Registro",
+    "discardDraft": "Descartar Borrador",
+    "leaveConfirm": {
+      "title": "Cambios Sin Guardar",
+      "message": "Los cambios en este registro no se han guardado. ¿Salir sin indexar?",
+      "cancel": "Continuar Editando",
+      "discard": "Descartar Cambios"
+    },
+    "discardConfirm": {
+      "title": "Descartar Borrador",
+      "message": "Esto eliminará permanentemente el borrador actual. Esta acción no se puede deshacer.",
+      "cancel": "Conservar Borrador",
+      "confirm": "Descartar"
+    }
   },
   "plateEditor": {
     "slots": {
@@ -141,6 +156,7 @@
       "edge": "Bordura"
     },
     "replace": "Reemplazar",
+    "importFile": "Importar",
     "establishBridge": "Activar Conexión",
     "importArchive": "Importar del Archivo Digital",
     "plateCaption": {
@@ -149,7 +165,10 @@
       "edge": "LÁMINA III"
     },
     "scanHint": "Escanea con el móvil para capturar {{slot}}",
-    "closeQr": "Cerrar código QR"
+    "closeQr": "Cerrar código QR",
+    "clearSlot": "Eliminar {{slot}}",
+    "activeHint": "← La próxima captura llegará aquí",
+    "importError": "Error al importar. Solo se aceptan archivos JPEG, PNG y WebP."
   },
   "autocomplete": {
     "addNew": "Agregar \u201C{{value}}\u201D",

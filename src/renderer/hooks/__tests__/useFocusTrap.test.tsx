@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import React, { useRef } from 'react';
 import { useFocusTrap } from '../useFocusTrap';
@@ -54,7 +54,6 @@ describe('useFocusTrap', () => {
 
   it('TC-FT-03: Tab between non-boundary elements does not intercept', () => {
     render(<ThreeButtonTrap active={true} />);
-    const btn1 = screen.getByTestId('btn1');
     const btn2 = screen.getByTestId('btn2');
 
     btn2.focus();
@@ -84,7 +83,6 @@ describe('useFocusTrap', () => {
   it('TC-FT-06: inactive trap (active=false) does not intercept Tab', () => {
     render(<ThreeButtonTrap active={false} />);
     const btn3 = screen.getByTestId('btn3');
-    const btn1 = screen.getByTestId('btn1');
 
     btn3.focus();
     fireEvent.keyDown(document, { key: 'Tab', shiftKey: false });

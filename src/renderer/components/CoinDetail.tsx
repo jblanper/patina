@@ -91,7 +91,7 @@ export const CoinDetail: React.FC = () => {
             <p>{t('detail.confirm.message')}</p>
             <div className="modal-actions">
               <button className="btn-minimal" onClick={() => setShowDeleteConfirm(false)}>{t('detail.confirm.cancel')}</button>
-              <button className="btn-solid" onClick={handleDelete}>{t('detail.confirm.delete')}</button>
+              <button className="btn-delete" onClick={handleDelete}>{t('detail.confirm.delete')}</button>
             </div>
           </div>
         </div>
@@ -146,16 +146,23 @@ export const CoinDetail: React.FC = () => {
              <div className="subtitle">
                {isVisible('ledger.mint') && (coin.mint ? `${t('detail.mintedAt')} ${coin.mint}` : t('detail.mintUnknown'))}
                {isVisible('ledger.denomination') && coin.denomination && ` // ${coin.denomination}`}
-               {isVisible('ledger.year') && coin.year_display && (
-                 <>
-                   {` // ${coin.year_display}`}
-                   {coin.year_numeric != null && (
-                     <span className="year-numeric-annotation"> ({coin.year_numeric} CE)</span>
-                   )}
-                 </>
-               )}
-               {isVisible('ledger.catalog_ref') && coin.catalog_ref && ` // ${coin.catalog_ref}`}
              </div>
+             {((isVisible('ledger.year') && coin.year_display) || (isVisible('ledger.catalog_ref') && coin.catalog_ref)) && (
+               <div className="subtitle-ref">
+                 {isVisible('ledger.year') && coin.year_display && (
+                   <>
+                     {coin.year_display}
+                     {coin.year_numeric != null && ` · ${coin.year_numeric} CE`}
+                   </>
+                 )}
+                 {isVisible('ledger.catalog_ref') && coin.catalog_ref && (
+                   <>
+                     {(isVisible('ledger.year') && coin.year_display) ? ' // ' : ''}
+                     {coin.catalog_ref}
+                   </>
+                 )}
+               </div>
+             )}
            </header>
 
           {/* 1. Physical Metrics */}

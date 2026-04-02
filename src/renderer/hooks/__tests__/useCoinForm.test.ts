@@ -120,4 +120,77 @@ describe('useCoinForm', () => {
     expect(result.current.formData.title).toBe('Synced Coin');
     expect(result.current.formData.era).toBe('Modern');
   });
+
+  describe('F-04 — isDirty flag', () => {
+    it('isDirty is false in add mode (no initialCoin)', () => {
+      const { result } = renderHook(() => useCoinForm());
+      expect(result.current.isDirty).toBe(false);
+    });
+
+    it('isDirty is false in edit mode before any changes', () => {
+      const mockCoin = { id: 1, title: 'Original', era: 'Roman Imperial', created_at: '2026-01-01' };
+      const { result } = renderHook(() => useCoinForm(mockCoin as any));
+      expect(result.current.isDirty).toBe(false);
+    });
+
+    it('isDirty becomes true when a field is modified in edit mode', () => {
+      const mockCoin = { id: 1, title: 'Original', era: 'Roman Imperial', created_at: '2026-01-01' };
+      const { result } = renderHook(() => useCoinForm(mockCoin as any));
+
+      act(() => {
+        result.current.updateField('title', 'Modified');
+      });
+
+      expect(result.current.isDirty).toBe(true);
+    });
+
+    it('isDirty returns false after field is reset to its original value', () => {
+      const mockCoin = { id: 1, title: 'Original', era: 'Roman Imperial', created_at: '2026-01-01' };
+      const { result } = renderHook(() => useCoinForm(mockCoin as any));
+
+      act(() => {
+        result.current.updateField('title', 'Modified');
+      });
+      expect(result.current.isDirty).toBe(true);
+
+      act(() => {
+        result.current.updateField('title', 'Original');
+      });
+      expect(result.current.isDirty).toBe(false);
+    });
+  });
+
+  describe('F-04 — imagesChanged flag', () => {
+    it('imagesChanged is false in add mode with no images', () => {
+      const { result } = renderHook(() => useCoinForm());
+      expect(result.current.imagesChanged).toBe(false);
+    });
+
+    it('imagesChanged is true in add mode when an image is set', () => {
+      const { result } = renderHook(() => useCoinForm());
+      act(() => {
+        result.current.updateImage('obverse', 'path/to/img.jpg');
+      });
+      expect(result.current.imagesChanged).toBe(true);
+    });
+
+    it('imagesChanged is false in edit mode when no new images are added', () => {
+      const mockCoin = { id: 1, title: 'Coin', era: 'Ancient', created_at: '2026-01-01' };
+      const existingImages = [{ id: 1, coin_id: 1, path: 'existing/path.jpg', label: 'Obverse', is_primary: true, sort_order: 0, created_at: '2026-01-01' }];
+      const { result } = renderHook(() => useCoinForm(mockCoin as any, existingImages));
+      expect(result.current.imagesChanged).toBe(false);
+    });
+
+    it('imagesChanged is true in edit mode when a new image path is added', () => {
+      const mockCoin = { id: 1, title: 'Coin', era: 'Ancient', created_at: '2026-01-01' };
+      const existingImages = [{ id: 1, coin_id: 1, path: 'existing/path.jpg', label: 'Obverse', is_primary: true, sort_order: 0, created_at: '2026-01-01' }];
+      const { result } = renderHook(() => useCoinForm(mockCoin as any, existingImages));
+
+      act(() => {
+        result.current.updateImage('reverse', 'new/reverse.jpg');
+      });
+
+      expect(result.current.imagesChanged).toBe(true);
+    });
+  });
 });

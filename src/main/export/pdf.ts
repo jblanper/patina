@@ -26,10 +26,6 @@ const MARGIN      = 20;
 const CONTENT_W   = 170;  // 210 - 2×20
 const IMG_COL_W   = 68;   // left column: images
 const META_COL_W  = 98;   // right column: metadata (4mm gap between cols)
-// SLOT_HEIGHT is a conservative half-page heuristic (~126mm). Actual rendering
-// may be shorter, pushing the second coin upward slightly — this is acceptable.
-// Do not increase this constant without re-testing long-text coins.
-const SLOT_HEIGHT = 126;
 const IMG_SIZE    = 35;   // obverse/reverse image box (mm)
 
 type Locale = 'en' | 'es';
@@ -173,15 +169,6 @@ function drawPageFooter(doc: jsPDF, pageNum: number, total: number, locale: Loca
   doc.setFontSize(9);
   doc.setTextColor(IRON_GALL);
   doc.text(`${t(locale, 'page')} ${pageNum} / ${total}`, 105, 287, { align: 'center' });
-}
-
-function estimateCoinSlotHeight(coin: Coin, hasImages: boolean): number {
-  let height = 18; // title + subtitle + rule
-  if (hasImages) height += 82; // 2×35mm + 2×6mm label + gap
-  height += 40; // spec table: ~10 rows
-  if (coin.story) height += Math.ceil(coin.story.length / 55) * 5;
-  if (coin.provenance) height += Math.ceil(coin.provenance.length / 55) * 5;
-  return height;
 }
 
 function drawCoinSlot(

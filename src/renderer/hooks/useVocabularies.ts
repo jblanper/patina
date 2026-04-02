@@ -62,7 +62,6 @@ export function useVocabularies(field: VocabField): UseVocabulariesReturn {
       setOptions(cache.get(cacheKey)!);
       setIsLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [field, language, cacheKey]);
 
   const addVocabulary = useCallback(

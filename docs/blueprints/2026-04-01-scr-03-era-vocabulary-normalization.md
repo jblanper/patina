@@ -19,6 +19,15 @@ Two independent defects prevent the vocabulary system from functioning correctly
 | N-01 | 🔴 Critical | `incrementUsage` never called — vocabulary learning non-functional for all 7 fields |
 | N-02 | 🟠 High | Filter matching is case-sensitive — case-variant entries do not merge in sidebar |
 
+**Backlog items flagged during SCR-03 audits (out of scope for this sprint):**
+
+| ID | Severity | Description | Scope |
+|----|----------|-------------|-------|
+| N-03 | 🟡 Medium | Seed gap — "Greek / Hellenistic", "Celtic", "Sasanian / Persian" absent; bare "Medieval" creates taxonomy trap | DB-only |
+| N-04 | 🟡 Medium | `incrementVocabUsage` UPDATE has no locale filter — EN selections increment ES rows for identical-spelling terms | Cross-process |
+
+See [Section 11](#11-backlog-items-flagged-by-scr-03-audits) for technical strategy and verification details.
+
 ### Philosophical Alignment
 
 - [x] **Archival Ledger Aesthetic:** No UI surface changes. Autocomplete suggestions silently re-order over time as usage data accumulates — an unobtrusive improvement that rewards collectors who build large collections.
@@ -388,6 +397,171 @@ This bug pre-exists SCR-03 and is not a regression introduced here. It has no us
 - After N-01 lands, `usage_count` values will begin diverging from seed values as collectors use the app. If a future data migration or seed reset is needed, `CURRENT_SEED_VERSION` bump restores seed `usage_count` values but preserves user-added entries — confirm this is the desired reset behaviour.
 - `CURRENT_SEED_VERSION` bump is **not required** for this sprint — no new seed data is added. All 7 vocabulary fields (including era) already have seed entries.
 - **SCR-04 data hygiene sprint: not recommended.** N-02 case-insensitive matching resolves the filter problem without touching stored data. Rewriting divergent era values risks overwriting intentional collector input. (`curating-coins` Finding 5)
-- **Seed gap (follow-on ticket):** No "Greek / Hellenistic" era is seeded — one of the three largest global collecting categories. "Celtic" and "Sasanian / Persian" are also absent. Add seed rows + bump `CURRENT_SEED_VERSION`. Separately, the bare "Medieval" seed entry coexists with "Early Medieval" / "High Medieval" / "Late Medieval" — creating a taxonomy trap where coins tagged "Medieval" don't appear in subdivision filters. Resolve in the seed-gap ticket. (`curating-coins` Finding 1)
-- **Locale bug in `incrementVocabUsage` (DB maintenance backlog):** `db.ts` `UPDATE` statement has no locale column in the WHERE clause — selecting "Medieval" in EN also increments the ES row. No user-visible consequence unless the collector switches locales. Fix: add `AND locale = ?` to the UPDATE and thread active locale through IPC. Pre-existing bug; out of scope for this sprint. (`curating-coins` Finding 6)
+- **N-03 (seed gap — follow-on ticket):** No "Greek / Hellenistic" era is seeded — one of the three largest global collecting categories. "Celtic" and "Sasanian / Persian" are also absent. Bare "Medieval" coexists with "Early Medieval" / "High Medieval" / "Late Medieval", creating a taxonomy trap. DB-only fix: add seed rows, remove bare "Medieval", bump `CURRENT_SEED_VERSION`. See [Section 11.1](#111-n-03--seed-gap-missing-era-vocabulary-entries) for full strategy. (`curating-coins` Finding 1)
+- **N-04 (locale bug — DB maintenance backlog):** `db.ts` `UPDATE` statement has no locale column in the WHERE clause — selecting "Medieval" in EN also increments the ES row. No user-visible consequence unless the collector switches locales. Cross-process fix: `VocabIncrementSchema` gains a `locale` field, IPC handler and preload bridge updated, `useVocabularies` threads active language through. See [Section 11.2](#112-n-04--locale-bug-incrementvocabusage-missing-locale-filter) for full strategy. (`curating-coins` Finding 6)
 - **Core Doc Revision:** Update `docs/reference/vocabulary-system.md` to correct the false claim that AutocompleteField handles `incrementVocabUsage` automatically. Add a paragraph documenting the `onIncrementUsage` prop as the canonical wiring pattern.
+
+---
+
+## 11. Backlog Items (Flagged by SCR-03 Audits)
+
+These items were identified during SCR-03 Phase II audits and are explicitly out of scope for this sprint. They are self-contained and can be implemented independently.
+
+---
+
+### 11.1 N-03 — Seed Gap: Missing Era Vocabulary Entries
+
+**Source:** `curating-coins` Finding 1
+**Scope:** DB-only. No cross-process schema change, no IPC changes.
+
+**Root Cause:**
+The era vocabulary seed in `src/main/db.ts` (`getSeedEntries()`) is missing three major collecting categories:
+
+- **"Greek / Hellenistic"** — one of the three largest global collecting categories (Athenian owls, Ptolemaic bronzes, Seleucid and Ptolemaic issues). Collectors of these coins must free-type the value on first entry.
+- **"Celtic"** — a distinct and actively collected tradition, entirely absent.
+- **"Sasanian / Persian"** — pre-Islamic Persian coinage, separate from the "Islamic" entry already seeded.
+
+Additionally, bare `"Medieval"` (EN, `usage_count: 10`) and `"Medieval"` (ES, `usage_count: 10`) coexist with three period subdivisions (`"Early Medieval"` / `"High Medieval"` / `"Late Medieval"` and their ES equivalents). This creates a taxonomy trap: a coin tagged `"Medieval"` will never appear when a collector filters by `"Early Medieval"`, and vice versa.
+
+**Current seed state (lines 93–116 of `src/main/db.ts`):**
+- 11 EN era entries, 11 ES era entries
+- Bare "Medieval" present in both locales at `usage_count: 10`
+- No "Greek / Hellenistic", "Celtic", or "Sasanian / Persian" in either locale
+
+**File: `src/main/db.ts`**
+
+1. **Remove** the bare `"Medieval"` / `"Medieval"` entries from both EN and ES. The three period subdivisions are canonical; a bare catch-all adds confusion rather than value.
+2. **Add** the following new EN era entries to `getSeedEntries()`:
+
+```typescript
+{ field: 'era', value: 'Greek / Hellenistic', locale: en, usage_count: 35 },
+{ field: 'era', value: 'Celtic',              locale: en, usage_count: 10 },
+{ field: 'era', value: 'Sasanian / Persian',  locale: en, usage_count: 8  },
+```
+
+3. **Add** their ES equivalents:
+
+```typescript
+{ field: 'era', value: 'Griego / Helenístico', locale: es, usage_count: 35 },
+{ field: 'era', value: 'Celta',                locale: es, usage_count: 10 },
+{ field: 'era', value: 'Sasánida / Persa',     locale: es, usage_count: 8  },
+```
+
+4. **Bump `CURRENT_SEED_VERSION`** (currently `'6c.2'`) to trigger re-seed on next app launch. New entries are inserted via `INSERT OR IGNORE` — user-added vocabulary is preserved. Seed reset updates `usage_count` for built-in entries only; collector data is unaffected.
+
+**Note:** `usage_count` values for new entries are set to plausible non-zero values so they sort reasonably against existing entries at first use. Greek/Hellenistic is seeded at 35 (comparable to "Byzantine" and "Roman Provincial") to reflect its collecting prominence.
+
+**Verification:**
+
+- Unit test on `getSeedEntries()`: assert new entries (`Greek / Hellenistic`, `Celtic`, `Sasanian / Persian`) present in EN and ES output.
+- Assert bare `"Medieval"` absent from both EN and ES seed output.
+- Integration smoke test (after `seedVocabularies()`): `getVocab('era', 'en')` returns `"Greek / Hellenistic"` and `"Celtic"`.
+- Colocation: test extends existing `src/main/__tests__/db.test.ts` (or equivalent seed test file).
+
+---
+
+### 11.2 N-04 — Locale Bug: `incrementVocabUsage` Missing Locale Filter
+
+**Source:** `curating-coins` Finding 6
+**Scope:** Cross-process. Touches `src/common/`, `src/main/` (three files), and `src/renderer/`.
+
+**Root Cause:**
+`src/main/db.ts` line 348:
+
+```sql
+UPDATE vocabularies SET usage_count = usage_count + 1 WHERE field = ? AND value = ?
+```
+
+There is no `locale` column in the `WHERE` clause. Terms that exist in both EN and ES seeds with identical spellings — "Medieval", "Billon", "Tumbaga", "Lugdunum" — will have **both** locale rows incremented when an EN-locale collector selects them. ES `usage_count` drifts for collectors who have never opened the Spanish UI.
+
+No user-visible consequence today unless the collector switches locales. The bug is pre-existing and is not a regression from SCR-03.
+
+**Files and changes:**
+
+**1. `src/common/validation.ts` (line 150)**
+
+Add `locale` to `VocabIncrementSchema`. Use the same `z.enum(['en', 'es'])` pattern already established by `VocabGetSchema` (line 147):
+
+```typescript
+export const VocabIncrementSchema = z.object({
+  field: z.enum(ALLOWED_VOCAB_FIELDS),
+  value: z.string().min(1).max(200),
+  locale: z.enum(['en', 'es']),
+}).strict();
+```
+
+**2. `src/main/index.ts` (line 229–232)**
+
+Destructure `locale` from the validated payload and pass it to the DB method:
+
+```typescript
+ipcMain.handle('vocab:increment', (_, data: unknown) => {
+  const { field, value, locale } = validateIpc(VocabIncrementSchema, data);
+  dbService.incrementVocabularyUsage(field, value, locale);
+});
+```
+
+**3. `src/main/db.ts` (lines 343–350)**
+
+Add `locale` parameter and update the SQL WHERE clause:
+
+```typescript
+incrementVocabularyUsage: (field: VocabField, value: string, locale: 'en' | 'es'): void => {
+  if (!ALLOWED_VOCAB_FIELDS.includes(field)) {
+    throw new Error(`Invalid vocabulary field: ${field}`);
+  }
+  db.prepare(
+    'UPDATE vocabularies SET usage_count = usage_count + 1 WHERE field = ? AND value = ? AND locale = ?'
+  ).run(field, value, locale);
+},
+```
+
+Note: The existing defence-in-depth field guard (line 344) is preserved unchanged.
+
+**4. `src/main/preload.ts` (line 38–39)**
+
+Update bridge signature:
+
+```typescript
+incrementVocabUsage: (field: VocabField, value: string, locale: 'en' | 'es'): Promise<void> =>
+  ipcRenderer.invoke('vocab:increment', { field, value, locale }),
+```
+
+**5. `src/renderer/electron.d.ts` (line 31)**
+
+Update the type declaration to match:
+
+```typescript
+incrementVocabUsage: (field: VocabField, value: string, locale: 'en' | 'es') => Promise<void>;
+```
+
+**6. `src/renderer/hooks/useVocabularies.ts` (lines 76–81)**
+
+Thread the active locale from `useLanguage()`:
+
+```typescript
+const { language } = useLanguage();
+
+const incrementUsage = useCallback(
+  (value: string) => {
+    window.electronAPI.incrementVocabUsage(field, value, language);
+  },
+  [field, language],
+);
+```
+
+`language` is already a stable value from context (not a new IPC call), so adding it to the `useCallback` dependency array does not cause re-renders. `useLanguage` is already imported in `useVocabularies` — confirm before assuming a new import is needed.
+
+**Verification:**
+
+Update existing `TC-UV-08` in `src/renderer/hooks/__tests__/useVocabularies.test.ts`:
+- Assert `window.electronAPI.incrementVocabUsage` is called with `(field, value, 'en')` when language is `'en'`.
+- Add a parallel case for `'es'`.
+
+Update `validation.test.ts` (TC-VS-20 through TC-VS-23):
+- TC-VS-20: valid `{ field, value, locale: 'en' }` passes.
+- New TC-VS-24: missing `locale` field rejected.
+- New TC-VS-25: invalid locale string (e.g. `'fr'`) rejected.
+- TC-VS-23 (extra properties): existing assertion continues to pass since `locale` is now a defined key.
+
+DB unit test: assert `incrementVocabularyUsage('era', 'Medieval', 'en')` updates only the EN row; ES row `usage_count` remains unchanged.
