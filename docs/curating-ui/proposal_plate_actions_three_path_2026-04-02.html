@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curatorial Proposal: Plate Action Bar — Patina</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-manuscript: #FCF9F2;
+      --text-ink: #2D2926;
+      --text-muted: #7A7875;
+      --border-hairline: #E0DCCD;
+      --accent-manuscript: #914E32;
+      --stone-pedestal: #F0EDE6;
+      --error-red: #B22222;
+      --font-serif: 'Cormorant Garamond', serif;
+      --font-sans: 'Montserrat', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --spacing-large: clamp(3rem, 8vw, 4rem);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: var(--font-sans);
+      background: #ECEAE4;
+      color: var(--text-ink);
+      padding: var(--spacing-large);
+      line-height: 1.6;
+    }
+
+    /* ── Proposal Shell ── */
+    .proposal-header {
+      max-width: 1300px;
+      margin: 0 auto 4rem;
+      border-bottom: 2px solid var(--text-ink);
+      padding-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .proposal-header h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      font-style: italic;
+      line-height: 1;
+    }
+    .proposal-meta {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-manuscript);
+      text-align: right;
+    }
+
+    .proposal-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 7rem;
+    }
+
+    .path-section { display: flex; flex-direction: column; gap: 2rem; }
+
+    .path-info { max-width: 720px; }
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-manuscript);
+      margin-bottom: 0.4rem;
+      display: block;
+      font-weight: 600;
+    }
+    .path-title { font-family: var(--font-serif); font-size: 2rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .rationale { font-family: var(--font-serif); font-size: 1.05rem; font-style: italic; color: var(--text-ink); max-width: 65ch; line-height: 1.7; }
+
+    /* ── Mockup stage ── */
+    .stage {
+      background: var(--bg-manuscript);
+      border: 1px solid var(--border-hairline);
+      border-radius: 6px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .stage-bar {
+      background: #E4E2DC;
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border-hairline);
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+    }
+    .dot { width: 11px; height: 11px; border-radius: 50%; background: #CCC; }
+    .dot.r { background: #FF5F56; }
+    .dot.y { background: #FFBD2E; }
+    .dot.g { background: #27C93F; }
+    .addr {
+      background: white;
+      padding: 0.25rem 1rem;
+      border-radius: 3px;
+      flex: 1;
+      margin-left: 1rem;
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: center;
+      border: 1px solid var(--border-hairline);
+    }
+    .stage-body {
+      padding: 3rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 3rem;
+      align-items: start;
+    }
+    .stage-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    /* ── Shared plate chrome ── */
+    .plate-demo {
+      border: 1.5px dashed var(--border-hairline);
+      background: var(--stone-pedestal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .plate-demo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .plate-demo-placeholder {
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      color: var(--text-muted); opacity: 0.4;
+    }
+    .plate-caption-demo {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 0.6rem;
+    }
+
+    /* ── Audit box ── */
+    .audit {
+      background: white;
+      padding: 2rem;
+      border: 1px solid var(--border-hairline);
+      border-left: 4px solid var(--accent-manuscript);
+    }
+    .audit h3 {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-manuscript);
+      margin-bottom: 1.25rem;
+    }
+    .audit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
+    .audit-item strong { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.2rem; }
+    .audit-item p { font-size: 0.9rem; }
+    .pass { color: #2A7C3F; font-weight: 600; }
+    .warn { color: var(--accent-manuscript); font-weight: 600; }
+
+    /* ══════════════════════════════════════════════
+       PATH A — Icon Trio
+    ══════════════════════════════════════════════ */
+
+    .pA-actions {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-top: 0.75rem;
+    }
+    .pA-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.5rem 1rem;
+      min-height: 44px;
+      justify-content: center;
+      position: relative;
+      transition: color 0.15s;
+      color: var(--text-muted);
+    }
+    .pA-btn + .pA-btn { border-left: 1px solid var(--border-hairline); }
+    .pA-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .pA-label {
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+    .pA-btn:hover { color: var(--text-ink); }
+    .pA-btn.danger:hover { color: var(--error-red); }
+
+    /* secondary (narrow) variant — icons only, label on hover tooltip */
+    .pA-actions--compact .pA-label { display: none; }
+    .pA-actions--compact .pA-btn {
+      padding: 0.5rem 0.65rem;
+      position: relative;
+    }
+    .pA-actions--compact .pA-btn::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text-ink);
+      color: #FCF9F2;
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.25rem 0.5rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s;
+    }
+    .pA-actions--compact .pA-btn:hover::after { opacity: 1; }
+
+    /* ══════════════════════════════════════════════
+       PATH B — Single kebab / overflow menu
+    ══════════════════════════════════════════════ */
+
+    .pB-wrap { position: relative; display: inline-block; margin-top: 0.75rem; }
+    .pB-trigger {
+      background: none;
+      border: 1px solid var(--border-hairline);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      letter-spacing: 2px;
+      min-height: 44px;
+      transition: border-color 0.15s, color 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .pB-trigger:hover { border-color: var(--text-muted); color: var(--text-ink); }
+    .pB-trigger svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .pB-menu {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-manuscript);
+      border: 1px solid var(--border-hairline);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      min-width: 160px;
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+    }
+    .pB-wrap.open .pB-menu { display: flex; }
+    .pB-item {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: background 0.1s, color 0.1s;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .pB-item:last-child { border-bottom: none; }
+    .pB-item:hover { background: var(--stone-pedestal); color: var(--text-ink); }
+    .pB-item.danger { color: var(--error-red); opacity: 0.75; }
+    .pB-item.danger:hover { background: #FDF0F0; opacity: 1; }
+    .pB-item svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .pB-item--sep { border-top: 1px solid var(--border-hairline); margin-top: 2px; }
+
+    /* pB caption area */
+    .pB-caption-wrap { display: flex; flex-direction: column; align-items: center; }
+
+    /* ══════════════════════════════════════════════
+       PATH C — In-frame hover toolbar
+    ══════════════════════════════════════════════ */
+
+    .pC-plate-wrap { position: relative; }
+    .pC-plate-wrap .plate-demo {
+      /* image frame */
+    }
+    .pC-toolbar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(252, 249, 242, 0.92);
+      backdrop-filter: blur(4px);
+      border-top: 1px solid var(--border-hairline);
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+    .pC-plate-wrap:hover .pC-toolbar {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .pC-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      border-right: 1px solid var(--border-hairline);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      padding: 0.6rem 0.5rem;
+      min-height: 44px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      transition: background 0.15s, color 0.15s;
+    }
+    .pC-btn:last-child { border-right: none; }
+    .pC-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .pC-btn:hover { background: rgba(240,237,230,0.9); color: var(--text-ink); }
+    .pC-btn.danger { color: var(--text-muted); }
+    .pC-btn.danger:hover { color: var(--error-red); background: rgba(178,34,34,0.05); }
+
+    /* always-visible fallback for narrow secondary (CSS :hover insufficient on touch) */
+    .pC-caption-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.6rem;
+    }
+    .pC-ghost {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem;
+      min-height: 44px;
+      transition: color 0.15s;
+    }
+    .pC-ghost svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .pC-ghost:hover { color: var(--text-ink); }
+    .pC-ghost.danger:hover { color: var(--error-red); }
+
+    /* ── SVG icon library ── */
+    /* Defined inline per usage for self-containment */
+
+  </style>
+</head>
+<body>
+
+<header class="proposal-header">
+  <h1>Plate Action Bar</h1>
+  <div class="proposal-meta">
+    Project: Patina // SCR-03<br>
+    Date: 2026-04-02 · curating-ui
+  </div>
+</header>
+
+<main class="proposal-container">
+
+  <!-- ════════════════════════════════
+       PATH A — Icon Trio
+  ════════════════════════════════ -->
+  <section class="path-section">
+    <div class="path-info">
+      <span class="tag">Archetype A</span>
+      <h2 class="path-title">The Icon Trio</h2>
+      <p class="rationale">
+        Three compact icon+label buttons replace the plain-text row. Each action is immediately scannable by its glyph — the label reinforces meaning without becoming the dominant visual. On narrow secondary slots the labels drop away and a tooltip appears on hover, keeping the strip uncluttered. The destructive Remove inherits the same iconographic language but erupts into deep red on hover — a warning without aggression.
+      </p>
+    </div>
+
+    <div class="stage">
+      <div class="stage-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="addr">patina://scriptorium/add</div>
+      </div>
+      <div class="stage-body">
+
+        <!-- Primary slot -->
+        <div>
+          <p class="stage-label">Primary slot — Obverse (~500px)</p>
+          <div style="max-width:500px">
+            <div class="plate-demo" style="height:260px">
+              <div class="plate-demo-placeholder">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <span style="font-family:var(--font-mono);font-size:0.55rem;text-transform:uppercase;letter-spacing:1px">imagen</span>
+              </div>
+            </div>
+            <p class="plate-caption-demo">Lámina I // Anverso (Principal)</p>
+
+            <!-- PATH A full actions -->
+            <div class="pA-actions">
+              <button class="pA-btn" title="Reemplazar vía QR">
+                <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+                <span class="pA-label">Reemplazar</span>
+              </button>
+              <button class="pA-btn" title="Importar archivo">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span class="pA-label">Importar</span>
+              </button>
+              <button class="pA-btn danger" title="Eliminar imagen">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                <span class="pA-label">Eliminar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary slot -->
+        <div>
+          <p class="stage-label">Secondary slot — Reverso (~200px)</p>
+          <div style="max-width:200px">
+            <div class="plate-demo" style="height:160px">
+              <div class="plate-demo-placeholder">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+            </div>
+            <p class="plate-caption-demo">Lámina II // Reverso</p>
+
+            <!-- PATH A compact (icons only + tooltip) -->
+            <div class="pA-actions pA-actions--compact">
+              <button class="pA-btn" data-tip="Reemplazar">
+                <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+              </button>
+              <button class="pA-btn" data-tip="Importar">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </button>
+              <button class="pA-btn danger" data-tip="Eliminar">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /stage-body -->
+    </div><!-- /stage -->
+
+    <div class="audit">
+      <h3>Curatorial Audit — Path A</h3>
+      <div class="audit-grid">
+        <div class="audit-item">
+          <strong>Touch targets</strong>
+          <p class="pass">Pass — min-height 44px per button</p>
+        </div>
+        <div class="audit-item">
+          <strong>Narrow slot</strong>
+          <p class="pass">Icons only; no wrapping possible</p>
+        </div>
+        <div class="audit-item">
+          <strong>Destructive distinction</strong>
+          <p>Red on hover; icon (trash) differs from the other two</p>
+        </div>
+        <div class="audit-item">
+          <strong>Implementation delta</strong>
+          <p>3 SVG icons added; compact modifier class; tooltip via <code>::after</code></p>
+        </div>
+        <div class="audit-item">
+          <strong>Archival tone</strong>
+          <p>Neutral at rest — glyphs recede, caption dominates</p>
+        </div>
+        <div class="audit-item">
+          <strong>Risk</strong>
+          <p class="warn">Tooltip not accessible on touch without label; secondary users must know icons</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════
+       PATH B — Kebab overflow menu
+  ════════════════════════════════ -->
+  <section class="path-section">
+    <div class="path-info">
+      <span class="tag">Archetype B</span>
+      <h2 class="path-title">The Overflow Menu</h2>
+      <p class="rationale">
+        A single discreet button — three dots, the universal sign for "more" — replaces the action row entirely. The caption area stays perfectly clean at all slot widths. Clicking reveals a compact dropdown anchored above the trigger: Replace, Import, then a ruled separator before Remove (colour-coded red). This path treats the plate frame as inviolable, keeping all controls subordinate to the image.
+      </p>
+    </div>
+
+    <div class="stage">
+      <div class="stage-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="addr">patina://scriptorium/add</div>
+      </div>
+      <div class="stage-body">
+
+        <!-- Primary slot -->
+        <div>
+          <p class="stage-label">Primary slot — Anverso (~500px)</p>
+          <div style="max-width:500px">
+            <div class="plate-demo" style="height:260px">
+              <div class="plate-demo-placeholder">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+            </div>
+            <div class="pB-caption-wrap">
+              <p class="plate-caption-demo">Lámina I // Anverso (Principal)</p>
+              <div class="pB-wrap open" id="pB-primary" style="margin-top:0.75rem">
+                <button class="pB-trigger" onclick="toggleMenu('pB-primary')">
+                  <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+                  Acciones
+                </button>
+                <div class="pB-menu">
+                  <button class="pB-item">
+                    <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+                    Reemplazar
+                  </button>
+                  <button class="pB-item">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Importar
+                  </button>
+                  <button class="pB-item danger pB-item--sep">
+                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+              <p style="font-family:var(--font-mono);font-size:0.5rem;color:var(--text-muted);margin-top:0.5rem;letter-spacing:0.5px">↑ menu open (click to toggle)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary slot -->
+        <div>
+          <p class="stage-label">Secondary slot — Reverso (~200px)</p>
+          <div style="max-width:200px">
+            <div class="plate-demo" style="height:160px">
+              <div class="plate-demo-placeholder">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+            </div>
+            <div class="pB-caption-wrap">
+              <p class="plate-caption-demo">Lámina II // Reverso</p>
+              <div class="pB-wrap" id="pB-secondary" style="margin-top:0.75rem">
+                <button class="pB-trigger" onclick="toggleMenu('pB-secondary')">
+                  <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+                  Acciones
+                </button>
+                <div class="pB-menu">
+                  <button class="pB-item">
+                    <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+                    Reemplazar
+                  </button>
+                  <button class="pB-item">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Importar
+                  </button>
+                  <button class="pB-item danger pB-item--sep">
+                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="audit">
+      <h3>Curatorial Audit — Path B</h3>
+      <div class="audit-grid">
+        <div class="audit-item">
+          <strong>Touch targets</strong>
+          <p class="pass">Single trigger (44px) + full-width menu items (44px row)</p>
+        </div>
+        <div class="audit-item">
+          <strong>Narrow slot</strong>
+          <p class="pass">Identical at any width — one button, no wrapping</p>
+        </div>
+        <div class="audit-item">
+          <strong>Destructive distinction</strong>
+          <p>Red label + ruling separator above Remove</p>
+        </div>
+        <div class="audit-item">
+          <strong>Implementation delta</strong>
+          <p>Dropdown state (open/close toggle); click-outside dismissal; position:absolute menu</p>
+        </div>
+        <div class="audit-item">
+          <strong>Archival tone</strong>
+          <p class="pass">Caption stays clean; nothing competes with the plate label at rest</p>
+        </div>
+        <div class="audit-item">
+          <strong>Risk</strong>
+          <p class="warn">Extra interaction step vs direct buttons; dropdown position may clip near viewport edge</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════
+       PATH C — In-frame hover toolbar
+  ════════════════════════════════ -->
+  <section class="path-section">
+    <div class="path-info">
+      <span class="tag">Archetype C</span>
+      <h2 class="path-title">The In-Frame Toolbar</h2>
+      <p class="rationale">
+        Actions migrate inside the plate frame itself — a slim frosted toolbar slides up from the bottom edge on hover, leaving the caption area entirely empty. The caption reads purely as a label; it carries no interactive burden. On secondary (narrow) slots where hover is unreliable, three ghost-icon buttons sit quietly below the caption at minimal size, always accessible without hover. The toolbar's translucent parchment wash keeps the image visible through the controls.
+      </p>
+    </div>
+
+    <div class="stage">
+      <div class="stage-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="addr">patina://scriptorium/add</div>
+      </div>
+      <div class="stage-body">
+
+        <!-- Primary slot -->
+        <div>
+          <p class="stage-label">Primary slot — hover the image to reveal toolbar</p>
+          <div style="max-width:500px">
+            <div class="pC-plate-wrap">
+              <div class="plate-demo" style="height:260px">
+                <div class="plate-demo-placeholder">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  <span style="font-family:var(--font-mono);font-size:0.5rem;text-transform:uppercase;letter-spacing:1px;margin-top:4px">Hover image</span>
+                </div>
+              </div>
+              <!-- Toolbar inside frame -->
+              <div class="pC-toolbar">
+                <button class="pC-btn">
+                  <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+                  Reemplazar
+                </button>
+                <button class="pC-btn">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Importar
+                </button>
+                <button class="pC-btn danger">
+                  <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+            <p class="plate-caption-demo">Lámina I // Anverso (Principal)</p>
+            <!-- No action buttons below caption -->
+          </div>
+        </div>
+
+        <!-- Secondary slot -->
+        <div>
+          <p class="stage-label">Secondary slot — ghost icons always visible</p>
+          <div style="max-width:200px">
+            <div class="pC-plate-wrap">
+              <div class="plate-demo" style="height:160px">
+                <div class="plate-demo-placeholder">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+              </div>
+              <div class="pC-toolbar">
+                <button class="pC-btn">
+                  <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+                  Reemplazar
+                </button>
+                <button class="pC-btn">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Importar
+                </button>
+                <button class="pC-btn danger">
+                  <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+            <p class="plate-caption-demo">Lámina II // Reverso</p>
+
+            <!-- Ghost icon row for touch/keyboard fallback -->
+            <div class="pC-caption-row">
+              <button class="pC-ghost" title="Reemplazar">
+                <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+              </button>
+              <button class="pC-ghost" title="Importar">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </button>
+              <button class="pC-ghost danger" title="Eliminar">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="audit">
+      <h3>Curatorial Audit — Path C</h3>
+      <div class="audit-grid">
+        <div class="audit-item">
+          <strong>Touch targets</strong>
+          <p class="pass">In-frame buttons ≥44px; ghost fallback icons 44px min</p>
+        </div>
+        <div class="audit-item">
+          <strong>Narrow slot</strong>
+          <p class="pass">Ghost icons below caption; no hover dependency</p>
+        </div>
+        <div class="audit-item">
+          <strong>Destructive distinction</strong>
+          <p>Danger button turns error-red on hover; positioned last</p>
+        </div>
+        <div class="audit-item">
+          <strong>Implementation delta</strong>
+          <p>Toolbar inside frame (position:absolute); ghost icon fallback for secondary; CSS-only reveal on primary</p>
+        </div>
+        <div class="audit-item">
+          <strong>Archival tone</strong>
+          <p class="pass">Caption is purely typographic — zero interactive noise at rest</p>
+        </div>
+        <div class="audit-item">
+          <strong>Risk</strong>
+          <p class="warn">Toolbar may obscure the bottom of the image; secondary slot has two control surfaces (toolbar + ghost)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  function toggleMenu(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open');
+  }
+  // Close all menus on outside click
+  document.addEventListener('click', function(e) {
+    document.querySelectorAll('.pB-wrap.open').forEach(function(menu) {
+      if (!menu.contains(e.target)) menu.classList.remove('open');
+    });
+  });
+</script>
+</body>
+</html>
