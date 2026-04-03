@@ -16,6 +16,7 @@ Only fields in `ALLOWED_VOCAB_FIELDS` may be used with vocabulary IPC handlers. 
 | `era` | Broad historical period (e.g., `Ancient`, `Medieval`, `Modern`) |
 | `die_axis` | Rotational alignment in clock-hour notation (e.g., `12h`, `6h`) |
 | `mint` | Place of issue (e.g., `Rome`, `London`, `Philadelphia`) |
+| `rarity` | Scarcity designation (e.g., `C`, `R`, `RR`, `RRRR`) |
 
 ---
 
@@ -72,23 +73,32 @@ Built-in vocabulary entries are loaded by `npm run db:seed`. The seed script che
 
 ## Component Pattern
 
-Vocabulary fields in forms use `AutocompleteField` backed by the `useVocabularies` hook:
+Vocabulary fields in forms use `AutocompleteField` backed by the `useVocabularies` hook. `LedgerForm` is the canonical example — it wires all seven vocab fields following the same pattern:
 
 ```typescript
 import { AutocompleteField } from '../components/AutocompleteField';
 import { useVocabularies } from '../hooks/useVocabularies';
 
-const { values, search } = useVocabularies('metal', locale);
+// One hook instance per field — no locale argument needed (language is
+// read from the i18n context inside the hook)
+const metalVocab = useVocabularies('metal');
 
 <AutocompleteField
   field="metal"
-  locale={locale}
-  value={formState.metal}
+  value={formData.metal || ''}
   onChange={(v) => updateField('metal', v)}
+  onAddNew={(v) => { metalVocab.addVocabulary(v); updateField('metal', v); }}
+  onIncrementUsage={metalVocab.incrementUsage}
+  options={metalVocab.options}
+  placeholder="e.g. Silver"
+  onReset={metalVocab.resetVocabularies}
+  hasUserValues={false}
 />
 ```
 
-`AutocompleteField` calls `incrementVocabUsage` automatically when the user confirms a value. Do not call it again in the parent.
+`useVocabularies` returns `{ options, isLoading, error, addVocabulary, incrementUsage, resetVocabularies }`.
+
+**`onIncrementUsage` is the canonical increment wiring.** `AutocompleteField` does not call `incrementVocabUsage` on its own — the parent must pass `onIncrementUsage={vocabHook.incrementUsage}` explicitly. The call fires only when an **existing** option is selected via `selectOption`; it does not fire when a new value is added via `handleAddNew` (new entries start at `usage_count = 0`). The prop is optional: any `AutocompleteField` usage outside of `LedgerForm` silently skips the increment.
 
 ---
 

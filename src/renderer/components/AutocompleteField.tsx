@@ -7,6 +7,7 @@ interface AutocompleteFieldProps {
   value: string;
   onChange: (value: string) => void;
   onAddNew: (value: string) => void;
+  onIncrementUsage?: (value: string) => void;
   options: string[];
   placeholder?: string;
   label?: string;
@@ -21,6 +22,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   value,
   onChange,
   onAddNew,
+  onIncrementUsage,
   options,
   placeholder,
   required,
@@ -65,10 +67,11 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   const selectOption = useCallback(
     (optionValue: string) => {
       onChange(optionValue);
+      onIncrementUsage?.(optionValue);
       setInputValue(optionValue);
       close();
     },
-    [onChange, close],
+    [onChange, onIncrementUsage, close],
   );
 
   const handleAddNew = useCallback(() => {

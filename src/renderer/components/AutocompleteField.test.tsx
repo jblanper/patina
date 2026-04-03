@@ -256,6 +256,32 @@ describe('AutocompleteField — scroll close', () => {
   });
 });
 
+describe('AutocompleteField — onIncrementUsage (N-01)', () => {
+  it('TC-AC-27: calls onIncrementUsage with selected value when an existing option is chosen', () => {
+    const onIncrementUsage = vi.fn();
+    render(<AutocompleteField {...DEFAULT_PROPS} onIncrementUsage={onIncrementUsage} />);
+    openDropdown();
+    fireEvent.mouseDown(screen.getByRole('option', { name: 'Roman' }));
+    expect(onIncrementUsage).toHaveBeenCalledOnce();
+    expect(onIncrementUsage).toHaveBeenCalledWith('Roman');
+  });
+
+  it('TC-AC-28: does NOT call onIncrementUsage when a new value is added via add-new', () => {
+    const onIncrementUsage = vi.fn();
+    render(<AutocompleteField {...DEFAULT_PROPS} onIncrementUsage={onIncrementUsage} />);
+    openDropdown();
+    fireEvent.change(screen.getByPlaceholderText('Select era'), { target: { value: 'Sassanid' } });
+    fireEvent.mouseDown(screen.getByRole('option', { name: /Add new value: Sassanid/i }));
+    expect(onIncrementUsage).not.toHaveBeenCalled();
+  });
+
+  it('TC-AC-29: does not throw when onIncrementUsage is not provided and an option is selected', () => {
+    render(<AutocompleteField {...DEFAULT_PROPS} />);
+    openDropdown();
+    expect(() => fireEvent.mouseDown(screen.getByRole('option', { name: 'Roman' }))).not.toThrow();
+  });
+});
+
 describe('AutocompleteField — error and required props', () => {
   it('TC-AC-25: renders autocomplete-input--error class on inner input when error prop is set', () => {
     render(<AutocompleteField {...DEFAULT_PROPS} error="Era is required" />);

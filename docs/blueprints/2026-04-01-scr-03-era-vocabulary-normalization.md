@@ -1,7 +1,7 @@
 # Implementation Blueprint: SCR-03 · Era Vocabulary Normalization
 
 **Date:** 2026-04-01
-**Status:** Proposed
+**Status:** Completed
 **Reference:** SCR-01 §11 numismatic re-audit — free-text era creates case-variant divergence; vocabulary usage increment not wired for any field
 
 ---
@@ -170,14 +170,26 @@ if (filters.grade.length > 0) {
 
 ## 4. Architectural Oversight (`curating-blueprints`)
 
-**Status:** Pending
+**Status:** Complete — PASS
 
 ### Audit Findings:
-- **System Integrity:** N-01 is renderer-only — no new IPC handlers, no schema changes, no new `contextBridge` exposure. `window.electronAPI.incrementVocabUsage` already exists. N-02 is a pure filter function change in a `useMemo` derivation — no cross-process surface.
-- **Abstraction:** `incrementUsage` correctly lives in `useVocabularies` (hook layer), is injected into `AutocompleteField` via prop, and called fire-and-forget. Business logic does not leak into the Electron bridge.
+
+**Process boundary integrity (N-01): PASS.** N-01 touches only the renderer process. `window.electronAPI.incrementVocabUsage` is already defined in `preload.ts` (line 38) and validated by `VocabIncrementSchema` at the IPC boundary. No new `contextBridge` exposures, no new handlers in `src/main/index.ts`, no schema changes. The prop injection pattern (`onIncrementUsage`) is correctly layered: the hook owns the IPC call, the component is passed a typed callback — business logic stays out of the Electron bridge.
+
+**Process boundary integrity (N-02): PASS.** N-02 is a pure `useMemo` predicate change in `useCoins.ts`. No IPC, no cross-process surface, no new types required. `toLowerCase()` on both sides of the comparison is a non-destructive in-memory operation — no data is written or mutated.
+
+**Abstraction layer correctness: PASS.** The `incrementUsage` call lives in `useVocabularies` (hook layer, lines 76–81), is injected into `AutocompleteField` via an optional prop typed as `(value: string) => void`, and is called fire-and-forget with optional chaining (`?.`). The component has no knowledge of IPC or SQLite — it remains a pure UI element. This is the correct layering pattern for the project.
+
+**`src/common/` cross-process consistency: PASS.** `VocabIncrementSchema` (the only shared validation schema touched by this sprint) is unchanged for N-01 and N-02. The `Coin` and `CoinImage` domain types in `src/common/types.ts` are unaffected. No cross-process type drift is introduced.
+
+**Backlog items (N-03 and N-04) architectural assessment:**
+- **N-03** (seed gap) is correctly scoped as DB-only. Bumping `CURRENT_SEED_VERSION` is the established pattern. No cross-process risk.
+- **N-04** (locale bug) is correctly scoped as cross-process. The proposed changes — adding `locale` to `VocabIncrementSchema`, threading it through the IPC handler, DB method, preload bridge, type declaration, and `useVocabularies` — follow The Filter and The Bridge patterns correctly. The `z.enum(['en', 'es'])` constraint mirrors the existing `VocabGetSchema` approach. This is the correct architectural approach for a future sprint.
 
 ### Review Notes & Suggestions:
-- *(To be filled by audit.)*
+
+- The N-04 backlog item in Section 11.2 correctly places the locale enum in `VocabIncrementSchema` rather than hardcoding it in the DB method — this keeps The Filter as the sole validation gate, consistent with all other IPC handlers. Confirm that `useLanguage` is already imported in `useVocabularies.ts` before the N-04 sprint begins (the blueprint notes this as a confirmation step, which is the correct approach).
+- No architectural issues found. Safe to proceed to Phase III user review.
 
 ---
 
@@ -373,25 +385,32 @@ This bug pre-exists SCR-03 and is not a regression introduced here. It has no us
 3. **`docs/reference/vocabulary-system.md` correction scope:** The doc claims AutocompleteField handles incrementUsage automatically. Should the correction be minimal (fix the one incorrect sentence) or a full accuracy review of the document?
 
 ### Final Decisions:
-*(Awaiting user confirmation of audit-recommended answers below.)*
 
-**Audit recommendations (Phase II consensus):**
-- **Q1 — N-02 scope:** Apply case-insensitive matching to all three filter groups (era, metal, grade). Metal drift is low-probability but the consequence is silent exclusion; grade consistency costs nothing. Blueprint code already does this. (`curating-coins` Finding 3)
-- **Q2 — Write-time normalisation:** Do not implement. Title Case corrupts ordinal suffixes ("3Rd Century Ad"), era abbreviations ("Bc"), and European name particles. Case-insensitive filter matching is sufficient. (`curating-coins` Finding 4)
-- **Q3 — `vocabulary-system.md` correction scope:** Minimal fix only — correct the one false claim and document the `onIncrementUsage` prop pattern. Full review is out of sprint scope. (`curating-coins` OQ-3)
+**Q1 — N-02 scope (confirmed by user, 2026-04-03):** Apply case-insensitive matching to all three filter groups (era, metal, grade). The blueprint code already implements this correctly.
+
+**Q2 — Write-time Title Case normalisation (confirmed by user, 2026-04-03):** Do not implement. Case-insensitive filter matching is sufficient; Title Case normalisation corrupts ordinal suffixes, era abbreviations, and European name particles.
+
+**Q3 — `vocabulary-system.md` correction scope (overridden by user, 2026-04-03):** Full accuracy review of `docs/reference/vocabulary-system.md` is in scope for this sprint — not just the one false claim. Correct all inaccurate statements and bring the document fully in line with the implemented system.
+
+**Era filter expand behaviour (noted by user, 2026-04-03):** The user requested that the era filter show max 8 values with an expand option, like metals and grades. Confirmed already implemented: `PatinaSidebar.tsx` applies `renderOverflowGroup` with `TRUNCATION_THRESHOLD = 8` to all three filter groups identically. No implementation work required.
 
 ---
 
 ## 10. Post-Implementation Retrospective
 
-**Date:** *(To be completed after implementation)*
-**Outcome:** *(Pending)*
+**Date:** 2026-04-03
+**Outcome:** Complete — all 79 tests pass, zero TypeScript errors.
 
 ### Summary of Work
-*(To be filled in.)*
+
+- **N-01:** Added `onIncrementUsage?: (value: string) => void` prop to `AutocompleteField`; called via optional chaining inside `selectOption` (not `handleAddNew`). Wired all 7 `AutocompleteField` instances in `LedgerForm` (era, mint, denomination, metal, die_axis (×2 — main + accordion), grade, rarity). Added TC-AC-27/28/29 to `AutocompleteField.test.tsx` and two integration spot-checks to `LedgerForm.test.tsx`.
+- **N-02:** Replaced `Array.prototype.includes` with `Array.prototype.some` + `toLowerCase()` on both sides for era, metal, and grade filters in `useCoins.ts`. Added N-02 describe block (3 tests) to `useCoins.test.ts` using per-test `mockResolvedValue` overrides to avoid mutating the shared `MOCK_COINS` fixture.
+- **Docs:** Updated `docs/reference/vocabulary-system.md` — added `rarity` to the allowed fields table, corrected the Component Pattern section (accurate hook return type, accurate `AutocompleteField` props), replaced the false claim that the component auto-calls `incrementVocabUsage` with the correct `onIncrementUsage` prop pattern.
 
 ### Pain Points
-*(To be filled in.)*
+
+- The LedgerForm N-01 integration tests required two non-obvious patterns: (1) `clearVocabCache()` in the describe-scoped `beforeEach` to prevent the module-level cache from serving empty arrays from previous tests, and (2) `within(field.closest('.autocomplete-field'))` to scope option queries — all 7 dropdowns render their options in the DOM simultaneously, so plain `getByRole('option', { name })` finds multiple elements and throws. The blueprint did not call out these patterns; they emerged from test execution.
+- `act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); })` was needed to flush the async `getVocab` call before opening the dropdown. Clicking before the promise resolves gives an empty dropdown.
 
 ### Things to Consider
 - After N-01 lands, `usage_count` values will begin diverging from seed values as collectors use the app. If a future data migration or seed reset is needed, `CURRENT_SEED_VERSION` bump restores seed `usage_count` values but preserves user-added entries — confirm this is the desired reset behaviour.

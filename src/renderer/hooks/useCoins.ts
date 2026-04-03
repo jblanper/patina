@@ -46,17 +46,26 @@ export function useCoins() {
 
     // 1. Era Filter
     if (filters.era.length > 0) {
-      result = result.filter(coin => filters.era.includes(coin.era));
+      result = result.filter(coin =>
+        coin.era != null &&
+        filters.era.some(f => f.toLowerCase() === coin.era!.toLowerCase())
+      );
     }
 
     // 2. Metal Filter
     if (filters.metal.length > 0) {
-      result = result.filter(coin => coin.metal && filters.metal.includes(coin.metal));
+      result = result.filter(coin =>
+        coin.metal != null &&
+        filters.metal.some(f => f.toLowerCase() === coin.metal!.toLowerCase())
+      );
     }
 
     // 3. Grade Filter
     if (filters.grade.length > 0) {
-      result = result.filter(coin => coin.grade && filters.grade.includes(coin.grade));
+      result = result.filter(coin =>
+        coin.grade != null &&
+        filters.grade.some(f => f.toLowerCase() === coin.grade!.toLowerCase())
+      );
     }
 
     // 4. Search Filter

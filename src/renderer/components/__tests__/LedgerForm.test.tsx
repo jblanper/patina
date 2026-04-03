@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { LedgerForm } from '../LedgerForm';
@@ -8,6 +8,7 @@ import { GlossaryContext } from '../../contexts/GlossaryContext';
 import { FieldVisibilityContext } from '../../contexts/FieldVisibilityContext';
 import { DEFAULT_FIELD_VISIBILITY } from '../../../common/validation';
 import type { FieldVisibilityMap } from '../../../common/types';
+import { clearVocabCache } from '../../hooks/useVocabularies';
 
 const mockGlossaryContext = {
   drawerState: { open: false, field: null },
@@ -330,6 +331,42 @@ describe('LedgerForm', () => {
         { 'ledger.acquisition': true }
       );
       expect(screen.getByPlaceholderText('0.00')).toBeInTheDocument();
+    });
+  });
+
+  describe('N-01 — onIncrementUsage wired to AutocompleteField', () => {
+    beforeEach(() => {
+      clearVocabCache();
+    });
+
+    it('calls incrementVocabUsage when an existing era option is selected', async () => {
+      (window.electronAPI.getVocab as ReturnType<typeof vi.fn>).mockResolvedValue(['Roman Imperial', 'Ancient']);
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+
+      // Flush async vocab loading before opening dropdown
+      await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
+
+      const eraInput = screen.getByPlaceholderText('e.g. Roman Imperial');
+      const eraField = eraInput.closest('.autocomplete-field') as HTMLElement;
+      fireEvent.click(eraInput);
+      fireEvent.mouseDown(within(eraField).getByRole('option', { name: 'Roman Imperial' }));
+
+      expect(window.electronAPI.incrementVocabUsage).toHaveBeenCalledWith('era', 'Roman Imperial');
+    });
+
+    it('calls incrementVocabUsage when an existing metal option is selected', async () => {
+      (window.electronAPI.getVocab as ReturnType<typeof vi.fn>).mockResolvedValue(['Silver', 'Gold']);
+      renderForm(<LedgerForm formData={baseFormData} errors={{}} updateField={updateField} />);
+
+      // Flush async vocab loading before opening dropdown
+      await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
+
+      const metalInput = screen.getByPlaceholderText('e.g. Silver');
+      const metalField = metalInput.closest('.autocomplete-field') as HTMLElement;
+      fireEvent.click(metalInput);
+      fireEvent.mouseDown(within(metalField).getByRole('option', { name: 'Silver' }));
+
+      expect(window.electronAPI.incrementVocabUsage).toHaveBeenCalledWith('metal', 'Silver');
     });
   });
 

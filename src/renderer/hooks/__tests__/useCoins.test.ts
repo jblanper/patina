@@ -192,6 +192,63 @@ describe('useCoins', () => {
     expect(titlesDesc).toEqual([...titlesDesc].sort().reverse());
   });
 
+  describe('N-02 — case-insensitive filter matching', () => {
+    it('N-02 era: filter matches coins regardless of case variant', async () => {
+      const caseVariantCoins = [
+        ...MOCK_COINS,
+        { id: 5, title: 'Archaic Owl', era: 'ancient', metal: 'Silver', created_at: '2026-03-12' },
+      ];
+      (window.electronAPI.getCoins as any).mockResolvedValue(caseVariantCoins);
+
+      const { result } = renderHook(() => useCoins());
+      await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
+
+      act(() => { result.current.updateFilters({ era: ['Ancient'] }); });
+
+      // Should match 'Ancient' (coin 1, 3, 4) and 'ancient' (coin 5) — not 'Medieval'
+      expect(result.current.filteredCoins.every(c =>
+        c.era?.toLowerCase() === 'ancient'
+      )).toBe(true);
+      expect(result.current.filteredCoins.some(c => c.title === 'Archaic Owl')).toBe(true);
+    });
+
+    it('N-02 metal: filter matches coins regardless of case variant', async () => {
+      const caseVariantCoins = [
+        ...MOCK_COINS,
+        { id: 5, title: 'Roman Denier', era: 'Ancient', metal: 'silver', created_at: '2026-03-12' },
+      ];
+      (window.electronAPI.getCoins as any).mockResolvedValue(caseVariantCoins);
+
+      const { result } = renderHook(() => useCoins());
+      await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
+
+      act(() => { result.current.updateFilters({ metal: ['Silver'] }); });
+
+      expect(result.current.filteredCoins.every(c =>
+        c.metal?.toLowerCase() === 'silver'
+      )).toBe(true);
+      expect(result.current.filteredCoins.some(c => c.title === 'Roman Denier')).toBe(true);
+    });
+
+    it('N-02 grade: filter matches coins regardless of case variant', async () => {
+      const caseVariantCoins = [
+        ...MOCK_COINS,
+        { id: 5, title: 'Late Sestertius', era: 'Ancient', metal: 'Bronze', grade: 'xf', created_at: '2026-03-12' },
+      ];
+      (window.electronAPI.getCoins as any).mockResolvedValue(caseVariantCoins);
+
+      const { result } = renderHook(() => useCoins());
+      await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
+
+      act(() => { result.current.updateFilters({ grade: ['XF'] }); });
+
+      expect(result.current.filteredCoins.every(c =>
+        c.grade?.toLowerCase() === 'xf'
+      )).toBe(true);
+      expect(result.current.filteredCoins.some(c => c.title === 'Late Sestertius')).toBe(true);
+    });
+  });
+
   it('should sort by purchase_date with nulls sorted to end', async () => {
     const { result } = renderHook(() => useCoins());
 

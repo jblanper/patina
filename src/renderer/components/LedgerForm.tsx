@@ -75,6 +75,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
               value={formData.era || ''}
               onChange={(v) => updateField('era', v)}
               onAddNew={(v) => { eraVocab.addVocabulary(v); updateField('era', v); }}
+              onIncrementUsage={eraVocab.incrementUsage}
               options={eraVocab.options}
               placeholder={t('ledger.placeholders.era')}
               onReset={eraVocab.resetVocabularies}
@@ -93,6 +94,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
               value={formData.mint || ''}
               onChange={(v) => updateField('mint', v)}
               onAddNew={(v) => { mintVocab.addVocabulary(v); updateField('mint', v); }}
+              onIncrementUsage={mintVocab.incrementUsage}
               options={mintVocab.options}
               placeholder={t('ledger.placeholders.mint')}
               onReset={mintVocab.resetVocabularies}
@@ -149,6 +151,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
               value={formData.denomination || ''}
               onChange={(v) => updateField('denomination', v)}
               onAddNew={(v) => { denominationVocab.addVocabulary(v); updateField('denomination', v); }}
+              onIncrementUsage={denominationVocab.incrementUsage}
               options={denominationVocab.options}
               placeholder={t('ledger.placeholders.denomination')}
               onReset={denominationVocab.resetVocabularies}
@@ -209,6 +212,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             value={formData.metal || ''}
             onChange={(v) => updateField('metal', v)}
             onAddNew={(v) => { metalVocab.addVocabulary(v); updateField('metal', v); }}
+            onIncrementUsage={metalVocab.incrementUsage}
             options={metalVocab.options}
             placeholder={t('ledger.placeholders.material')}
             onReset={metalVocab.resetVocabularies}
@@ -238,6 +242,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             value={formData.grade || ''}
             onChange={(v) => updateField('grade', v)}
             onAddNew={(v) => { gradeVocab.addVocabulary(v); updateField('grade', v); }}
+            onIncrementUsage={gradeVocab.incrementUsage}
             options={gradeVocab.options}
             placeholder={t('ledger.placeholders.grade')}
             onReset={gradeVocab.resetVocabularies}
@@ -253,6 +258,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
             value={formData.rarity || ''}
             onChange={(v) => updateField('rarity', v)}
             onAddNew={(v) => { rarityVocab.addVocabulary(v); updateField('rarity', v); }}
+            onIncrementUsage={rarityVocab.incrementUsage}
             options={rarityVocab.options}
             placeholder={t('ledger.placeholders.rarity')}
             onReset={rarityVocab.resetVocabularies}
@@ -269,6 +275,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
               value={formData.die_axis || ''}
               onChange={(v) => updateField('die_axis', v)}
               onAddNew={(v) => { dieAxisVocab.addVocabulary(v); updateField('die_axis', v); }}
+              onIncrementUsage={dieAxisVocab.incrementUsage}
               options={dieAxisVocab.options}
               placeholder={t('ledger.placeholders.dieAxis')}
               onReset={dieAxisVocab.resetVocabularies}
@@ -296,6 +303,7 @@ export const LedgerForm: React.FC<LedgerFormProps> = ({ formData, errors, update
                     value={formData.die_axis || ''}
                     onChange={(v) => updateField('die_axis', v)}
                     onAddNew={(v) => { dieAxisVocab.addVocabulary(v); updateField('die_axis', v); }}
+                    onIncrementUsage={dieAxisVocab.incrementUsage}
                     options={dieAxisVocab.options}
                     placeholder={t('ledger.placeholders.dieAxis')}
                     onReset={dieAxisVocab.resetVocabularies}
