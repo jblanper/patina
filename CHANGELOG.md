@@ -1,3 +1,13 @@
+## v1.1.1 — 2026-04-03
+
+### Fixes
+- wire incrementUsage prop and case-insensitive filter matching
+
+### Docs
+- archive blueprint, standardise vocabulary pattern in AGENTS.md
+
+---
+
 # Changelog
 
 ## v1.1.0 — 2026-04-02
