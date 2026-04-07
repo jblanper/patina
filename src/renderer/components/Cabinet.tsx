@@ -1,14 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FieldVisibilityDrawer } from './FieldVisibilityDrawer';
 import { useCoins } from '../hooks/useCoins';
 import { useExport } from '../hooks/useExport';
 import { useLanguage } from '../hooks/useLanguage';
+import { useSelection } from '../hooks/useSelection';
 import { GalleryGrid } from './GalleryGrid';
+import { CoinListView } from './CoinListView';
 import { PatinaSidebar } from './PatinaSidebar';
 import { SearchBar } from './SearchBar';
 import { ExportToast } from './ExportToast';
+import { SelectionToolbar } from './SelectionToolbar';
+import { BulkEditModal } from './BulkEditModal';
 
 export const Cabinet: React.FC = () => {
   const navigate = useNavigate();
@@ -23,14 +27,23 @@ export const Cabinet: React.FC = () => {
     clearFilters,
     availableMetals,
     availableGrades,
-    availableEras
+    availableEras,
+    deleteCoin,
+    refresh,
   } = useCoins();
 
   const { language } = useLanguage();
   const { status, resultPath, error: exportError, exportToZip, exportToPdf, reset } = useExport();
+  const { selected, toggle, toggleRange, selectAll, clearAll, count: selectionCount } = useSelection();
+
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
+  const [bulkEditOpen, setBulkEditOpen] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const toolsRef = useRef<HTMLDivElement>(null);
+  const lastAnchorId = useRef<number | null>(null);
 
   useEffect(() => {
     if (!toolsOpen) return;
@@ -43,6 +56,37 @@ export const Cabinet: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [toolsOpen]);
 
+  const handleToggleSelect = useCallback((id: number, shiftKey: boolean) => {
+    if (shiftKey && lastAnchorId.current !== null) {
+      const ids = filteredCoins.map(c => c.id);
+      toggleRange(ids, lastAnchorId.current, id);
+    } else {
+      toggle(id);
+      lastAnchorId.current = id;
+    }
+  }, [filteredCoins, toggle, toggleRange]);
+
+  const handleBulkDeleteConfirm = useCallback(async () => {
+    const ids = [...selected];
+    for (const id of ids) {
+      try {
+        await deleteCoin(id);
+      } catch {
+        // continue deleting remaining coins
+      }
+    }
+    clearAll();
+    setBulkDeleteOpen(false);
+  }, [selected, deleteCoin, clearAll]);
+
+  const exportSelectionToZip = useCallback((ids: number[]) => {
+    exportToZip(true, true, ids);
+  }, [exportToZip]);
+
+  const exportSelectionToPdf = useCallback((ids: number[]) => {
+    exportToPdf(language, ids);
+  }, [exportToPdf, language]);
+
   if (error) {
     throw error;
   }
@@ -54,7 +98,7 @@ export const Cabinet: React.FC = () => {
         <div className="version-tag">{t('cabinet.tagline')}</div>
       </header>
 
-      <div className="app-layout">
+      <div className={`app-layout${sidebarOpen ? '' : ' app-layout--sidebar-collapsed'}`}>
         <PatinaSidebar
           filters={filters}
           updateFilters={updateFilters}
@@ -62,6 +106,8 @@ export const Cabinet: React.FC = () => {
           availableMetals={availableMetals}
           availableGrades={availableGrades}
           availableEras={availableEras}
+          isOpen={sidebarOpen}
+          onToggle={() => setSidebarOpen(prev => !prev)}
         />
 
         <main className="app-main">
@@ -75,6 +121,41 @@ export const Cabinet: React.FC = () => {
                 >
                   {t('cabinet.customizeDisplay')}
                 </button>
+
+                <div className="view-toggle" role="group" aria-label={t('cabinet.viewToggle')}>
+                  <button
+                    className="btn-view-mode"
+                    aria-pressed={viewMode === 'grid'}
+                    aria-label={t('cabinet.viewGrid')}
+                    onClick={() => setViewMode('grid')}
+                    type="button"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
+                      <rect x="1" y="1" width="6" height="6" rx="1" />
+                      <rect x="9" y="1" width="6" height="6" rx="1" />
+                      <rect x="1" y="9" width="6" height="6" rx="1" />
+                      <rect x="9" y="9" width="6" height="6" rx="1" />
+                    </svg>
+                    <span className="sr-only">{t('cabinet.viewGrid')}</span>
+                  </button>
+                  <button
+                    className="btn-view-mode"
+                    aria-pressed={viewMode === 'list'}
+                    aria-label={t('cabinet.viewList')}
+                    onClick={() => setViewMode('list')}
+                    type="button"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
+                      <rect x="1" y="2" width="3" height="3" rx="0.5" />
+                      <rect x="6" y="2" width="9" height="3" rx="0.5" />
+                      <rect x="1" y="7" width="3" height="3" rx="0.5" />
+                      <rect x="6" y="7" width="9" height="3" rx="0.5" />
+                      <rect x="1" y="12" width="3" height="3" rx="0.5" />
+                      <rect x="6" y="12" width="9" height="3" rx="0.5" />
+                    </svg>
+                    <span className="sr-only">{t('cabinet.viewList')}</span>
+                  </button>
+                </div>
 
                 <div className="tools-menu" ref={toolsRef}>
                   <button
@@ -130,12 +211,38 @@ export const Cabinet: React.FC = () => {
               placeholder={t('cabinet.search')}
             />
 
-            <GalleryGrid
-              coins={filteredCoins}
-              loading={loading}
-              isDatabaseEmpty={coins.length === 0}
-              onCoinClick={(id) => navigate(`/coin/${id}`)}
-            />
+            {(viewMode === 'list' || selectionCount > 0) && (
+              <SelectionToolbar
+                count={selectionCount}
+                onBulkEdit={() => setBulkEditOpen(true)}
+                onBulkDelete={() => setBulkDeleteOpen(true)}
+                onExportZip={() => exportSelectionToZip([...selected])}
+                onExportPdf={() => exportSelectionToPdf([...selected])}
+                onClearSelection={clearAll}
+                disabled={selectionCount === 0}
+              />
+            )}
+
+            {viewMode === 'list' ? (
+              <CoinListView
+                coins={filteredCoins}
+                loading={loading}
+                selected={selected}
+                onToggleSelect={handleToggleSelect}
+                onSelectAll={selectAll}
+                onClearAll={clearAll}
+              />
+            ) : (
+              <GalleryGrid
+                coins={filteredCoins}
+                loading={loading}
+                isDatabaseEmpty={coins.length === 0}
+                onCoinClick={(id) => navigate(`/coin/${id}`)}
+                selectable
+                selected={selected}
+                onToggleSelect={handleToggleSelect}
+              />
+            )}
           </section>
         </main>
       </div>
@@ -156,6 +263,48 @@ export const Cabinet: React.FC = () => {
         }
         onDismiss={reset}
       />
+
+      <BulkEditModal
+        isOpen={bulkEditOpen}
+        onClose={() => setBulkEditOpen(false)}
+        selectedIds={[...selected]}
+        onComplete={() => {
+          refresh();
+          clearAll();
+          setBulkEditOpen(false);
+        }}
+      />
+
+      {bulkDeleteOpen && (
+        <div className="modal-overlay" onClick={() => setBulkDeleteOpen(false)}>
+          <div
+            className="modal-content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="bulk-delete-modal-title"
+            onClick={e => e.stopPropagation()}
+          >
+            <h2 id="bulk-delete-modal-title">{t('detail.confirm.title')}</h2>
+            <p>{t('cabinet.confirmBulkDelete', { count: selectionCount })}</p>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn-minimal"
+                onClick={() => setBulkDeleteOpen(false)}
+              >
+                {t('detail.confirm.cancel')}
+              </button>
+              <button
+                type="button"
+                className="btn-delete"
+                onClick={handleBulkDeleteConfirm}
+              >
+                {t('detail.confirm.delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

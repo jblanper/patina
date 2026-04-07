@@ -6,6 +6,9 @@ import { useFieldVisibility } from '../hooks/useFieldVisibility';
 interface CoinCardProps {
   coin: CoinWithPrimaryImage;
   onClick?: (id: number) => void;
+  selectable?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: (id: number, shiftKey: boolean) => void;
 }
 
 /**
@@ -13,7 +16,7 @@ interface CoinCardProps {
  * Merges the borderless archival look with persistent data.
  * Adheres to 2-decimal (weight) and 1-decimal (diameter) rules.
  */
-export const CoinCard: React.FC<CoinCardProps> = React.memo(({ coin, onClick }) => {
+export const CoinCard: React.FC<CoinCardProps> = React.memo(({ coin, onClick, selectable, isSelected, onToggleSelect }) => {
   const { t } = useTranslation();
   const { isVisible } = useFieldVisibility();
 
@@ -33,16 +36,15 @@ export const CoinCard: React.FC<CoinCardProps> = React.memo(({ coin, onClick }) 
     }).format(d) + 'mm';
   };
 
-  // Safe image path handling (using relative paths from data/images)
-  // In a real Electron app, you might use a custom protocol like patina://
-  // For now, we'll assume the renderer can resolve them if the base path is handled.
-  const imageSrc = coin.primary_image_path 
-    ? `patina-img://${coin.primary_image_path}` 
+  const imageSrc = coin.primary_image_path
+    ? `patina-img://${coin.primary_image_path}`
     : null;
 
+  const cardClassName = `coin-card${isSelected ? ' coin-card--selected' : ''}`;
+
   return (
-    <article 
-      className="coin-card"
+    <article
+      className={cardClassName}
       onClick={() => onClick?.(coin.id)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -53,13 +55,29 @@ export const CoinCard: React.FC<CoinCardProps> = React.memo(({ coin, onClick }) 
       tabIndex={0}
       aria-label={`Coin card for ${coin.title}`}
     >
+      {selectable && (
+        <label
+          className="card-checkbox-wrapper"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            checked={!!isSelected}
+            aria-label={t('cabinet.selectCoin', { title: coin.title })}
+            onChange={(e) => {
+              onToggleSelect?.(coin.id, (e.nativeEvent as MouseEvent).shiftKey);
+            }}
+          />
+        </label>
+      )}
+
       <div className="coin-image-container">
         {imageSrc ? (
-          <img 
-            src={imageSrc} 
-            alt={coin.title} 
-            className="coin-image" 
-            loading="lazy" 
+          <img
+            src={imageSrc}
+            alt={coin.title}
+            className="coin-image"
+            loading="lazy"
           />
         ) : (
           <div className="coin-placeholder">
@@ -67,10 +85,10 @@ export const CoinCard: React.FC<CoinCardProps> = React.memo(({ coin, onClick }) 
           </div>
         )}
       </div>
-      
+
       <div className="coin-info">
         <h3 className="coin-title">{coin.title}</h3>
-        
+
         <div className="coin-metrics">
           <span className="metric-metal">{coin.metal || '??'}</span>
           <span className="metric-divider">//</span>
@@ -78,7 +96,7 @@ export const CoinCard: React.FC<CoinCardProps> = React.memo(({ coin, onClick }) 
           <span className="metric-divider">//</span>
           <span className="metric-diameter">{formatDiameter(coin.diameter)}</span>
         </div>
-        
+
         {isVisible('card.grade') && coin.grade && (
           <div className="coin-grade-row">
             <span className="coin-grade-label">{t('ledger.grade')}</span>

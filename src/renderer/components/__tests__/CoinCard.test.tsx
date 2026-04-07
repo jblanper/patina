@@ -149,4 +149,73 @@ describe('CoinCard', () => {
     fireEvent.keyDown(getByRole('article'), { key: ' ' });
     expect(onClick).toHaveBeenCalledWith(1);
   });
+
+  // ── Multi-select (CAB-A) ─────────────────────────────────────────────────
+
+  it('TC-CC-SEL-01: card checkbox is rendered when selectable=true', () => {
+    const { container } = renderCard({}, {});
+    // Re-render with selectable prop
+    const visibility = DEFAULT_FIELD_VISIBILITY as FieldVisibilityMap;
+    const { container: c } = render(
+      <FieldVisibilityContext.Provider
+        value={{
+          visibility,
+          isVisible: (key: VisibilityKey) => (visibility as Record<VisibilityKey, boolean>)[key] ?? true,
+          setVisibility: vi.fn(),
+          resetToDefaults: vi.fn(),
+        }}
+      >
+        <CoinCard coin={mockCoin} onClick={vi.fn()} selectable={true} />
+      </FieldVisibilityContext.Provider>
+    );
+    expect(c.querySelector('.card-checkbox-wrapper')).toBeInTheDocument();
+    expect(c.querySelector('input[type="checkbox"]')).toBeInTheDocument();
+    void container; // suppress unused var
+  });
+
+  it('TC-CC-SEL-02: card checkbox is absent when selectable=false (default)', () => {
+    const { container } = renderCard();
+    expect(container.querySelector('.card-checkbox-wrapper')).not.toBeInTheDocument();
+  });
+
+  it('TC-CC-SEL-03: coin-card--selected class applied when isSelected=true', () => {
+    const visibility = DEFAULT_FIELD_VISIBILITY as FieldVisibilityMap;
+    const { container } = render(
+      <FieldVisibilityContext.Provider
+        value={{
+          visibility,
+          isVisible: (key: VisibilityKey) => (visibility as Record<VisibilityKey, boolean>)[key] ?? true,
+          setVisibility: vi.fn(),
+          resetToDefaults: vi.fn(),
+        }}
+      >
+        <CoinCard coin={mockCoin} onClick={vi.fn()} selectable isSelected />
+      </FieldVisibilityContext.Provider>
+    );
+    expect(container.querySelector('.coin-card--selected')).toBeInTheDocument();
+  });
+
+  it('TC-CC-SEL-04: clicking checkbox calls onToggleSelect; clicking card body calls onClick', () => {
+    const onClick = vi.fn();
+    const onToggleSelect = vi.fn();
+    const visibility = DEFAULT_FIELD_VISIBILITY as FieldVisibilityMap;
+    const { container } = render(
+      <FieldVisibilityContext.Provider
+        value={{
+          visibility,
+          isVisible: (key: VisibilityKey) => (visibility as Record<VisibilityKey, boolean>)[key] ?? true,
+          setVisibility: vi.fn(),
+          resetToDefaults: vi.fn(),
+        }}
+      >
+        <CoinCard coin={mockCoin} onClick={onClick} selectable onToggleSelect={onToggleSelect} />
+      </FieldVisibilityContext.Provider>
+    );
+    const checkbox = container.querySelector('input[type="checkbox"]')!;
+    fireEvent.click(checkbox);
+    expect(onToggleSelect).toHaveBeenCalled();
+
+    fireEvent.click(container.querySelector('.coin-card')!);
+    expect(onClick).toHaveBeenCalledWith(1);
+  });
 });

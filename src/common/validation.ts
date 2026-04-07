@@ -91,6 +91,7 @@ export const ExportOptionsSchema = z.object({
     .refine(val => !val || path.isAbsolute(val), "Must be absolute path"),
   includeImages: z.boolean().default(true),
   includeCsv: z.boolean().default(true),
+  coinIds: z.array(z.number().int().positive()).max(5000).optional(),
 }).strict();
 
 /**
@@ -221,6 +222,7 @@ export const DEFAULT_FIELD_VISIBILITY: Record<VisibilityKey, boolean> = {
  */
 export const PdfExportOptionsSchema = z.object({
   locale: z.enum(['en', 'es']).default('es'),
+  coinIds: z.array(z.number().int().positive()).max(5000).optional(),
 }).strict();
 export type PdfExportOptions = z.infer<typeof PdfExportOptionsSchema>;
 

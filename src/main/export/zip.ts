@@ -52,28 +52,30 @@ function generateCsv(coins: Coin[], imagesMap: Map<number, CoinImages>): string 
   return bom + header + '\n' + rows.join('\n');
 }
 
-function generateManifest(coinCount: number): string {
+function generateManifest(coinCount: number, scoped: boolean): string {
   return JSON.stringify({
     version: '1.0.0',
     app: 'Patina',
     exportDate: new Date().toISOString(),
     coinCount,
-    type: 'full-archive'
+    type: scoped ? 'selection-archive' : 'full-archive'
   }, null, 2);
 }
 
-export async function exportToZip(targetPath: string, includeImages = true, includeCsv = true): Promise<ExportResult> {
+export async function exportToZip(targetPath: string, includeImages = true, includeCsv = true, coinIds?: number[]): Promise<ExportResult> {
   return new Promise((resolve) => {
     try {
-      const coins = dbService.getCoins();
+      const allCoins = dbService.getCoins();
+      const coins = coinIds ? allCoins.filter(c => c.id !== undefined && coinIds.includes(c.id)) : allCoins;
       const imagesMap = new Map<number, CoinImages>();
       const allImages: CoinImage[] = [];
       
-      const coinIds = coins.map(c => c.id).filter((id): id is number => id !== undefined);
-      if (coinIds.length > 0) {
-        const placeholders = coinIds.map(() => '?').join(',');
+      const filteredIds = coins.map(c => c.id).filter((id): id is number => id !== undefined);
+      const scoped = !!coinIds;
+      if (filteredIds.length > 0) {
+        const placeholders = filteredIds.map(() => '?').join(',');
         const database = new Database(dbPath);
-        const rows = database.prepare(`SELECT * FROM images WHERE coin_id IN (${placeholders})`).all(...coinIds) as CoinImage[];
+        const rows = database.prepare(`SELECT * FROM images WHERE coin_id IN (${placeholders})`).all(...filteredIds) as CoinImage[];
         database.close();
         
         rows.forEach(img => {
@@ -106,7 +108,7 @@ export async function exportToZip(targetPath: string, includeImages = true, incl
 
       archive.pipe(output);
 
-      archive.append(generateManifest(coins.length), { name: 'manifest.json' });
+      archive.append(generateManifest(coins.length, scoped), { name: 'manifest.json' });
 
       if (fs.existsSync(dbPath)) {
         archive.file(dbPath, { name: 'coins.db' });

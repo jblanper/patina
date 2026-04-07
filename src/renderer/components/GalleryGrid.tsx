@@ -8,6 +8,9 @@ interface GalleryGridProps {
   onCoinClick?: (id: number) => void;
   loading?: boolean;
   isDatabaseEmpty?: boolean;
+  selectable?: boolean;
+  selected?: Set<number>;
+  onToggleSelect?: (id: number, shiftKey: boolean) => void;
 }
 
 /**
@@ -18,7 +21,10 @@ export const GalleryGrid: React.FC<GalleryGridProps> = React.memo(({
   coins,
   onCoinClick,
   loading,
-  isDatabaseEmpty
+  isDatabaseEmpty,
+  selectable,
+  selected,
+  onToggleSelect,
 }) => {
   const { t } = useTranslation();
 
@@ -57,6 +63,9 @@ export const GalleryGrid: React.FC<GalleryGridProps> = React.memo(({
           key={coin.id}
           coin={coin}
           onClick={onCoinClick}
+          selectable={selectable}
+          isSelected={selected?.has(coin.id)}
+          onToggleSelect={onToggleSelect}
         />
       ))}
     </section>

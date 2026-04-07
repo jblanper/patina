@@ -177,16 +177,16 @@ app.whenReady().then(() => {
       defaultPath: `patina-export-${Date.now()}.zip`,
       filters: [{ name: 'ZIP Archive', extensions: ['zip'] }]
     });
-    
+
     if (result.canceled || !result.filePath) {
       return { success: false, error: 'Export cancelled' };
     }
-    
-    return exportToZip(result.filePath, validated.includeImages, validated.includeCsv);
+
+    return exportToZip(result.filePath, validated.includeImages, validated.includeCsv, validated.coinIds);
   });
 
   ipcMain.handle('export:toPdf', async (_, data: unknown) => {
-    const { locale } = validateIpc(PdfExportOptionsSchema, data);
+    const { locale, coinIds } = validateIpc(PdfExportOptionsSchema, data);
     const result = await dialog.showSaveDialog({
       title: 'Export PDF Catalog',
       defaultPath: `patina-catalog-${Date.now()}.pdf`,
@@ -197,7 +197,7 @@ app.whenReady().then(() => {
       return { success: false, error: 'Export cancelled' };
     }
 
-    return exportToPdf(result.filePath, locale);
+    return exportToPdf(result.filePath, locale, coinIds);
   });
 
   // Vocabulary IPC Handlers

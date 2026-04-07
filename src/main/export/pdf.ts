@@ -374,6 +374,7 @@ function drawCoverPage(
   allImages: Map<number, CoinImage[]>,
   locale: Locale,
   fonts: Fonts,
+  scoped = false,
 ): void {
   // Featured coin: largest image file by size
   let featuredImgData: string | null = null;
@@ -413,7 +414,7 @@ function drawCoverPage(
   doc.setFont(fonts.heading, 'bold');
   doc.setFontSize(36);
   doc.setTextColor(IRON_GALL);
-  doc.text('Patina', 105, 168, { align: 'center' });
+  doc.text(scoped ? 'Selection Catalog' : 'Patina', 105, 168, { align: 'center' });
 
   // Subtitle line
   const now = new Date();
@@ -528,7 +529,7 @@ function renderTocEntries(
   }
 }
 
-export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Promise<ExportResult> {
+export async function exportToPdf(targetPath: string, locale: Locale = 'es', coinIds?: number[]): Promise<ExportResult> {
   try {
     // 1. Set up document and fonts
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -539,7 +540,9 @@ export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Pr
     };
 
     // 2. Load all data
-    const coins = dbService.getCoins();
+    const allCoins = dbService.getCoins();
+    const coins = coinIds ? allCoins.filter(c => c.id !== undefined && coinIds.includes(c.id)) : allCoins;
+    const scoped = !!coinIds;
     const allImages = new Map<number, CoinImage[]>();
     for (const coin of coins) {
       const imgs = dbService.getImagesByCoinId(coin.id);
@@ -548,7 +551,7 @@ export async function exportToPdf(targetPath: string, locale: Locale = 'es'): Pr
 
     // 3. Cover page (page 1)
     applyPageBackground(doc);
-    drawCoverPage(doc, coins, allImages, locale, fonts);
+    drawCoverPage(doc, coins, allImages, locale, fonts, scoped);
 
     // 4. Compute pagePlan: one coin per page (dense metadata makes pairing impractical)
     const pagePlan: { coins: Coin[] }[] = coins.map(coin => ({ coins: [coin] }));

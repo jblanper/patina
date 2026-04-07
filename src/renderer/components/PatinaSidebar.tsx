@@ -10,6 +10,8 @@ interface PatinaSidebarProps {
   availableMetals: string[];
   availableGrades: string[];
   availableEras: string[];
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 const TRUNCATION_THRESHOLD = 8;
@@ -26,7 +28,9 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
   clearFilters,
   availableMetals,
   availableGrades,
-  availableEras
+  availableEras,
+  isOpen,
+  onToggle,
 }) => {
   const { t } = useTranslation();
 
@@ -106,6 +110,20 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
 
   return (
     <aside className="patina-sidebar">
+      <button
+        className="btn-sidebar-toggle"
+        aria-label={isOpen ? t('sidebar.collapse') : t('sidebar.expand')}
+        aria-expanded={isOpen}
+        onClick={onToggle}
+        type="button"
+      >
+        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none">
+          <path d="M10 3L6 8l4 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        {isOpen && <span className="btn-sidebar-toggle-label">{t('sidebar.collapse')}</span>}
+      </button>
+
+      {isOpen && <>
       {/* Sort Controls — Path B "The Ledger" */}
       <div className="filter-group">
         <span className="type-meta filter-label">{t('sidebar.orderBy')}</span>
@@ -209,6 +227,7 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
           {t('sidebar.reset')}
         </button>
       </div>
+      </>}
     </aside>
   );
 };

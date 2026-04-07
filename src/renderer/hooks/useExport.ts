@@ -18,12 +18,12 @@ export function useExport() {
     resultPath: null
   });
 
-  const exportToZip = useCallback(async (includeImages = true, includeCsv = true) => {
+  const exportToZip = useCallback(async (includeImages = true, includeCsv = true, coinIds?: number[]) => {
     setState({ status: 'exporting', type: 'zip', error: null, resultPath: null });
-    
+
     try {
-      const result = await window.electronAPI.exportToZip({ includeImages, includeCsv });
-      
+      const result = await window.electronAPI.exportToZip({ includeImages, includeCsv, coinIds });
+
       if (result.success) {
         setState({ status: 'success', type: 'zip', error: null, resultPath: result.path || null });
       } else {
@@ -34,12 +34,12 @@ export function useExport() {
     }
   }, []);
 
-  const exportToPdf = useCallback(async (locale: 'en' | 'es' = 'es') => {
+  const exportToPdf = useCallback(async (locale: 'en' | 'es' = 'es', coinIds?: number[]) => {
     setState({ status: 'exporting', type: 'pdf', error: null, resultPath: null });
 
     try {
-      const result = await window.electronAPI.exportToPdf(locale);
-      
+      const result = await window.electronAPI.exportToPdf(locale, coinIds);
+
       if (result.success) {
         setState({ status: 'success', type: 'pdf', error: null, resultPath: result.path || null });
       } else {

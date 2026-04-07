@@ -21,8 +21,8 @@ export interface IElectronAPI {
   removeLensListeners: () => void;
 
   // Export API
-  exportToZip: (options: { includeImages?: boolean; includeCsv?: boolean }) => Promise<{ success: boolean; path?: string; error?: string }>;
-  exportToPdf: (locale: 'en' | 'es') => Promise<{ success: boolean; path?: string; error?: string }>;
+  exportToZip: (options: { includeImages?: boolean; includeCsv?: boolean; coinIds?: number[] }) => Promise<{ success: boolean; path?: string; error?: string }>;
+  exportToPdf: (locale: 'en' | 'es', coinIds?: number[]) => Promise<{ success: boolean; path?: string; error?: string }>;
 
   // Vocabulary API
   getVocab: (field: VocabField, locale?: 'en' | 'es') => Promise<string[]>;

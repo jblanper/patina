@@ -223,6 +223,16 @@ describe('validation.ts', () => {
         expect(result.data).not.toHaveProperty('created_at');
       }
     });
+
+    it('TC-VAL-PARTIAL-STRICT: NewCoinSchema.partial() still rejects unknown keys', () => {
+      // Security: .partial() must not strip the .strict() modifier so unknown keys
+      // injected via the bulk-edit IPC path are rejected before any SQL runs.
+      const result = NewCoinSchema.partial().safeParse({
+        title: 'Test',
+        injectedKey: 'malicious',
+      });
+      expect(result.success).toBe(false);
+    });
   });
 
   describe('FilterStateSchema', () => {
@@ -402,6 +412,32 @@ describe('validation.ts', () => {
         targetPath: '/absolute/path',
         unknownField: 'value'
       });
+      expect(result.success).toBe(false);
+    });
+
+    it('TC-VAL-ZIP-COINIDS: accepts valid coinIds array', () => {
+      const result = ExportOptionsSchema.safeParse({ coinIds: [1, 2, 3] });
+      expect(result.success).toBe(true);
+    });
+
+    it('TC-VAL-ZIP-COINIDS: omitting coinIds (undefined) parses without error', () => {
+      const result = ExportOptionsSchema.safeParse({});
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.data.coinIds).toBeUndefined();
+    });
+
+    it('TC-VAL-ZIP-COINIDS-MAX: rejects coinIds array exceeding 5000 elements', () => {
+      const result = ExportOptionsSchema.safeParse({ coinIds: Array.from({ length: 5001 }, (_, i) => i + 1) });
+      expect(result.success).toBe(false);
+    });
+
+    it('TC-VAL-ZIP-COINIDS: rejects non-integer coinId elements', () => {
+      const result = ExportOptionsSchema.safeParse({ coinIds: [1.5, 2] });
+      expect(result.success).toBe(false);
+    });
+
+    it('TC-VAL-ZIP-COINIDS: rejects zero or negative coinId elements', () => {
+      const result = ExportOptionsSchema.safeParse({ coinIds: [0, 1] });
       expect(result.success).toBe(false);
     });
   });
@@ -621,6 +657,25 @@ describe('VocabResetSchema', () => {
 
     it('TC-PDF-05: rejects extra properties (.strict)', () => {
       const result = PdfExportOptionsSchema.safeParse({ locale: 'es', extra: true });
+      expect(result.success).toBe(false);
+    });
+
+    it('TC-VAL-PDF-COINIDS: accepts valid coinIds array', () => {
+      const result = PdfExportOptionsSchema.safeParse({ locale: 'es', coinIds: [1, 2, 3] });
+      expect(result.success).toBe(true);
+    });
+
+    it('TC-VAL-PDF-COINIDS: omitting coinIds (undefined) parses without error', () => {
+      const result = PdfExportOptionsSchema.safeParse({ locale: 'es' });
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.data.coinIds).toBeUndefined();
+    });
+
+    it('TC-VAL-PDF-COINIDS-MAX: rejects coinIds array exceeding 5000 elements', () => {
+      const result = PdfExportOptionsSchema.safeParse({
+        locale: 'es',
+        coinIds: Array.from({ length: 5001 }, (_, i) => i + 1),
+      });
       expect(result.success).toBe(false);
     });
   });

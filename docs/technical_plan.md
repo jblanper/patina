@@ -138,6 +138,9 @@ Toolbar collapsed from five flat items to a three-item Command Strip (Personaliz
 |---|---|
 | [Phase 6C: Field Visibility Settings](./blueprints/2026-03-19-phase-6c-field-visibility.md) | Approved |
 | [Sidebar Filter Overflow — The Soft Reveal](./blueprints/2026-03-21-sidebar-filter-overflow.md) | Verification |
+| [CAB-A: Cabinet List View & Multi-Select](./blueprints/2026-04-05-cab-a-list-view-multiselect.md) | Proposed |
+| [CAB-B: Cabinet Bulk Operations](./blueprints/2026-04-05-cab-b-bulk-operations.md) | Proposed |
+| [CAB-C: Coin Import](./blueprints/2026-04-05-cab-c-coin-import.md) | Proposed |
 
 ---
 
@@ -153,3 +156,4 @@ To research any of these ideas before committing to a blueprint, use `/scouting-
 - **Loan & Exhibition Tracking** — record when a coin leaves the collection temporarily (loaned to a museum, sent for grading). Adds a status field and return date without altering the core schema.
 - **Multi-Collection Support** — allow the curator to maintain separate collections (personal, inherited, investment) within one installation, each with its own SQLite file.
 - **Coin Research Panel** — a contextual panel within the Scriptorium that lets the curator look up numismatic references (Numista, PCGS, museum databases) without leaving the app. The goal is to reduce context-switching during cataloguing and help populate fields accurately from authoritative sources. → [Research report](./research/2026-03-22-coin-research-panel-research.md) (Proposed — ready for `/curating-blueprints`)
+- **Cabinet List View, Bulk Operations & Coin Import** — see active blueprints CAB-A, CAB-B, CAB-C above.

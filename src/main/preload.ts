@@ -22,8 +22,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   removeLensListeners: () => ipcRenderer.removeAllListeners('lens:image-received'),
 
   // Export API
-  exportToZip: (options: { includeImages?: boolean; includeCsv?: boolean }) => ipcRenderer.invoke('export:toZip', options),
-  exportToPdf: (locale: 'en' | 'es') => ipcRenderer.invoke('export:toPdf', { locale }),
+  exportToZip: (options: { includeImages?: boolean; includeCsv?: boolean; coinIds?: number[] }) =>
+    ipcRenderer.invoke('export:toZip', options),
+  exportToPdf: (locale: 'en' | 'es', coinIds?: number[]) =>
+    ipcRenderer.invoke('export:toPdf', { locale, coinIds }),
 
   // Vocabulary API
   getVocab: (field: VocabField, locale?: 'en' | 'es'): Promise<string[]> =>

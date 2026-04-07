@@ -1,5 +1,12 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+
+// jsdom does not implement ResizeObserver — provide a no-op stub
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
 import en from './i18n/locales/en.json';
 import { DEFAULT_FIELD_VISIBILITY } from '../common/validation';
 

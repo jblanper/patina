@@ -18,7 +18,9 @@ const defaultProps = {
   clearFilters: vi.fn(),
   availableMetals: ['Silver', 'Gold'],
   availableGrades: ['Choice VF', 'XF'],
-  availableEras: ['Ancient', 'Medieval', 'Modern']
+  availableEras: ['Ancient', 'Medieval', 'Modern'],
+  isOpen: true,
+  onToggle: vi.fn(),
 };
 
 describe('PatinaSidebar', () => {
@@ -204,5 +206,33 @@ describe('PatinaSidebar', () => {
     render(<PatinaSidebar {...defaultProps} filters={filters} />);
     const resetBtn = screen.getByRole('button', { name: /Reset Archive View/i });
     expect(resetBtn).not.toBeDisabled();
+  });
+
+  // ── CAB-A1: Sidebar Collapse Toggle ──────────────────────────────────────
+
+  it('TC-PSB-COL-01: renders .btn-sidebar-toggle button', () => {
+    const { container } = render(<PatinaSidebar {...defaultProps} />);
+    expect(container.querySelector('.btn-sidebar-toggle')).toBeInTheDocument();
+  });
+
+  it('TC-PSB-COL-02: aria-expanded is true when isOpen=true, false when isOpen=false', () => {
+    const { container, rerender } = render(<PatinaSidebar {...defaultProps} isOpen={true} />);
+    expect(container.querySelector('.btn-sidebar-toggle')).toHaveAttribute('aria-expanded', 'true');
+    rerender(<PatinaSidebar {...defaultProps} isOpen={false} />);
+    expect(container.querySelector('.btn-sidebar-toggle')).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('TC-PSB-COL-03: clicking the toggle button calls onToggle', () => {
+    const onToggle = vi.fn();
+    const { container } = render(<PatinaSidebar {...defaultProps} onToggle={onToggle} />);
+    fireEvent.click(container.querySelector('.btn-sidebar-toggle')!);
+    expect(onToggle).toHaveBeenCalledTimes(1);
+  });
+
+  it('TC-PSB-COL-04: filter controls are not in the DOM when isOpen=false', () => {
+    render(<PatinaSidebar {...defaultProps} isOpen={false} />);
+    expect(screen.queryByText('Eras')).toBeNull();
+    expect(screen.queryByText('Metals')).toBeNull();
+    expect(screen.queryByText('Grade')).toBeNull();
   });
 });

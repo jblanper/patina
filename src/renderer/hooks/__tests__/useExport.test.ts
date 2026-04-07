@@ -87,6 +87,16 @@ describe('useExport Hook', () => {
 
       expect(mockExportToZip).toHaveBeenCalledWith({ includeImages: false, includeCsv: true });
     });
+
+    it('TC-EXP-ZIP-SCOPE: forwards coinIds through window.electronAPI.exportToZip', async () => {
+      mockExportToZip.mockResolvedValueOnce({ success: true, path: '/tmp/export.zip' });
+
+      const { result } = renderHook(() => useExport());
+
+      await result.current.exportToZip(true, true, [1, 2, 3]);
+
+      expect(mockExportToZip).toHaveBeenCalledWith({ includeImages: true, includeCsv: true, coinIds: [1, 2, 3] });
+    });
   });
 
   describe('exportToPdf', () => {
@@ -139,7 +149,7 @@ describe('useExport Hook', () => {
 
       await result.current.exportToPdf();
 
-      expect(mockExportToPdf).toHaveBeenCalledWith('es');
+      expect(mockExportToPdf).toHaveBeenCalledWith('es', undefined);
     });
 
     it('should call exportToPdf with an explicit locale when provided', async () => {
@@ -149,7 +159,17 @@ describe('useExport Hook', () => {
 
       await result.current.exportToPdf('en');
 
-      expect(mockExportToPdf).toHaveBeenCalledWith('en');
+      expect(mockExportToPdf).toHaveBeenCalledWith('en', undefined);
+    });
+
+    it('TC-EXP-PDF-SCOPE: forwards coinIds through window.electronAPI.exportToPdf', async () => {
+      mockExportToPdf.mockResolvedValueOnce({ success: true, path: '/tmp/catalog.pdf' });
+
+      const { result } = renderHook(() => useExport());
+
+      await result.current.exportToPdf('es', [1, 2, 3]);
+
+      expect(mockExportToPdf).toHaveBeenCalledWith('es', [1, 2, 3]);
     });
   });
 

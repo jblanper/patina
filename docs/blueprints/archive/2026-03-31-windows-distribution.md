@@ -1,7 +1,7 @@
 # Implementation Blueprint: Windows Distribution — NSIS Installer via GitHub Actions
 
 **Date:** 2026-03-31
-**Status:** Proposed
+**Status:** Completed
 **Reference:** `package.json` (existing `electron-builder` devDependency v26.8.1)
 
 ---
@@ -304,14 +304,17 @@ This blueprint adds zero new source files. CI workflow correctness is verified b
 
 ## 10. Post-Implementation Retrospective
 
-**Date:** —
-**Outcome:** —
+**Date:** 2026-03-31
+**Outcome:** Completed as designed — no application code changes were required.
 
 ### Summary of Work
-- —
+- Added `electron-builder` `build` config to `package.json` (`appId`, `productName`, `directories.output: release/`, `files`, `asarUnpack` for `better-sqlite3`, `extraResources` for fonts, `win.target: nsis`, `nsis` wizard options).
+- Added `dist:win` npm script.
+- Added `release/` to `.gitignore`.
+- Created `.github/workflows/build-win.yml` — builds on push to `main` and `workflow_dispatch`, uploads `release/*.exe` as a 30-day artifact.
 
 ### Pain Points
-- —
+- None. The app was already packaged-runtime-safe (`app.isPackaged` branching for DB and image paths). The blueprint was pure config.
 
 ### Things to Consider
 - Add `assets/icon.ico` (256×256) for brand presence in installer and taskbar.
