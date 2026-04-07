@@ -1,3 +1,10 @@
+## v1.2.0 — 2026-04-07
+
+### Features
+- bulk operations — edit field, delete, scoped export (CAB-B)
+
+---
+
 ## v1.1.1 — 2026-04-03
 
 ### Fixes
