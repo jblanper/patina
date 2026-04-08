@@ -145,6 +145,51 @@ const relativePath = await window.electronAPI.importImageFromFile();
 
 ---
 
+## Coin Import Handlers
+
+Three handlers implement a **two-phase IPC design**: the preview handler opens the native dialog and stages the file path in the Main process; the execute handler reads from the staged path using options validated from the renderer. The renderer never supplies or receives a file path.
+
+> **Note:** CSV import was removed after the initial CAB-C release (see §11 of the CAB-C blueprint). Only ZIP-based import is supported. `src/main/import/csv.ts` is retained as an internal module used by the ZIP importer; it is not exposed through the bridge.
+
+### `import:zipPreview`
+
+Opens a native dialog filtered to `.zip`. Validates `manifest.json` (must have `app: 'Patina'`). Caches the chosen path as `stagedZipPath`.
+
+```typescript
+const result = await window.electronAPI.importZipPreview();
+// result: ZipPreviewResult | { cancelled: true } | { error: string }
+```
+
+**Returns:** `{ coinCount, hasImages, exportDate, appVersion }` or an error/cancelled sentinel.
+
+---
+
+### `import:zipExecute`
+
+Reads from `stagedZipPath`. Validates all ZIP entries for path traversal and null bytes before writing anything to disk (fail-whole-on-traversal). Extracts images with collision-safe names, then imports coins from `coins.csv`. Clears `stagedZipPath` in a `finally` block.
+
+```typescript
+const result = await window.electronAPI.importZipExecute({
+  locale: 'es',
+  skipDuplicates: false,
+});
+// result: ZipImportResult
+```
+
+**Security mandates:** null byte check before `path.normalize()`; `resolvedPath.startsWith(imageRoot)` boundary check; SVG blocked; 10 MB per image.
+
+---
+
+### `import:cancel`
+
+Clears `stagedZipPath`. Called by the renderer whenever the ImportDialog closes without executing. Takes no parameters.
+
+```typescript
+await window.electronAPI.importCancel();
+```
+
+---
+
 ## Lens Handlers
 
 ### `lens:start`
@@ -187,7 +232,7 @@ const { status } = await window.electronAPI.getLensStatus();
 
 ### `export:toZip`
 
-Creates a ZIP archive of the entire collection.
+Creates a ZIP archive of the collection. When `coinIds` is provided, only those coins are included (scoped export).
 
 ```typescript
 const { success, path } = await window.electronAPI.exportToZip(options?: ExportOptions);
@@ -198,6 +243,9 @@ const { success, path } = await window.electronAPI.exportToZip(options?: ExportO
 | `options.targetPath` | `string` | No | Absolute path for the output file |
 | `options.includeImages` | `boolean` | No | Include images (default: `true`) |
 | `options.includeCsv` | `boolean` | No | Include CSV export (default: `true`) |
+| `options.coinIds` | `number[]` | No | Limit export to these coin IDs (max 5000). Omit for full collection. |
+
+The manifest `type` field is `'selection-archive'` when `coinIds` is provided, `'full-archive'` otherwise.
 
 **Returns:** `{ success: boolean, path: string }`
 
@@ -209,11 +257,16 @@ const { success, path } = await window.electronAPI.exportToZip(options?: ExportO
 
 ### `export:toPdf`
 
-Generates a PDF catalog of the collection.
+Generates a PDF catalog of the collection. When `coinIds` is provided, only those coins are included (scoped catalog).
 
 ```typescript
-const { success, path } = await window.electronAPI.exportToPdf();
+const { success, path } = await window.electronAPI.exportToPdf(locale: 'en' | 'es', coinIds?: number[]);
 ```
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `locale` | `'en' \| 'es'` | Yes | Language for the generated catalog |
+| `coinIds` | `number[]` | No | Limit catalog to these coin IDs (max 5000). Omit for full collection. |
 
 **Returns:** `{ success: boolean, path: string }`
 

@@ -125,6 +125,33 @@ describe('Cabinet — CAB-A', () => {
     });
   });
 
+  it('TC-CAB-D-01: btn-customize is not rendered in the toolbar', () => {
+    const { container } = renderCabinet();
+    expect(container.querySelector('.btn-customize')).not.toBeInTheDocument();
+  });
+
+  it('TC-CAB-D-02: "Customize Display" appears in tools dropdown when opened', async () => {
+    renderCabinet();
+    const toolsBtn = screen.getByRole('button', { name: /tools/i });
+    fireEvent.click(toolsBtn);
+    await waitFor(() => {
+      expect(screen.getByRole('menuitem', { name: /customize display/i })).toBeInTheDocument();
+    });
+  });
+
+  it('TC-CAB-D-03: clicking "Customize Display" in dropdown opens the drawer and closes dropdown', async () => {
+    const { container } = renderCabinet();
+    const toolsBtn = screen.getByRole('button', { name: /tools/i });
+    fireEvent.click(toolsBtn);
+    await waitFor(() => {
+      expect(screen.getByRole('menuitem', { name: /customize display/i })).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole('menuitem', { name: /customize display/i }));
+    await waitFor(() => {
+      expect(container.querySelector('.tools-dropdown')).not.toBeInTheDocument();
+    });
+  });
+
   it('TC-CAB-SEL-03: selection persists when toggling between grid and list views', async () => {
     const { container } = renderCabinet();
 

@@ -13,6 +13,7 @@ import { SearchBar } from './SearchBar';
 import { ExportToast } from './ExportToast';
 import { SelectionToolbar } from './SelectionToolbar';
 import { BulkEditModal } from './BulkEditModal';
+import { ImportDialog } from './ImportDialog';
 
 export const Cabinet: React.FC = () => {
   const navigate = useNavigate();
@@ -41,6 +42,7 @@ export const Cabinet: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [bulkEditOpen, setBulkEditOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const toolsRef = useRef<HTMLDivElement>(null);
   const lastAnchorId = useRef<number | null>(null);
@@ -114,14 +116,6 @@ export const Cabinet: React.FC = () => {
           <section className="cabinet-section">
             <header className="cabinet-header">
               <div className="cabinet-toolbar">
-                <button
-                  className="btn-customize"
-                  onClick={() => setDrawerOpen(true)}
-                  aria-label={t('cabinet.customizeDisplay')}
-                >
-                  {t('cabinet.customizeDisplay')}
-                </button>
-
                 <div className="view-toggle" role="group" aria-label={t('cabinet.viewToggle')}>
                   <button
                     className="btn-view-mode"
@@ -171,9 +165,24 @@ export const Cabinet: React.FC = () => {
                       <button
                         className="tools-dropdown-item"
                         role="menuitem"
+                        onClick={() => { setDrawerOpen(true); setToolsOpen(false); }}
+                      >
+                        {t('cabinet.customizeDisplay')}
+                      </button>
+                      <hr className="tools-dropdown-divider" />
+                      <button
+                        className="tools-dropdown-item"
+                        role="menuitem"
                         onClick={() => { exportToZip(); setToolsOpen(false); }}
                       >
                         {t('cabinet.exportArchive')}
+                      </button>
+                      <button
+                        className="tools-dropdown-item"
+                        role="menuitem"
+                        onClick={() => { setImportOpen(true); setToolsOpen(false); }}
+                      >
+                        {t('cabinet.importCoins')}
                       </button>
                       <button
                         className="tools-dropdown-item"
@@ -272,6 +281,15 @@ export const Cabinet: React.FC = () => {
           refresh();
           clearAll();
           setBulkEditOpen(false);
+        }}
+      />
+
+      <ImportDialog
+        isOpen={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImportComplete={() => {
+          refresh();
+          setImportOpen(false);
         }}
       />
 

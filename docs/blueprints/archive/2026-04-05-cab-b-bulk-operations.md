@@ -1,7 +1,7 @@
 # Implementation Blueprint: Cabinet Bulk Operations (CAB-B)
 
 **Date:** 2026-04-05
-**Status:** In-Progress
+**Status:** Completed
 **Reference:** `docs/research/2026-04-03-cabinet-list-bulk-import-research.md`
 **Series:** Cabinet Enhancement Series — Blueprint B of 3. **Depends on CAB-A** (`2026-04-05-cab-a-list-view-multiselect.md`) being Completed first.
 **Dependency:** The `useSelection` hook, `CoinListView`, and checkbox infrastructure from CAB-A are prerequisites.
@@ -484,7 +484,7 @@ The two-step flow (field selection → value entry) is the right sequencing: it 
 
 ## 10. Post-Implementation Retrospective
 **Date:** 2026-04-07
-**Outcome:** In-Progress — further issues identified; under active revision.
+**Outcome:** Completed. All post-ship UX rounds resolved; 491 tests pass; `tsc --noEmit` clean.
 
 ### Summary of Work
 - `SelectionToolbar` component — sticky contextual action bar with export dropdown, keyboard-accessible, `aria-live` count label, `.btn-delete` for destructive action.
@@ -531,4 +531,4 @@ Two further issues identified and resolved. 491 tests pass, `tsc --noEmit` clean
 - Sidebar filter toggle UX still needs a proper solution — to be addressed in a future blueprint.
 
 ### Things to Consider
-- **Core Doc Revision:** `docs/reference/ipc_api.md` must be updated to document the `coinIds` parameter on `export:toZip` and `export:toPdf`. `AGENTS.md` may need a note about the bulk-edit pattern (sequential IPC calls for write batches).
+- **Core Doc Revision:** `docs/reference/ipc_api.md` updated with `coinIds` parameter on `export:toZip` and `export:toPdf` ✓. `AGENTS.md` updated with Bulk Write Pattern and Scoped Export Pattern notes ✓.

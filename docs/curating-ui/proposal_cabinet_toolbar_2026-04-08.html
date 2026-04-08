@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curatorial Refinement: Cabinet Toolbar & Sidebar Toggle — Patina</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-manuscript: #FCF9F2;
+      --text-ink: #2D2926;
+      --text-muted: #7A7875;
+      --border-hairline: #E0DCCD;
+      --accent-manuscript: #914E32;
+      --stone-pedestal: #F0EDE6;
+      --font-serif: 'Cormorant Garamond', serif;
+      --font-sans: 'Montserrat', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --spacing-large: clamp(3rem, 8vw, 4rem);
+      --spacing-med: 2rem;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: #EFEDE8;
+      color: var(--text-ink);
+      line-height: 1.6;
+      padding: var(--spacing-large);
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    /* ─── Curator Brief ─── */
+    .curator-brief {
+      max-width: 1300px;
+      margin: 0 auto;
+      width: 100%;
+      background: white;
+      border: 1px solid var(--border-hairline);
+      border-left: 4px solid var(--accent-manuscript);
+      padding: 3rem;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 4rem;
+    }
+    .brief-main h1 {
+      font-family: var(--font-serif);
+      font-size: 2.2rem;
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-manuscript);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .rationale {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      font-style: italic;
+      max-width: 62ch;
+      line-height: 1.7;
+      color: var(--text-ink);
+      margin-bottom: 1.5rem;
+    }
+    .changes-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      font-family: var(--font-sans);
+    }
+    .changes-list li::before {
+      content: '→ ';
+      color: var(--accent-manuscript);
+    }
+    .brief-audit h3 {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-manuscript);
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-hairline);
+      padding-bottom: 0.5rem;
+    }
+    .audit-list { list-style: none; display: flex; flex-direction: column; gap: 1.5rem; }
+    .audit-item strong {
+      display: block;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+    .audit-item p { font-size: 0.82rem; }
+
+    /* ─── Browser Frame ─── */
+    .scenario-label {
+      max-width: 1300px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .scenario-label h2 {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+    }
+    .scenario-label .badge {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid currentColor;
+    }
+    .badge.before { color: var(--text-muted); }
+    .badge.after { color: var(--accent-manuscript); border-color: var(--accent-manuscript); }
+
+    .browser-frame {
+      max-width: 1300px;
+      margin: 0 auto;
+      width: 100%;
+      background: var(--bg-manuscript);
+      border: 1px solid var(--border-hairline);
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .frame-header {
+      background: #E8E8E8;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #CCC;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: #CCC; }
+    .dot.red { background: #FF5F56; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green { background: #27C93F; }
+    .address-bar {
+      background: white;
+      padding: 0.25rem 1rem;
+      border-radius: 4px;
+      flex: 1;
+      margin-left: 1rem;
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: center;
+      border: 1px solid var(--border-hairline);
+    }
+    .frame-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── App Header ─── */
+    .app-header {
+      padding: 1rem var(--spacing-large);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-manuscript);
+      border-bottom: 2px solid var(--text-ink);
+    }
+    .app-header h1 {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-style: italic;
+    }
+    .version-tag {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-manuscript);
+    }
+
+    /* ─── App Layout ─── */
+    .app-layout {
+      display: flex;
+    }
+
+    /* ─── BEFORE: Current Sidebar ─── */
+    .patina-sidebar-before {
+      width: 280px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 1rem 1.5rem 1.5rem;
+      border-right: 1px solid var(--border-hairline);
+    }
+    .patina-sidebar-before.collapsed {
+      width: 44px;
+      padding: 1rem 0;
+      gap: 0;
+      align-items: center;
+    }
+    .btn-sidebar-toggle-before {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.35rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0;
+    }
+    .btn-sidebar-toggle-before.collapsed {
+      justify-content: center;
+    }
+
+    /* ─── AFTER: Proposed Sidebar ─── */
+    .patina-sidebar-after {
+      width: 280px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 1rem 1.5rem 1.5rem;
+      border-right: 1px solid var(--border-hairline);
+    }
+    .patina-sidebar-after.collapsed {
+      width: 44px;
+      padding: 0;
+      gap: 0;
+      align-items: center;
+      justify-content: flex-start;
+      border-right: 1px solid var(--border-hairline);
+    }
+    .btn-sidebar-toggle-after {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0.75rem 0;
+      justify-content: flex-end;
+      width: 100%;
+    }
+    /* Collapsed state — vertical filter label */
+    .patina-sidebar-after.collapsed .btn-sidebar-toggle-after {
+      flex-direction: column;
+      gap: 0.5rem;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 1rem 0;
+      width: 44px;
+      height: 100%;
+    }
+    .sidebar-toggle-label-vertical {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* ─── Main Content ─── */
+    .app-main {
+      flex: 1;
+      min-width: 0;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* ─── BEFORE Toolbar ─── */
+    .cabinet-toolbar-before {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .btn-customize-before {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--text-muted);
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.1rem 0;
+    }
+    .view-toggle-before {
+      display: flex;
+    }
+    .btn-view-before {
+      background: none;
+      border: 1px solid var(--border-hairline);
+      padding: 0.4rem 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      color: var(--text-ink);
+    }
+    .btn-view-before:first-child { border-radius: 2px 0 0 2px; border-right: none; }
+    .btn-view-before:last-child  { border-radius: 0 2px 2px 0; }
+    .btn-view-before.active { background: var(--accent-manuscript); color: #fff; border-color: var(--accent-manuscript); }
+    .btn-tools-before {
+      background: none;
+      border: 1px solid var(--border-hairline);
+      padding: 0.4rem 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-ink);
+      cursor: pointer;
+      border-color: var(--accent-manuscript);
+      color: var(--accent-manuscript);
+    }
+    .btn-primary-before {
+      margin-left: auto;
+      background: var(--text-ink);
+      color: white;
+      border: none;
+      padding: 0.55rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+
+    /* ─── AFTER Toolbar ─── */
+    .cabinet-toolbar-after {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    /* Unified icon group: Grid | List | Display */
+    .view-toggle-after {
+      display: flex;
+    }
+    .btn-view-after {
+      background: none;
+      border: 1px solid var(--border-hairline);
+      padding: 0.4rem 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-ink);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .btn-view-after:first-child { border-radius: 2px 0 0 2px; border-right: none; }
+    .btn-view-after:last-child  { border-radius: 0 2px 2px 0; }
+    .btn-view-after:not(:first-child):not(:last-child) { border-right: none; }
+    .btn-view-after.active { background: var(--accent-manuscript); color: #fff; border-color: var(--accent-manuscript); }
+    .btn-view-after:hover:not(.active) { border-color: var(--accent-manuscript); color: var(--accent-manuscript); }
+
+    /* Divider between icon group and tools */
+    .toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border-hairline);
+      flex-shrink: 0;
+    }
+
+    .btn-tools-after {
+      background: none;
+      border: 1px solid var(--border-hairline);
+      padding: 0.4rem 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-ink);
+      cursor: pointer;
+      border-radius: 2px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-tools-after:hover { border-color: var(--accent-manuscript); color: var(--accent-manuscript); }
+
+    .btn-primary-after {
+      margin-left: auto;
+      background: var(--text-ink);
+      color: white;
+      border: none;
+      padding: 0.55rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    /* ─── Sidebar content simulation ─── */
+    .sidebar-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .filter-group-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .filter-pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      list-style: none;
+    }
+    .filter-pill {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid var(--border-hairline);
+      color: var(--text-muted);
+      border-radius: 1px;
+    }
+    .filter-pill.active {
+      background: var(--accent-manuscript);
+      color: white;
+      border-color: var(--accent-manuscript);
+    }
+    .sort-options { display: flex; flex-direction: column; gap: 0.4rem; }
+    .sort-option {
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .sort-option.active { color: var(--text-ink); font-weight: 600; }
+    .radio-dot {
+      width: 12px; height: 12px;
+      border: 1.5px solid var(--border-hairline);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .radio-dot.active { border-color: var(--accent-manuscript); background: var(--accent-manuscript); }
+
+    /* content placeholder */
+    .content-placeholder {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding-top: 0.5rem;
+    }
+    .coin-card-ghost {
+      background: var(--stone-pedestal);
+      aspect-ratio: 3/4;
+      border-radius: 2px;
+    }
+    .subtitle-text {
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── annotation ─── */
+    .annotation-block {
+      max-width: 1300px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .annotation {
+      background: white;
+      border: 1px solid var(--border-hairline);
+      padding: 1.5rem;
+    }
+    .annotation h4 {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-manuscript);
+      margin-bottom: 0.75rem;
+    }
+    .annotation ul {
+      padding-left: 1rem;
+      font-size: 0.82rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    @media (max-width: 900px) {
+      .curator-brief, .annotation-block { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Curator Brief ─── -->
+  <section class="curator-brief">
+    <div class="brief-main">
+      <span class="tag">Case B · Refinement Proposal · 2026-04-08</span>
+      <h1>Cabinet Toolbar &amp; Sidebar Toggle: Coherence &amp; Clarity</h1>
+      <p class="rationale">
+        The Ledger's top bar carries four distinct visual languages — ghost text link, icon toggle,
+        outlined button, solid CTA — creating noise where there should be hierarchy.
+        The sidebar collapse offers no affordance in its closed state: a lone chevron
+        in a 44px strip reveals nothing of what lies behind it.
+        This refinement unifies the toolbar into a three-zone grammar and restores
+        legibility to the hidden-filter state.
+      </p>
+      <ul class="changes-list">
+        <li>Remove "CUSTOMIZE DISPLAY" as a standalone labelled text-link button</li>
+        <li>Absorb display customisation into the view-toggle group as a third icon button (columns icon)</li>
+        <li>Normalise TOOLS ▾ border to <code>--border-hairline</code> (resting state); Sienna only on hover/active</li>
+        <li>Three-zone toolbar: [display controls] / [tools] / [→ primary CTA]</li>
+        <li>Collapsed sidebar: add rotated "FILTERS" vertical label so the strip reads on first glance</li>
+      </ul>
+    </div>
+    <div class="brief-audit">
+      <h3>Curatorial Audit</h3>
+      <ul class="audit-list">
+        <li class="audit-item">
+          <strong>Visual Language</strong>
+          <p>Current: 4 distinct button treatments in one row. Proposed: 2 treatments — icon-group for display + outlined text for tools — with a clear primary CTA separated by auto-margin.</p>
+        </li>
+        <li class="audit-item">
+          <strong>Affordance (Sidebar)</strong>
+          <p>A bare chevron fails the "zero context" test. The vertical "FILTERS" label costs 0 px of layout space and instantly communicates what is hidden. No hover required.</p>
+        </li>
+        <li class="audit-item">
+          <strong>Interaction Feel</strong>
+          <p>The TOOLS button's Sienna border in its resting state competes with the primary CTA. Demoting it to hairline resting state preserves the accent colour for true active/hover feedback.</p>
+        </li>
+        <li class="audit-item">
+          <strong>Touch Targets</strong>
+          <p>All icon buttons remain at ≥ 44px touch target. Vertical FILTERS label inherits full strip height click area — no accessibility regression.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!--  BEFORE                                           -->
+  <!-- ══════════════════════════════════════════════════ -->
+
+  <div class="scenario-label">
+    <h2>Current State</h2>
+    <span class="badge before">Before</span>
+  </div>
+
+  <!-- BEFORE: Sidebar OPEN -->
+  <div class="browser-frame">
+    <div class="frame-header">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="address-bar">patina://cabinet — sidebar open</div>
+    </div>
+    <div class="frame-content">
+      <header class="app-header">
+        <h1>Patina — The Cabinet</h1>
+        <span class="version-tag">Archive V1.0 // The Display Case</span>
+      </header>
+      <div class="app-layout">
+        <!-- sidebar open -->
+        <div class="patina-sidebar-before">
+          <button class="btn-sidebar-toggle-before">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3L6 8l4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Hide Filters</span>
+          </button>
+          <div class="sidebar-body">
+            <div>
+              <span class="filter-group-label">Order By</span>
+              <div class="sort-options">
+                <div class="sort-option active"><span class="radio-dot active"></span> Year</div>
+                <div class="sort-option"><span class="radio-dot"></span> Title</div>
+                <div class="sort-option"><span class="radio-dot"></span> Acquired</div>
+              </div>
+            </div>
+            <div>
+              <span class="filter-group-label">Metal</span>
+              <ul class="filter-pill-list">
+                <li class="filter-pill active">Silver</li>
+                <li class="filter-pill">Gold</li>
+                <li class="filter-pill">Bronze</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- main -->
+        <div class="app-main">
+          <div class="cabinet-toolbar-before">
+            <button class="btn-customize-before">Customize Display</button>
+            <div class="view-toggle-before">
+              <button class="btn-view-before active">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="1" y="1" width="6" height="6" rx="1"/>
+                  <rect x="9" y="1" width="6" height="6" rx="1"/>
+                  <rect x="1" y="9" width="6" height="6" rx="1"/>
+                  <rect x="9" y="9" width="6" height="6" rx="1"/>
+                </svg>
+              </button>
+              <button class="btn-view-before">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="1" y="2" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="2" width="9" height="3" rx="0.5"/>
+                  <rect x="1" y="7" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="7" width="9" height="3" rx="0.5"/>
+                  <rect x="1" y="12" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="12" width="9" height="3" rx="0.5"/>
+                </svg>
+              </button>
+            </div>
+            <button class="btn-tools-before">Tools ▾</button>
+            <button class="btn-primary-before">+ New Entry</button>
+          </div>
+          <p class="subtitle-text">16 objects in the ledger.</p>
+          <div class="content-placeholder">
+            <div class="coin-card-ghost"></div>
+            <div class="coin-card-ghost"></div>
+            <div class="coin-card-ghost"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEFORE: Sidebar COLLAPSED -->
+  <div class="browser-frame">
+    <div class="frame-header">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="address-bar">patina://cabinet — sidebar collapsed</div>
+    </div>
+    <div class="frame-content">
+      <header class="app-header">
+        <h1>Patina — The Cabinet</h1>
+        <span class="version-tag">Archive V1.0 // The Display Case</span>
+      </header>
+      <div class="app-layout">
+        <!-- collapsed sidebar — current: just a chevron -->
+        <div class="patina-sidebar-before collapsed">
+          <button class="btn-sidebar-toggle-before collapsed">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="transform:rotate(180deg)">
+              <path d="M10 3L6 8l4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <!-- main -->
+        <div class="app-main">
+          <div class="cabinet-toolbar-before">
+            <button class="btn-customize-before">Customize Display</button>
+            <div class="view-toggle-before">
+              <button class="btn-view-before active">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="1" y="1" width="6" height="6" rx="1"/>
+                  <rect x="9" y="1" width="6" height="6" rx="1"/>
+                  <rect x="1" y="9" width="6" height="6" rx="1"/>
+                  <rect x="9" y="9" width="6" height="6" rx="1"/>
+                </svg>
+              </button>
+              <button class="btn-view-before">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="1" y="2" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="2" width="9" height="3" rx="0.5"/>
+                  <rect x="1" y="7" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="7" width="9" height="3" rx="0.5"/>
+                  <rect x="1" y="12" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="12" width="9" height="3" rx="0.5"/>
+                </svg>
+              </button>
+            </div>
+            <button class="btn-tools-before">Tools ▾</button>
+            <button class="btn-primary-before">+ New Entry</button>
+          </div>
+          <p class="subtitle-text">16 objects in the ledger.</p>
+          <div class="content-placeholder">
+            <div class="coin-card-ghost"></div>
+            <div class="coin-card-ghost"></div>
+            <div class="coin-card-ghost"></div>
+            <div class="coin-card-ghost"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!--  AFTER                                            -->
+  <!-- ══════════════════════════════════════════════════ -->
+
+  <div class="scenario-label">
+    <h2>Proposed Refinement</h2>
+    <span class="badge after">After</span>
+  </div>
+
+  <!-- AFTER: Sidebar OPEN -->
+  <div class="browser-frame">
+    <div class="frame-header">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="address-bar">patina://cabinet — sidebar open</div>
+    </div>
+    <div class="frame-content">
+      <header class="app-header">
+        <h1>Patina — The Cabinet</h1>
+        <span class="version-tag">Archive V1.0 // The Display Case</span>
+      </header>
+      <div class="app-layout">
+        <!-- sidebar open -->
+        <div class="patina-sidebar-after">
+          <button class="btn-sidebar-toggle-after">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3L6 8l4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Hide Filters</span>
+          </button>
+          <div class="sidebar-body">
+            <div>
+              <span class="filter-group-label">Order By</span>
+              <div class="sort-options">
+                <div class="sort-option active"><span class="radio-dot active"></span> Year</div>
+                <div class="sort-option"><span class="radio-dot"></span> Title</div>
+                <div class="sort-option"><span class="radio-dot"></span> Acquired</div>
+              </div>
+            </div>
+            <div>
+              <span class="filter-group-label">Metal</span>
+              <ul class="filter-pill-list">
+                <li class="filter-pill active">Silver</li>
+                <li class="filter-pill">Gold</li>
+                <li class="filter-pill">Bronze</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- main: PROPOSED TOOLBAR -->
+        <div class="app-main">
+          <div class="cabinet-toolbar-after">
+            <!-- Unified display group: Grid | List | Columns (was "Customize Display") -->
+            <div class="view-toggle-after" role="group" aria-label="Display controls">
+              <button class="btn-view-after active" title="Grid view" aria-pressed="true">
+                <!-- Grid icon -->
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="1" y="1" width="6" height="6" rx="1"/>
+                  <rect x="9" y="1" width="6" height="6" rx="1"/>
+                  <rect x="1" y="9" width="6" height="6" rx="1"/>
+                  <rect x="9" y="9" width="6" height="6" rx="1"/>
+                </svg>
+              </button>
+              <button class="btn-view-after" title="List view" aria-pressed="false">
+                <!-- List icon -->
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="1" y="2" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="2" width="9" height="3" rx="0.5"/>
+                  <rect x="1" y="7" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="7" width="9" height="3" rx="0.5"/>
+                  <rect x="1" y="12" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="12" width="9" height="3" rx="0.5"/>
+                </svg>
+              </button>
+              <button class="btn-view-after" title="Customize display" aria-label="Customize display fields">
+                <!-- Columns / sliders icon -->
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="1" y="1" width="4" height="14" rx="1"/>
+                  <rect x="6" y="1" width="4" height="14" rx="1"/>
+                  <rect x="11" y="1" width="4" height="14" rx="1"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="toolbar-divider"></div>
+
+            <button class="btn-tools-after">Tools ▾</button>
+            <button class="btn-primary-after">+ New Entry</button>
+          </div>
+          <p class="subtitle-text">16 objects in the ledger.</p>
+          <div class="content-placeholder">
+            <div class="coin-card-ghost"></div>
+            <div class="coin-card-ghost"></div>
+            <div class="coin-card-ghost"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFTER: Sidebar COLLAPSED -->
+  <div class="browser-frame">
+    <div class="frame-header">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="address-bar">patina://cabinet — sidebar collapsed</div>
+    </div>
+    <div class="frame-content">
+      <header class="app-header">
+        <h1>Patina — The Cabinet</h1>
+        <span class="version-tag">Archive V1.0 // The Display Case</span>
+      </header>
+      <div class="app-layout">
+        <!-- collapsed sidebar: PROPOSED — chevron + rotated FILTERS label -->
+        <div class="patina-sidebar-after collapsed">
+          <button class="btn-sidebar-toggle-after" aria-label="Show filters" aria-expanded="false">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="transform:rotate(180deg)">
+              <path d="M10 3L6 8l4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="sidebar-toggle-label-vertical">Filters</span>
+          </button>
+        </div>
+        <!-- main -->
+        <div class="app-main">
+          <div class="cabinet-toolbar-after">
+            <div class="view-toggle-after" role="group">
+              <button class="btn-view-after active" aria-pressed="true">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="1" y="1" width="6" height="6" rx="1"/>
+                  <rect x="9" y="1" width="6" height="6" rx="1"/>
+                  <rect x="1" y="9" width="6" height="6" rx="1"/>
+                  <rect x="9" y="9" width="6" height="6" rx="1"/>
+                </svg>
+              </button>
+              <button class="btn-view-after" aria-pressed="false">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="1" y="2" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="2" width="9" height="3" rx="0.5"/>
+                  <rect x="1" y="7" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="7" width="9" height="3" rx="0.5"/>
+                  <rect x="1" y="12" width="3" height="3" rx="0.5"/>
+                  <rect x="6" y="12" width="9" height="3" rx="0.5"/>
+                </svg>
+              </button>
+              <button class="btn-view-after">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="1" y="1" width="4" height="14" rx="1"/>
+                  <rect x="6" y="1" width="4" height="14" rx="1"/>
+                  <rect x="11" y="1" width="4" height="14" rx="1"/>
+                </svg>
+              </button>
+            </div>
+            <div class="toolbar-divider"></div>
+            <button class="btn-tools-after">Tools ▾</button>
+            <button class="btn-primary-after">+ New Entry</button>
+          </div>
+          <p class="subtitle-text">16 objects in the ledger.</p>
+          <div class="content-placeholder">
+            <div class="coin-card-ghost"></div>
+            <div class="coin-card-ghost"></div>
+            <div class="coin-card-ghost"></div>
+            <div class="coin-card-ghost"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Annotation ─── -->
+  <div class="annotation-block">
+    <div class="annotation">
+      <h4>Toolbar: What Changed &amp; Why</h4>
+      <ul>
+        <li><strong>"CUSTOMIZE DISPLAY"</strong> removed as a standalone text-link. The bare underline style was visually ambiguous — it looked more like a section label than an interactive button, and positioned left of the view toggle, it read as a descriptor for those icons rather than its own action.</li>
+        <li>A <strong>columns icon</strong> (three vertical bars) replaces it as the third button in the view-toggle group. Conceptually coherent: all three icons now govern "how you see the data." The action is still one click away.</li>
+        <li><strong>TOOLS ▾</strong> resting border drops to <code>--border-hairline</code>. Sienna is reserved for hover/active — the same contract already used by <code>btn-view-mode</code>. This removes the colour competition with <code>+ NEW ENTRY</code>.</li>
+        <li>A <strong>hairline divider</strong> separates the icon group from TOOLS, establishing the three-zone grammar without adding visual weight.</li>
+      </ul>
+    </div>
+    <div class="annotation">
+      <h4>Sidebar Toggle: What Changed &amp; Why</h4>
+      <ul>
+        <li>In the collapsed state, a <strong>rotated "FILTERS" label</strong> runs the height of the strip below the chevron. Zero layout cost — it fits within the existing 44px width. No hover interaction required to understand the affordance.</li>
+        <li>The same <code>writing-mode: vertical-rl</code> + <code>rotate(180deg)</code> pattern is established CSS — no new primitives needed. Label inherits the button's existing mono/uppercase/muted-colour treatment.</li>
+        <li>The chevron itself flips to point right in the collapsed state (already implemented via <code>rotate(180deg)</code> on the SVG). Combined with "FILTERS", the strip now reads: <em>"expand → to see filters."</em></li>
+        <li>The full strip remains the click target (44px × full height), satisfying the WCAG 2.5.5 touch target mandate without any change to the component's outer dimensions.</li>
+      </ul>
+    </div>
+  </div>
+
+</body>
+</html>

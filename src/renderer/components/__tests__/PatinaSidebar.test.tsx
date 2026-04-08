@@ -235,4 +235,16 @@ describe('PatinaSidebar', () => {
     expect(screen.queryByText('Metals')).toBeNull();
     expect(screen.queryByText('Grade')).toBeNull();
   });
+
+  // ── CAB-D: Sidebar Collapsed Affordance ────────────────────────────────────
+
+  it('TC-CAB-D-04: vertical FILTERS label renders when isOpen=false', () => {
+    const { container } = render(<PatinaSidebar {...defaultProps} isOpen={false} />);
+    expect(container.querySelector('.btn-sidebar-toggle-label-vertical')).toBeInTheDocument();
+  });
+
+  it('TC-CAB-D-05: vertical FILTERS label is absent when isOpen=true', () => {
+    const { container } = render(<PatinaSidebar {...defaultProps} isOpen={true} />);
+    expect(container.querySelector('.btn-sidebar-toggle-label-vertical')).not.toBeInTheDocument();
+  });
 });

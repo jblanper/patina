@@ -20,6 +20,7 @@
     "language": "Language",
     "collapse": "Hide filters",
     "expand": "Show filters",
+    "filtersLabel": "Filters",
     "ariaFilter": {
       "era":   "Filter by {{value}} era",
       "metal": "Filter by {{value}} metal",

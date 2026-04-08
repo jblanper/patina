@@ -6,6 +6,7 @@ import { app } from 'electron';
 import { Coin, CoinImage } from '../../common/types';
 import { dbService } from '../db';
 import { exportCsvField } from '../../common/validation';
+import { CSV_HEADERS } from '../../common/csv';
 
 const isDev = !app.isPackaged;
 const imageRoot = isDev
@@ -21,13 +22,6 @@ interface ExportResult {
   path?: string;
   error?: string;
 }
-
-const CSV_HEADERS = [
-  'id', 'title', 'issuer', 'denomination', 'year_display', 'year_numeric', 'era', 'mint', 'metal',
-  'fineness', 'weight', 'diameter', 'die_axis', 'obverse_legend', 'obverse_desc', 'reverse_legend',
-  'reverse_desc', 'edge_desc', 'catalog_ref', 'rarity', 'grade', 'provenance', 'story',
-  'purchase_price', 'purchase_date', 'purchase_source', 'created_at', 'obverse_image', 'reverse_image', 'edge_image'
-];
 
 interface CoinImages {
   obverse?: string;

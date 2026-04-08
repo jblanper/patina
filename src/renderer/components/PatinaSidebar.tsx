@@ -121,6 +121,7 @@ export const PatinaSidebar: React.FC<PatinaSidebarProps> = ({
           <path d="M10 3L6 8l4 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         {isOpen && <span className="btn-sidebar-toggle-label">{t('sidebar.collapse')}</span>}
+        {!isOpen && <span className="btn-sidebar-toggle-label-vertical">{t('sidebar.filtersLabel')}</span>}
       </button>
 
       {isOpen && <>

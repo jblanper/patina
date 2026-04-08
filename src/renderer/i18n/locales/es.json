@@ -20,6 +20,7 @@
     "language": "Idioma",
     "collapse": "Ocultar filtros",
     "expand": "Mostrar filtros",
+    "filtersLabel": "Filtros",
     "ariaFilter": {
       "era":   "Filtrar por época {{value}}",
       "metal": "Filtrar por metal {{value}}",
