@@ -1,3 +1,13 @@
+## v1.3.0 — 2026-04-08
+
+### Features
+- toolbar coherence & sidebar collapsed affordance
+
+### Fixes
+- remove CSV import, fix ZIP image attachment bug
+
+---
+
 ## v1.2.0 — 2026-04-07
 
 ### Features
