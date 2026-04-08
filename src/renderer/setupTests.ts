@@ -65,4 +65,13 @@ window.electronAPI = {
   prefsSetVisibility: vi.fn().mockResolvedValue(undefined),
   prefsResetVisibility: vi.fn().mockResolvedValue({ ...DEFAULT_FIELD_VISIBILITY }),
   importImageFromFile: vi.fn().mockResolvedValue(null),
+
+  // Coin Import API stubs
+  importZipPreview: vi.fn().mockResolvedValue({
+    coinCount: 0, hasImages: false, exportDate: '', appVersion: '',
+  }),
+  importZipExecute: vi.fn().mockResolvedValue({
+    imported: 0, skipped: 0, duplicates: [], errors: [],
+  }),
+  importCancel: vi.fn().mockResolvedValue(undefined),
 };

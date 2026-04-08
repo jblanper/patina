@@ -30,6 +30,7 @@
     "header": "Patina — The Cabinet",
     "tagline": "Archive v1.0 // THE DISPLAY CASE",
     "exportArchive": "Export Archive",
+    "importCoins": "Import...",
     "generateCatalog": "Generate Catalog",
     "newEntry": "+ New Entry",
     "loading": "Synchronizing with the local archive...",
@@ -296,5 +297,19 @@
   },
   "lens": {
     "scanPrompt": "Scan with your mobile device\nto capture an image."
+  },
+  "import": {
+    "title": "Import Coins",
+    "stepN": "Step {{n}} of {{total}}",
+    "fromZip": "From Patina Archive (ZIP)",
+    "skipDuplicates": "Skip potential duplicates automatically",
+    "reviewDuplicates": "Review potential duplicates",
+    "confirmButton": "Import",
+    "result": "Import complete",
+    "resultSummary": "Imported {{imported}} · Skipped {{skipped}} · Errors {{errors}}",
+    "invalidZip": "This file does not appear to be a Patina archive",
+    "newIdsAssigned": "New record IDs were assigned to all imported coins",
+    "showErrors": "Show details",
+    "duplicate": "[Row {{row}}] {{title}} — likely matches existing coin \"{{existing}}\" (id: {{id}})"
   }
 }

@@ -5,9 +5,10 @@ import { dbService } from './db';
 import { createLensServer } from './server';
 import { getLocalIp } from './ip';
 import { NewCoin, NewCoinImage } from '../common/types';
-import { ExportOptionsSchema, PdfExportOptionsSchema, VocabGetSchema, VocabAddSchema, VocabSearchSchema, VocabIncrementSchema, VocabResetSchema, PreferenceGetSchema, PreferenceSetSchema, SetVisibilitySchema, LOCKED_VISIBILITY_KEYS } from '../common/validation';
+import { ExportOptionsSchema, PdfExportOptionsSchema, VocabGetSchema, VocabAddSchema, VocabSearchSchema, VocabIncrementSchema, VocabResetSchema, PreferenceGetSchema, PreferenceSetSchema, SetVisibilitySchema, LOCKED_VISIBILITY_KEYS, ZipExecuteSchema } from '../common/validation';
 import { exportToZip } from './export/zip';
 import { exportToPdf } from './export/pdf';
+import { previewZip, processZipImport } from './import/zip';
 
 function validateExportOptions(data: unknown) {
   const result = ExportOptionsSchema.safeParse(data);
@@ -24,6 +25,10 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 let lensServer: ReturnType<typeof createLensServer> | null = null;
+
+// Two-phase import: stagedZipPath is set by import:zipPreview and consumed by import:zipExecute.
+// Cleared in a finally block after execute, or by import:cancel.
+let stagedZipPath: string | null = null;
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -277,6 +282,32 @@ app.whenReady().then(() => {
     await fs.promises.copyFile(path.resolve(sourcePath), destPath);
 
     return path.join('coins', uniqueName);
+  });
+
+  // Coin Import IPC Handlers (two-phase: preview → execute)
+  ipcMain.handle('import:zipPreview', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: 'Import Patina Archive',
+      properties: ['openFile'],
+      filters: [{ name: 'ZIP Archive', extensions: ['zip'] }],
+    });
+    if (canceled || !filePaths[0]) return { cancelled: true };
+    stagedZipPath = filePaths[0];
+    return previewZip(stagedZipPath);
+  });
+
+  ipcMain.handle('import:zipExecute', async (_, data: unknown) => {
+    const options = validateIpc(ZipExecuteSchema, data);
+    try {
+      if (!stagedZipPath) throw new Error('No staged ZIP path');
+      return await processZipImport(stagedZipPath, options, imageRoot);
+    } finally {
+      stagedZipPath = null;
+    }
+  });
+
+  ipcMain.handle('import:cancel', () => {
+    stagedZipPath = null;
   });
 
   ipcMain.handle('ping', () => 'pong');

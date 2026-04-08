@@ -122,7 +122,7 @@ export const VocabAddSchema = z.object({
     .min(1, 'Vocabulary value cannot be empty')
     .max(200, 'Vocabulary value must be 200 characters or fewer')
     .regex(
-      /^[\p{L}\p{N}\s\-'().,:&]+$/u,
+      /^[\p{L}\p{N}\s\-'().,:&/]+$/u,
       'Value contains disallowed characters',
     ),
   locale: z.string().length(2).regex(/^[a-z]{2}$/).optional().default('en'),
@@ -225,6 +225,16 @@ export const PdfExportOptionsSchema = z.object({
   coinIds: z.array(z.number().int().positive()).max(5000).optional(),
 }).strict();
 export type PdfExportOptions = z.infer<typeof PdfExportOptionsSchema>;
+
+/**
+ * Import Schemas
+ */
+export const ZipExecuteSchema = z.object({
+  locale: z.enum(['en', 'es']).default('es'),
+  skipDuplicates: z.boolean().default(false),
+}).strict();
+
+export type ZipExecuteOptions = z.infer<typeof ZipExecuteSchema>;
 
 /**
  * CSV field escaping to prevent formula injection

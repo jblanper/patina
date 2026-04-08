@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { NewCoin, NewCoinImage } from '../common/types';
-import type { VocabField } from '../common/validation';
+import type { VocabField, ZipExecuteOptions } from '../common/validation';
+import type { ZipPreviewResult, ZipImportResult } from './import/zip';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   ping: () => ipcRenderer.invoke('ping'),
@@ -63,4 +64,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Image Import API
   importImageFromFile: (): Promise<string | null> =>
     ipcRenderer.invoke('image:importFromFile'),
+
+  // Coin Import API (two-phase: preview → execute)
+  importZipPreview: (): Promise<ZipPreviewResult | { cancelled: true } | { error: string }> =>
+    ipcRenderer.invoke('import:zipPreview'),
+
+  importZipExecute: (options: ZipExecuteOptions): Promise<ZipImportResult> =>
+    ipcRenderer.invoke('import:zipExecute', options),
+
+  importCancel: (): Promise<void> =>
+    ipcRenderer.invoke('import:cancel'),
 });

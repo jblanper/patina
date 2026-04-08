@@ -17,6 +17,7 @@ import {
   SetVisibilitySchema,
   LOCKED_VISIBILITY_KEYS,
   DEFAULT_FIELD_VISIBILITY,
+  ZipExecuteSchema,
 } from '../validation';
 
 describe('validation.ts', () => {
@@ -771,5 +772,35 @@ describe('VocabResetSchema', () => {
       expect(DEFAULT_FIELD_VISIBILITY['ledger.denomination']).toBe(true);
       expect(DEFAULT_FIELD_VISIBILITY['ledger.year']).toBe(true);
     });
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// Import Schemas
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('ZipExecuteSchema', () => {
+  it('TC-VAL-ZIP-EXEC-01: accepts valid input', () => {
+    const result = ZipExecuteSchema.safeParse({ locale: 'en', skipDuplicates: true });
+    expect(result.success).toBe(true);
+  });
+
+  it('TC-VAL-ZIP-EXEC-02: defaults locale to "es" and skipDuplicates to false', () => {
+    const result = ZipExecuteSchema.safeParse({});
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.locale).toBe('es');
+      expect(result.data.skipDuplicates).toBe(false);
+    }
+  });
+
+  it('TC-VAL-ZIP-EXEC-03: rejects extra top-level key (.strict())', () => {
+    const result = ZipExecuteSchema.safeParse({ extra: 'field' });
+    expect(result.success).toBe(false);
+  });
+
+  it('TC-VAL-ZIP-EXEC-04: rejects invalid locale', () => {
+    const result = ZipExecuteSchema.safeParse({ locale: 'de' });
+    expect(result.success).toBe(false);
   });
 });

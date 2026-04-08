@@ -1,5 +1,6 @@
 import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage, FieldVisibilityMap } from '../common/types';
-import type { VocabField } from '../common/validation';
+import type { VocabField, ZipExecuteOptions } from '../common/validation';
+import type { ZipPreviewResult, ZipImportResult } from '../main/import/zip';
 
 export interface IElectronAPI {
   ping: () => Promise<string>;
@@ -42,6 +43,11 @@ export interface IElectronAPI {
 
   // Image Import API
   importImageFromFile: () => Promise<string | null>;
+
+  // Coin Import API (two-phase: preview → execute)
+  importZipPreview: () => Promise<ZipPreviewResult | { cancelled: true } | { error: string }>;
+  importZipExecute: (options: ZipExecuteOptions) => Promise<ZipImportResult>;
+  importCancel: () => Promise<void>;
 }
 
 declare global {

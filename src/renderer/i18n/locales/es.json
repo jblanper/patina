@@ -30,6 +30,7 @@
     "header": "Patina — El Gabinete",
     "tagline": "Archivo v1.0 // LA VITRINA",
     "exportArchive": "Exportar Archivo",
+    "importCoins": "Importar...",
     "generateCatalog": "Generar Catálogo",
     "newEntry": "+ Nueva Entrada",
     "loading": "Sincronizando con el archivo local...",
@@ -296,5 +297,19 @@
   },
   "lens": {
     "scanPrompt": "Escanea con tu móvil\npara capturar una imagen."
+  },
+  "import": {
+    "title": "Importar Monedas",
+    "stepN": "Paso {{n}} de {{total}}",
+    "fromZip": "Desde archivo Patina (ZIP)",
+    "skipDuplicates": "Omitir duplicados potenciales automáticamente",
+    "reviewDuplicates": "Revisar duplicados potenciales",
+    "confirmButton": "Importar",
+    "result": "Importación completada",
+    "resultSummary": "Importadas {{imported}} · Omitidas {{skipped}} · Errores {{errors}}",
+    "invalidZip": "Este archivo no parece ser un archivo Patina",
+    "newIdsAssigned": "Se asignaron nuevos IDs de registro a todas las monedas importadas",
+    "showErrors": "Mostrar detalles",
+    "duplicate": "[Fila {{row}}] {{title}} — posiblemente coincide con moneda existente \"{{existing}}\" (id: {{id}})"
   }
 }
