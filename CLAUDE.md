@@ -87,6 +87,8 @@ All IPC/DB state in custom hooks: `useCoins`, `useCoin`, `useCoinForm`, `useExpo
 
 **Lens testing:** `supertest` against `createApp()` factory from `src/main/server.ts`.
 
+**Main process logging:** All IPC handlers use `timedHandler(logger, channel, fn)` from `src/main/ipc-utils.ts`. This emits `ipc:call` (debug) on success with duration, or `ipc:error` (error) on throw. The logger is a pino singleton; when mocking it in tests, use `vi.hoisted()` to ensure the variable is available in `vi.mock()` factories. For native modules (e.g., `better-sqlite3`), use regular-function stubs (`vi.fn(function Stub() { ... })`) — arrow functions cannot serve as constructors.
+
 **i18n parity:** `src/renderer/i18n/__tests__/translations.test.ts` enforces key parity between locales. Add new keys to both `en.json` and `es.json`.
 
 ## Styling Rules

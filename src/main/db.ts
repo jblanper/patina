@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { app } from 'electron';
 import { z } from 'zod';
+import { logger } from './logger';
 import { Coin, CoinImage, NewCoin, NewCoinImage, CoinWithPrimaryImage, FieldVisibilityMap } from '../common/types';
 import { NewCoinSchema, NewCoinImageSchema, ALLOWED_VOCAB_FIELDS, VocabField, ALLOWED_VISIBILITY_KEYS, DEFAULT_FIELD_VISIBILITY, VisibilityKey } from '../common/validation';
 
@@ -179,6 +180,7 @@ if (!fs.existsSync(path.dirname(dbPath))) {
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
+logger.info({ file: path.basename(dbPath) }, 'db:open');
 
 // Initialize tables
 db.exec(generateSQL(SCHEMA));
@@ -227,7 +229,9 @@ export const dbService = {
     const values = Object.values(validated);
     
     const info = db.prepare(`INSERT INTO coins (${columns}) VALUES (${placeholders})`).run(...values);
-    return info.lastInsertRowid as number;
+    const id = info.lastInsertRowid as number;
+    logger.debug({ op: 'insert', table: 'coins', id }, 'db:query');
+    return id;
   },
 
   updateCoin: (id: number, coin: Partial<NewCoin>): boolean => {
@@ -241,6 +245,7 @@ export const dbService = {
     const values = [...Object.values(validated), id];
     
     const info = db.prepare(`UPDATE coins SET ${updates} WHERE id = ?`).run(...values);
+    if (info.changes > 0) logger.debug({ op: 'update', table: 'coins', id }, 'db:query');
     return info.changes > 0;
   },
 
@@ -250,8 +255,9 @@ export const dbService = {
     const images = db.prepare('SELECT path FROM images WHERE coin_id = ?').all(id) as { path: string }[];
     
     const info = db.prepare('DELETE FROM coins WHERE id = ?').run(id);
-    
+
     if (info.changes > 0) {
+      logger.debug({ op: 'delete', table: 'coins', id }, 'db:query');
       images.forEach(img => {
         const fullPath = path.join(imageRoot, img.path);
         try {
@@ -259,11 +265,11 @@ export const dbService = {
             fs.unlinkSync(fullPath);
           }
         } catch (err) {
-          console.error(`Failed to delete image file: ${fullPath}`, err);
+          logger.error({ message: (err as Error).message }, 'db:imageDeleteFailed');
         }
       });
     }
-    
+
     return info.changes > 0;
   },
 
@@ -276,7 +282,9 @@ export const dbService = {
       const existing = db.prepare('SELECT id FROM images WHERE coin_id = ? AND path = ?').get(image.coin_id, image.path) as { id: number } | undefined;
       return existing?.id ?? 0;
     }
-    return info.lastInsertRowid as number;
+    const imageId = info.lastInsertRowid as number;
+    logger.debug({ op: 'insert', table: 'coin_images', coinId: image.coin_id }, 'db:query');
+    return imageId;
   },
 
   getImagesByCoinId: (coinId: number): CoinImage[] => {
@@ -287,6 +295,7 @@ export const dbService = {
   deleteImage: (id: number): boolean => {
     validate(idSchema, id);
     const info = db.prepare('DELETE FROM images WHERE id = ?').run(id);
+    if (info.changes > 0) logger.debug({ op: 'delete', table: 'coin_images', id }, 'db:query');
     return info.changes > 0;
   },
 

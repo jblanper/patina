@@ -74,4 +74,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   importCancel: (): Promise<void> =>
     ipcRenderer.invoke('import:cancel'),
+
+  // Logger relay — ErrorBoundary errors only
+  logError: (data: { message: string; stack?: string }): Promise<void> =>
+    ipcRenderer.invoke('log:error', data),
 });

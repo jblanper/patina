@@ -48,6 +48,9 @@ export interface IElectronAPI {
   importZipPreview: () => Promise<ZipPreviewResult | { cancelled: true } | { error: string }>;
   importZipExecute: (options: ZipExecuteOptions) => Promise<ZipImportResult>;
   importCancel: () => Promise<void>;
+
+  // Logger relay
+  logError: (data: { message: string; stack?: string }) => Promise<void>;
 }
 
 declare global {

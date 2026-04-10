@@ -34,10 +34,16 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   );
 }
 
-export function ErrorBoundary({ children }: { children: React.ReactNode }) {
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  onError?: (error: unknown, info: { componentStack?: string | null }) => void;
+}
+
+export function ErrorBoundary({ children, onError }: ErrorBoundaryProps) {
   return (
     <ReactErrorBoundary
       FallbackComponent={ErrorFallback}
+      onError={onError}
       onReset={() => {
         // Scoped recovery - reset error boundary state without full page reload
       }}

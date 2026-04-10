@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import path from 'path';
 import fs from 'fs';
 import { app } from 'electron'; // For user data path
+import { logger } from './logger';
 
 // Types
 interface ServerConfig {
@@ -72,6 +73,20 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
   });
   expressApp.use(limiter);
 
+  // Request logging middleware
+  expressApp.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+      logger.debug({
+        method: req.method,
+        path: req.path,
+        statusCode: res.statusCode,
+        durationMs: Date.now() - start,
+      }, 'lens:request');
+    });
+    next();
+  });
+
   // Security Headers (CSP Mandate)
   expressApp.use((req, res, next) => {
     res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com");
@@ -114,6 +129,7 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
       if (ALLOWED_MIMES.has(file.mimetype)) {
         cb(null, true);
       } else {
+        logger.warn({ mime: file.mimetype }, 'lens:mimeRejected');
         const err = new Error(s.mimeError);
         cb(err as unknown as null, false);
       }
@@ -129,6 +145,7 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
 
   expressApp.get('/lens/:token', (req: Request, res: Response) => {
     if (req.params.token !== activeToken) {
+      logger.warn({ reason: 'invalid_token' }, 'lens:authFail');
       return res.status(403).send(s.invalidSession);
     }
 
@@ -252,6 +269,7 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
 
   expressApp.post('/lens/:token/upload', upload.single('image'), (req: Request, res: Response) => {
     if (req.params.token !== activeToken) {
+      logger.warn({ reason: 'invalid_token' }, 'lens:authFail');
       return res.status(403).send(s.invalidSession);
     }
     if (!req.file) {
@@ -264,10 +282,12 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
       : app.getPath('userData');
     const relativePath = path.relative(baseDir, req.file.path);
     
+    logger.info({ mime: req.file.mimetype, sizeBytes: req.file.size }, 'lens:upload');
+
     if (config.onUpload) {
       config.onUpload(relativePath);
     }
-    
+
     res.status(200).send(s.uploadOk);
   });
 
@@ -281,13 +301,8 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
           if (typeof address === 'object' && address !== null) {
              const port = address.port;
              activeToken = uuidv4();
-             
-             // Import getLocalIp dynamically or use loopback for dev if needed
-             // For now, we assume this runs in Main process context where we can use require/import
-             // But we need to pass the IP back.
-             // We'll rely on the caller (main/index.ts) to get the IP using src/main/ip.ts
-             
              server = listener;
+             logger.info({ port }, 'lens:start');
              resolve({ port, token: activeToken, url: '' }); // URL constructed by caller
           } else {
             reject(new Error('Failed to get server address'));
@@ -300,6 +315,7 @@ export function createLensServer(config: ServerConfig = {}): ServerInstance {
         server.close();
         server = null;
         activeToken = null;
+        logger.info('lens:stop');
       }
     }
   };

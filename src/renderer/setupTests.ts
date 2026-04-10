@@ -37,8 +37,8 @@ vi.mock('react-i18next', () => ({
   Trans: ({ i18nKey }: { i18nKey: string }) => i18nKey,
 }));
 
-// Mock electronAPI
-window.electronAPI = {
+// Mock electronAPI — only available in jsdom (browser) environment
+if (typeof window !== 'undefined') window.electronAPI = {
   ping: vi.fn(),
   getCoins: vi.fn(),
   getCoinById: vi.fn(),
@@ -74,4 +74,5 @@ window.electronAPI = {
     imported: 0, skipped: 0, duplicates: [], errors: [],
   }),
   importCancel: vi.fn().mockResolvedValue(undefined),
-};
+  logError: vi.fn().mockResolvedValue(undefined),
+} as typeof window.electronAPI;
