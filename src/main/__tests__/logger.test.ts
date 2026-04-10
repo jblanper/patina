@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Writable } from 'stream';
+import pino from 'pino';
 
 // Tests cover: dev/prod transport branch selection, log directory creation,
 // privacy (redact), and module structure.
@@ -81,8 +82,6 @@ describe('logger module', () => {
   it('pino redact config prevents sensitive coin fields from appearing in log output', () => {
     // Use a real pino instance (not logger.ts) to verify the redact config works at runtime.
     // This proves the privacy contract: sensitive field values are replaced with [Redacted].
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const pino = require('pino');
     const lines: string[] = [];
     const dest = new Writable({
       write(chunk: Buffer, _encoding: string, cb: () => void) {

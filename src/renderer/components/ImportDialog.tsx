@@ -78,7 +78,6 @@ export const ImportDialog: React.FC<ImportDialogProps> = ({ isOpen, onClose, onI
         setStep('error');
       })
       .finally(() => setIsExecuting(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   // Focus first focusable element when step changes
