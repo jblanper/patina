@@ -1,3 +1,13 @@
+## v1.4.0 — 2026-04-10
+
+### Features
+- implement structured logging system with pino
+
+### Fixes
+- improve test isolation and error handling
+
+---
+
 ## v1.3.0 — 2026-04-08
 
 ### Features
