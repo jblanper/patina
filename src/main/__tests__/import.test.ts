@@ -1,3 +1,4 @@
+// @vitest-environment node
 /**
  * Main-process import tests.
  * Tests the pure async functions directly (no IPC wiring needed).
@@ -12,12 +13,14 @@ import { previewCsv, processCsvImport, parseCsvLine } from '../import/csv';
 import { previewZip, processZipImport } from '../import/zip';
 
 // ── Mock dbService ────────────────────────────────────────────────────────────
-// vi.mock() is hoisted above imports by Vitest, so the mock is in place
-// before the import/csv and import/zip modules resolve their ../db dependency.
-const mockAddCoin = vi.fn().mockReturnValue(1);
-const mockAddImage = vi.fn().mockReturnValue(1);
-const mockAddVocabulary = vi.fn();
-const mockGetCoins = vi.fn().mockReturnValue([]);
+// vi.mock() is hoisted above imports by Vitest. vi.hoisted() runs in the same
+// hoisted scope so the mock variables are available inside the factory.
+const { mockAddCoin, mockAddImage, mockAddVocabulary, mockGetCoins } = vi.hoisted(() => ({
+  mockAddCoin: vi.fn().mockReturnValue(1),
+  mockAddImage: vi.fn().mockReturnValue(1),
+  mockAddVocabulary: vi.fn(),
+  mockGetCoins: vi.fn().mockReturnValue([]),
+}));
 
 vi.mock('../db', () => ({
   dbService: {
@@ -310,6 +313,44 @@ describe('previewZip', () => {
 
 // ── processZipImport ──────────────────────────────────────────────────────────
 
+/**
+ * Creates a minimal valid ZIP with a single STORED (uncompressed) entry whose
+ * name is written verbatim — unlike adm-zip's addFile() which normalises away
+ * traversal sequences like "/../". Use this when a test must exercise the
+ * path-traversal security check in processZipImport.
+ */
+function makeRawZipEntry(entryName: string, data: Buffer): Buffer {
+  const name = Buffer.from(entryName, 'utf-8');
+  let crc = 0xFFFFFFFF;
+  for (const b of data) {
+    crc ^= b;
+    for (let j = 0; j < 8; j++) crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
+  }
+  crc = (crc ^ 0xFFFFFFFF) >>> 0;
+
+  const lh = Buffer.alloc(30 + name.length);
+  lh.writeUInt32LE(0x04034b50, 0); lh.writeUInt16LE(20, 4); lh.writeUInt16LE(0, 6);
+  lh.writeUInt16LE(0, 8); lh.writeUInt16LE(0, 10); lh.writeUInt16LE(0, 12);
+  lh.writeUInt32LE(crc, 14); lh.writeUInt32LE(data.length, 18); lh.writeUInt32LE(data.length, 22);
+  lh.writeUInt16LE(name.length, 26); lh.writeUInt16LE(0, 28); name.copy(lh, 30);
+
+  const cdOff = lh.length + data.length;
+  const cd = Buffer.alloc(46 + name.length);
+  cd.writeUInt32LE(0x02014b50, 0); cd.writeUInt16LE(798, 4); cd.writeUInt16LE(20, 6);
+  cd.writeUInt16LE(0, 8); cd.writeUInt16LE(0, 10); cd.writeUInt16LE(0, 12);
+  cd.writeUInt16LE(0, 14); cd.writeUInt32LE(crc, 16); cd.writeUInt32LE(data.length, 20);
+  cd.writeUInt32LE(data.length, 24); cd.writeUInt16LE(name.length, 28); cd.writeUInt16LE(0, 30);
+  cd.writeUInt16LE(0, 32); cd.writeUInt16LE(0, 34); cd.writeUInt16LE(0, 36);
+  cd.writeUInt32LE(0, 38); cd.writeUInt32LE(0, 42); name.copy(cd, 46);
+
+  const eocd = Buffer.alloc(22);
+  eocd.writeUInt32LE(0x06054b50, 0); eocd.writeUInt16LE(0, 4); eocd.writeUInt16LE(0, 6);
+  eocd.writeUInt16LE(1, 8); eocd.writeUInt16LE(1, 10);
+  eocd.writeUInt32LE(cd.length, 12); eocd.writeUInt32LE(cdOff, 16); eocd.writeUInt16LE(0, 20);
+
+  return Buffer.concat([lh, data, cd, eocd]);
+}
+
 describe('processZipImport', () => {
   it('TC-IMP-ZIP-01: valid Patina ZIP imports coins', async () => {
     const buf = makePatinaZip([{ title: 'Morgan Dollar', era: 'Modern' }]);
@@ -325,15 +366,12 @@ describe('processZipImport', () => {
   });
 
   it('TC-IMP-ZIP-02: image with path traversal (../) rejects the entire import', async () => {
-    const zip = new AdmZip();
-    zip.addFile('manifest.json', Buffer.from(JSON.stringify({
-      app: 'Patina', version: '1.0.0', exportDate: '', coinCount: 0
-    })));
-    zip.addFile('coins.csv', Buffer.from('\uFEFFtitle\n'));
-    // Craft an entry with traversal in the name
-    zip.addFile('images/../../../evil.jpg', Buffer.from('fake'));
+    // adm-zip normalises entry names on addFile() — "images/../../../evil.jpg"
+    // becomes "evil.jpg", so the traversal is invisible to the security check.
+    // We build a raw ZIP binary to preserve the traversal path verbatim.
+    const buf = makeRawZipEntry('images/../../../evil.jpg', Buffer.from('fake'));
     const p = join(tmpDir, `test-traversal-${Date.now()}.zip`);
-    await writeFile(p, zip.toBuffer());
+    await writeFile(p, buf);
     try {
       const result = await processZipImport(p, { locale: 'en', skipDuplicates: false }, tmpDir);
       expect(result.errors).toHaveLength(1);

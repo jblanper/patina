@@ -26,6 +26,7 @@ export default defineConfig({
     include: [
       '**/*.{test,spec}.?(c|m)[jt]s?(x)',
       path.resolve(__dirname, 'src/common/__tests__/**/*.{test,spec}.?(c|m)[jt]s?(x)'),
+      path.resolve(__dirname, 'src/main/__tests__/**/*.{test,spec}.?(c|m)[jt]s?(x)'),
     ],
     coverage: {
       provider: 'v8',

@@ -325,7 +325,13 @@ export async function processCsvImport(
       purchase_source: candidate.purchase_source ?? undefined,
     };
 
-    const newId = dbService.addCoin(newCoin);
+    let newId: number;
+    try {
+      newId = dbService.addCoin(newCoin);
+    } catch (err) {
+      errors.push({ rowIndex, message: err instanceof Error ? err.message : 'Failed to insert coin' });
+      continue;
+    }
     imported.push(rowIndex);
     insertedRowIds.set(rowIndex, newId);
 
