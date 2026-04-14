@@ -1,3 +1,14 @@
+## v1.4.1 — 2026-04-14
+
+### Fixes
+- correct renderer index.html path in packaged builds
+- remove unused eslint-disable directives
+
+### Other
+- ci(release): auto-attach Windows installer to GitHub Release on tag push
+
+---
+
 ## v1.4.0 — 2026-04-10
 
 ### Features

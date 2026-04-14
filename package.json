@@ -1,6 +1,6 @@
 {
   "name": "patina",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Privacy-first desktop application for historical coin collectors",
   "main": "dist/main/main/index.js",
   "scripts": {
